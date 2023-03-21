@@ -3,7 +3,8 @@ const express = require('express');
 
 const router = express.Router();
 
-const {Spot, SpotImage} = require('../../db/models');
+const {Spot, SpotImage, Review} = require('../../db/models');
+const spot = require('../../db/models/spot');
 
 router.get('/', async (req, res, next)=> {
       let spots = await Spot.findAll({include:SpotImage});
@@ -13,16 +14,28 @@ router.get('/', async (req, res, next)=> {
       spots.forEach(spot => out.push(spot.toJSON()));
       out = {Spots: out};
 
-      //find preview image
-      out.Spots.forEach(spot => {
-        spot.SpotImages.forEach(img => {
-            if (img.preview === true){
-                spot.previewImage = img.url;
-            }
-        })
-        delete spot.SpotImages;
-      });
 
+      //find average rating
+      for (let i = 0; i < spots.length; i++){
+          let allReviews = await spots[i].getReviews();
+          let sum = 0;
+          let count = 0;
+          allReviews.forEach(review => {
+              sum += review.stars;
+              count += 1;
+            });
+            out.Spots[i].avgRating = sum / count;
+        }
+
+        //find preview image
+        out.Spots.forEach(spot => {
+          spot.SpotImages.forEach(img => {
+              if (img.preview === true){
+                  spot.previewImage = img.url;
+              }
+          });
+          delete spot.SpotImages;
+        });
 
       return res.json(out);
   });
