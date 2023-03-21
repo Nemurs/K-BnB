@@ -17,7 +17,7 @@ router.get('/', async (req, res, next)=> {
 
       //find average rating
       for (let i = 0; i < spots.length; i++){
-          let allReviews = await spots[i].getReviews();
+          let allReviews = await spots[i].getReviews({attributes:['stars']});
           let sum = 0;
           let count = 0;
           allReviews.forEach(review => {
