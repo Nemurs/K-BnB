@@ -12,8 +12,12 @@ module.exports = (sequelize, DataTypes) => {
       User.hasMany(models.Spot, {foreignKey:'ownerId'});
       User.belongsToMany(models.Spot, {
         through: models.Review
-      })
-      User.hasMany(models.Review, {foreignKey:'userId'})
+      });
+      User.belongsToMany(models.Spot, {
+        through: models.Booking
+      });
+      User.hasMany(models.Review, {foreignKey:'userId'});
+      User.hasMany(models.Booking, {foreignKey:'userId'});
     }
   }
   User.init({
