@@ -9,7 +9,15 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      User.hasMany(models.Spot, {foreignKey:'ownerId'});
+      User.belongsToMany(models.Spot, {
+        through: models.Review
+      });
+      User.belongsToMany(models.Spot, {
+        through: models.Booking
+      });
+      User.hasMany(models.Review, {foreignKey:'userId'});
+      User.hasMany(models.Booking, {foreignKey:'userId'});
     }
   }
   User.init({
