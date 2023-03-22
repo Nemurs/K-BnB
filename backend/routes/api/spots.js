@@ -6,7 +6,7 @@ const { handleValidationErrors } = require('../../utils/validation');
 
 const router = express.Router();
 
-const { Spot, SpotImage, User, Review } = require('../../db/models');
+const { Spot, SpotImage, User, Review, ReviewImage } = require('../../db/models');
 
 async function getReviewAggs(spot) {
   let allReviews = await spot.getReviews({ attributes: ['stars'] });
@@ -58,6 +58,37 @@ router.get('/current', requireAuth, async (req, res, next) => {
 
   return res.json(out);
 
+});
+
+/*** Get all reviews by a spot's id***/
+router.get('/:spotId/reviews', async (req, res, next) => {
+  //Check Spot and route parameter
+  if (isNaN(Number(req.params.spotId))) {
+    return next(new Error('id parameter must be a number'));
+  }
+
+  let spot = await Spot.findByPk(req.params.spotId);
+  if (!spot) {
+    res.statusCode = 404;
+    return res.json({
+      message: `Spot ${req.params.spotId} could not be found.`
+    })
+  }
+
+  //find spots's reviews
+  let reviews = await Review.findAll({
+    include: [User, ReviewImage],
+    where: {
+      spotId: Number(req.params.spotId)
+    }
+  });
+
+  //convert reviews to POJOs
+  let out = [];
+  reviews.forEach(review => out.push(review.toJSON()));
+  out = { Reviews: out };
+
+  res.json(out);
 });
 
 /*** Get spot by id ***/
