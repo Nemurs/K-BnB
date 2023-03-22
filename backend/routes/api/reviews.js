@@ -14,6 +14,7 @@ router.get('/current', requireAuth, async (req, res, next) => {
 
     //find user's reviews
     let reviews = await Review.findAll({
+        attributes: ["id", "spotId", "userId", "review", "stars", "createdAt", "updatedAt"],
         include: [
             User,
             {
