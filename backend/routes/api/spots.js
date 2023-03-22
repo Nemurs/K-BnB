@@ -1,6 +1,6 @@
 // backend/routes/api/spots.js
 const express = require('express');
-const {requireAuth} = require('../../utils/auth');
+const { requireAuth } = require('../../utils/auth');
 const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 
@@ -48,7 +48,7 @@ router.get('/current', requireAuth, async (req, res, next) => {
   //find preview image
   out.Spots.forEach(spot => {
     spot.SpotImages.forEach(img => {
-      if(!spot.SpotImages) spot.previewImage = null;
+      if (!spot.SpotImages) spot.previewImage = null;
       if (img.preview === true) {
         spot.previewImage = img.url;
       }
@@ -112,7 +112,7 @@ router.get('', async (req, res, next) => {
 
   //find preview image
   out.Spots.forEach(spot => {
-    if(!spot.SpotImages) spot.previewImage = null;
+    if (!spot.SpotImages) spot.previewImage = null;
     spot.SpotImages.forEach(img => {
       if (img.preview === true) {
         spot.previewImage = img.url;
@@ -140,18 +140,18 @@ const validatImageBody = [
 router.post('/:spotId/images', requireAuth, validatImageBody, async (req, res, next) => {
   const { user } = req;
   let spot = await Spot.findByPk(req.params.spotId);
-  if(!spot){
-    return next(makeError('Spot Not Found',"Spot couldn't be found",404));
+  if (!spot) {
+    return next(makeError('Spot Not Found', "Spot couldn't be found", 404));
   }
-  if(user.id != spot.ownerId){
-    return next(makeError('Forbidden Spot',"Spot must belong to the current user",403));
+  if (user.id != spot.ownerId) {
+    return next(makeError('Forbidden Spot', "Spot must belong to the current user", 403));
   }
 
-  let {url, preview} = req.body;
+  let { url, preview } = req.body;
   preview = typeof preview === 'undefined' ? false : preview;
   const spotId = req.params.spotId;
   try {
-    let newSpotImg = await SpotImage.create({spotId, url, preview})
+    let newSpotImg = await SpotImage.create({ spotId, url, preview })
     res.json(newSpotImg)
   } catch (error) {
     return next(error)
@@ -192,12 +192,12 @@ const validatSpotBody = [
   handleValidationErrors
 ];
 router.post('/', requireAuth, validatSpotBody, async (req, res, next) => {
-  const {address, city, state, country, lat, lng, name, description, price} = req.body;
+  const { address, city, state, country, lat, lng, name, description, price } = req.body;
   const { user } = req;
   const ownerId = user.id;
 
   try {
-    let newSpot = await Spot.create({ownerId, address, city, state, country, lat, lng, name, description, price});
+    let newSpot = await Spot.create({ ownerId, address, city, state, country, lat, lng, name, description, price });
     res.statusCode = 201;
     res.json(newSpot);
   } catch (error) {
@@ -209,16 +209,16 @@ router.post('/', requireAuth, validatSpotBody, async (req, res, next) => {
 router.put('/:spotId', requireAuth, validatSpotBody, async (req, res, next) => {
   const { user } = req;
   let spot = await Spot.findByPk(req.params.spotId);
-  if(!spot){
-    return next(makeError('Spot Not Found',"Spot couldn't be found",404));
+  if (!spot) {
+    return next(makeError('Spot Not Found', "Spot couldn't be found", 404));
   }
-  if(user.id != spot.ownerId){
-    return next(makeError('Forbidden Spot',"Spot must belong to the current user",403));
+  if (user.id != spot.ownerId) {
+    return next(makeError('Forbidden Spot', "Spot must belong to the current user", 403));
   }
 
-  const {address, city, state, country, lat, lng, name, description, price} = req.body;
+  const { address, city, state, country, lat, lng, name, description, price } = req.body;
   try {
-    await Spot.update({address, city, state, country, lat, lng, name, description, price}, {where:{id:req.params.spotId}})
+    await Spot.update({ address, city, state, country, lat, lng, name, description, price }, { where: { id: req.params.spotId } })
     let updatedSpot = await Spot.findByPk(req.params.spotId);
     res.json(updatedSpot)
   } catch (error) {
@@ -230,11 +230,11 @@ router.put('/:spotId', requireAuth, validatSpotBody, async (req, res, next) => {
 router.delete('/:spotId', requireAuth, async (req, res, next) => {
   const { user } = req;
   let spot = await Spot.findByPk(req.params.spotId);
-  if(!spot){
-    return next(makeError('Spot Not Found',"Spot couldn't be found",404));
+  if (!spot) {
+    return next(makeError('Spot Not Found', "Spot couldn't be found", 404));
   }
-  if(user.id != spot.ownerId){
-    return next(makeError('Forbidden Spot',"Spot must belong to the current user",403));
+  if (user.id != spot.ownerId) {
+    return next(makeError('Forbidden Spot', "Spot must belong to the current user", 403));
   }
 
   try {
@@ -249,7 +249,7 @@ router.delete('/:spotId', requireAuth, async (req, res, next) => {
 })
 
 /*** Helper Functions ***/
-function makeError(title = '', msg = '', status = 500){
+function makeError(title = '', msg = '', status = 500) {
   const err = new Error(title);
   err.title = title;
   err.errors = { message: msg };
