@@ -127,9 +127,41 @@ router.get('', async (req, res, next) => {
   return res.json(out);
 });
 
-/*** Create a spot ***/
+/*** Add an image to a spot based on the spot's id ***/
+const validatImageBody = [
+  check('url')
+    .exists({ checkFalsy: true })
+    .isURL()
+    .withMessage('URL is required'),
+  check('preview')
+    .if(check('preview').exists())
+    .isBoolean()
+    .withMessage('Preview must be a boolean'),
+  handleValidationErrors
+];
 
-const validateBody = [
+router.post('/:spotId/images', requireAuth, validatImageBody, async (req, res, next) => {
+  const { user } = req;
+  let spot = await Spot.findByPk(req.params.spotId);
+  if(!spot){
+    return next(makeError('Spot Not Found',"Spot couldn't be found",404));
+  }
+  if(user.id != spot.ownerId){
+    return next(makeError('Forbidden Spot',"Spot must belong to the current user",403));
+  }
+
+  let {url, preview} = req.body;
+  preview = typeof preview === 'undefined' ? false : preview;
+  const spotId = req.params.spotId;
+  try {
+    let newSpotImg = await SpotImage.create({spotId, url, preview})
+    res.json(newSpotImg)
+  } catch (error) {
+    return next(error)
+  }
+});
+/*** Create a spot ***/
+const validatSpotBody = [
   check('address')
     .exists({ checkFalsy: true })
     .withMessage('Street address is required'),
@@ -162,7 +194,7 @@ const validateBody = [
     .withMessage('Price per day is required'),
   handleValidationErrors
 ];
-router.post('/', requireAuth, validateBody, async (req, res, next) => {
+router.post('/', requireAuth, validatSpotBody, async (req, res, next) => {
   const {address, city, state, country, lat, lng, name, description, price} = req.body;
   const { user } = req;
   const ownerId = user.id;
@@ -177,22 +209,14 @@ router.post('/', requireAuth, validateBody, async (req, res, next) => {
 });
 
 /*** Edit a spot ***/
-router.put('/:spotId', requireAuth, validateBody, async (req, res, next) => {
+router.put('/:spotId', requireAuth, validatSpotBody, async (req, res, next) => {
   const { user } = req;
   let spot = await Spot.findByPk(req.params.spotId);
   if(!spot){
-    const err = new Error('Spot Not Found');
-    err.title = 'Spot Not Found';
-    err.errors = { message: "Spot couldn't be found" };
-    err.status = 404;
-    return next(err);
+    return next(makeError('Spot Not Found',"Spot couldn't be found",404));
   }
   if(user.id != spot.ownerId){
-    const err = new Error('Forbidden Spot');
-    err.title = 'Forbidden Spot';
-    err.errors = { message: "Spot must belong to the current user" };
-    err.status = 403;
-    return next(err);
+    return next(makeError('Forbidden Spot',"Spot must belong to the current user",403));
   }
 
   const {address, city, state, country, lat, lng, name, description, price} = req.body;
@@ -201,8 +225,17 @@ router.put('/:spotId', requireAuth, validateBody, async (req, res, next) => {
     let updatedSpot = await Spot.findByPk(req.params.spotId);
     res.json(updatedSpot)
   } catch (error) {
-    next(error);
+    return next(error);
   }
 })
+
+/* Helper Functions*/
+function makeError(title = '', msg = '', status = 500){
+  const err = new Error(title);
+  err.title = title;
+  err.errors = { message: msg };
+  err.status = status;
+  return
+}
 
 module.exports = router;
