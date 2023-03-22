@@ -129,7 +129,7 @@ router.get('', async (req, res, next) => {
 
 /*** Create a spot ***/
 
-const validateNewPost = [
+const validateBody = [
   check('address')
     .exists({ checkFalsy: true })
     .withMessage('Street address is required'),
@@ -162,18 +162,47 @@ const validateNewPost = [
     .withMessage('Price per day is required'),
   handleValidationErrors
 ];
-router.post('/', requireAuth, validateNewPost, async (req, res, next) => {
+router.post('/', requireAuth, validateBody, async (req, res, next) => {
   const {address, city, state, country, lat, lng, name, description, price} = req.body;
   const { user } = req;
-
   const ownerId = user.id;
 
   try {
     let newSpot = await Spot.create({ownerId, address, city, state, country, lat, lng, name, description, price});
+    res.statusCode = 201;
     res.json(newSpot);
   } catch (error) {
     next(error)
   }
 });
+
+/*** Edit a spot ***/
+router.put('/:spotId', requireAuth, validateBody, async (req, res, next) => {
+  const { user } = req;
+  let spot = await Spot.findByPk(req.params.spotId);
+  if(!spot){
+    const err = new Error('Spot Not Found');
+    err.title = 'Spot Not Found';
+    err.errors = { message: "Spot couldn't be found" };
+    err.status = 404;
+    return next(err);
+  }
+  if(user.id != spot.ownerId){
+    const err = new Error('Forbidden Spot');
+    err.title = 'Forbidden Spot';
+    err.errors = { message: "Spot must belong to the current user" };
+    err.status = 403;
+    return next(err);
+  }
+
+  const {address, city, state, country, lat, lng, name, description, price} = req.body;
+  try {
+    await Spot.update({address, city, state, country, lat, lng, name, description, price}, {where:{id:req.params.spotId}})
+    let updatedSpot = await Spot.findByPk(req.params.spotId);
+    res.json(updatedSpot)
+  } catch (error) {
+    next(error);
+  }
+})
 
 module.exports = router;
