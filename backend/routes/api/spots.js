@@ -257,7 +257,7 @@ function makeError(title = '', msg = '', status = 500){
   err.title = title;
   err.errors = { message: msg };
   err.status = status;
-  return
+  return err;
 }
 
 module.exports = router;
