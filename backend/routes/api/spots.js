@@ -229,7 +229,29 @@ router.put('/:spotId', requireAuth, validatSpotBody, async (req, res, next) => {
   }
 })
 
-/* Helper Functions*/
+/*** Delete a Spot ***/
+router.delete('/:spotId', requireAuth, async (req, res, next) => {
+  const { user } = req;
+  let spot = await Spot.findByPk(req.params.spotId);
+  if(!spot){
+    return next(makeError('Spot Not Found',"Spot couldn't be found",404));
+  }
+  if(user.id != spot.ownerId){
+    return next(makeError('Forbidden Spot',"Spot must belong to the current user",403));
+  }
+
+  try {
+    spot.destroy();
+    res.json({
+      message: "Successfully deleted"
+    })
+  } catch (error) {
+    return next(error);
+  }
+
+})
+
+/*** Helper Functions ***/
 function makeError(title = '', msg = '', status = 500){
   const err = new Error(title);
   err.title = title;
