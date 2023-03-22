@@ -7,7 +7,6 @@ const { handleValidationErrors } = require('../../utils/validation');
 const router = express.Router();
 
 const { Spot, SpotImage, User, Review } = require('../../db/models');
-const spot = require('../../db/models/spot');
 
 async function getReviewAggs(spot) {
   let allReviews = await spot.getReviews({ attributes: ['stars'] });
@@ -33,8 +32,6 @@ router.get('/current', requireAuth, async (req, res, next) => {
     },
     include: SpotImage
   });
-
-  console.log(spots);
 
   //convert spots to POJOs
   let out = [];
