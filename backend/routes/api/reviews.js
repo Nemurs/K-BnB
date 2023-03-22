@@ -14,7 +14,20 @@ router.get('/current', requireAuth, async (req, res, next) => {
 
     //find user's reviews
     let reviews = await Review.findAll({
-        include: [User, Spot, ReviewImage],
+        include: [
+            User,
+            {
+                model: Spot,
+                attributes: {
+                    exclude: ['createdAt', 'updatedAt']
+                }
+            },
+            {
+                model: ReviewImage,
+                attributes: {
+                    exclude: ['createdAt', 'updatedAt']
+                }
+            }],
         where: {
             userId: user.id
         }
