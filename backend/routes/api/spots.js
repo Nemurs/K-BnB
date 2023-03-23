@@ -6,7 +6,7 @@ const { handleValidationErrors } = require('../../utils/validation');
 
 const router = express.Router();
 
-const { Spot, SpotImage, User, Review, ReviewImage } = require('../../db/models');
+const { Spot, SpotImage, User, Review, ReviewImage, Booking } = require('../../db/models');
 
 async function getReviewAggs(spot) {
   let allReviews = await spot.getReviews({ attributes: ['stars'] });
@@ -60,6 +60,58 @@ router.get('/current', requireAuth, async (req, res, next) => {
 
 });
 
+/*** Get all bookings by a spot's id***/
+router.get('/:spotId/bookings', requireAuth, async (req, res, next) => {
+  //Check Spot and route parameter
+  if (isNaN(Number(req.params.spotId))) {
+    return next(new Error('id parameter must be a number'));
+  }
+
+  let spot = await Spot.findByPk(req.params.spotId);
+  if (!spot) {
+    res.statusCode = 404;
+    return res.json({
+      message: `Spot ${req.params.spotId} could not be found.`
+    })
+  }
+
+  //find spots's bookings
+  let out = [];
+  const { user } = req;
+  if (spot.ownerId != user.id) {
+    //if user is NOT spot owner
+    let bookings = await Booking.findAll({
+      attributes: ["spotId", "startDate", "endDate"],
+      where: {
+        spotId: req.params.spotId
+      }
+    });
+    //convert bookings to POJOs
+    bookings.forEach(booking => out.push(booking.toJSON()));
+    out = { Bookings: out };
+    return res.json(out);
+  } else {
+    //if user is spot owner
+    let bookings = await Booking.findAll({
+      attributes: ["id", "spotId", "userId", "startDate", "endDate", "createdAt", "updatedAt"],
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'firstName', 'lastName'],
+        }],
+      where: {
+        spotId: req.params.spotId
+      }
+    });
+    //convert bookings to POJOs
+    bookings.forEach(booking => out.push(booking.toJSON()));
+    out = { Bookings: out };
+    return res.json(out);
+  }
+
+
+});
+
 /*** Get all reviews by a spot's id***/
 router.get('/:spotId/reviews', async (req, res, next) => {
   //Check Spot and route parameter
@@ -95,13 +147,13 @@ router.get('/:spotId/reviews', async (req, res, next) => {
 /*** Create a review for a spot based on the spot's id***/
 const validateReviewBody = [
   check('review')
-    .exists({checkFalsy: true})
+    .exists({ checkFalsy: true })
     .isString()
-    .isLength({min: 3})
+    .isLength({ min: 3 })
     .withMessage('Review string of at least 3 characters is required'),
   check('stars')
     .exists()
-    .isInt({min: 1, max: 5})
+    .isInt({ min: 1, max: 5 })
     .withMessage('Rating must be an integer between 1 and 5'),
   handleValidationErrors
 ];
@@ -111,8 +163,8 @@ router.post('/:spotId/reviews', requireAuth, validateReviewBody, async (req, res
   let rev = await Review.findOne({
     attributes: ["id", "spotId", "userId", "review", "stars", "createdAt", "updatedAt"],
     where: {
-      userId : user.id,
-      spotId : req.params.spotId
+      userId: user.id,
+      spotId: req.params.spotId
     }
   });
   if (!spot) {
@@ -121,22 +173,22 @@ router.post('/:spotId/reviews', requireAuth, validateReviewBody, async (req, res
   if (user.id == spot.ownerId) {
     return next(makeError('Forbidden Spot', "Spot must NOT belong to the current user", 403));
   }
-  if (rev){
+  if (rev) {
     return next(makeError('Duplicate Action', "User already has a review for this spot. Edit review instead.", 403));
   }
 
-  const {review, stars} = req.body;
+  const { review, stars } = req.body;
   const userId = user.id;
   const spotId = req.params.spotId;
 
   try {
-    let newReview = await Review.create({userId, spotId, review, stars}, {returning: false})
+    let newReview = await Review.create({ userId, spotId, review, stars }, { returning: false })
     newReview = newReview.toJSON();
     newReview.id = (await Review.findOne({
       attributes: ["id", "spotId", "userId", "review", "stars", "createdAt", "updatedAt"],
       where: {
-        userId : user.id,
-        spotId : req.params.spotId
+        userId: user.id,
+        spotId: req.params.spotId
       }
     })).id
     res.statusCode = 201;
