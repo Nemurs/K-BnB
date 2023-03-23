@@ -131,6 +131,14 @@ router.post('/:spotId/reviews', requireAuth, validateReviewBody, async (req, res
 
   try {
     let newReview = await Review.create({userId, spotId, review, stars}, {returning: false})
+    newReview = newReview.toJSON();
+    newReview.id = (await Review.findOne({
+      attributes: ["id", "spotId", "userId", "review", "stars", "createdAt", "updatedAt"],
+      where: {
+        userId : user.id,
+        spotId : req.params.spotId
+      }
+    })).id
     res.statusCode = 201;
     res.json(newReview);
   } catch (error) {
