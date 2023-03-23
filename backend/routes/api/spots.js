@@ -109,6 +109,7 @@ router.post('/:spotId/reviews', requireAuth, validateReviewBody, async (req, res
   const { user } = req;
   let spot = await Spot.findByPk(req.params.spotId);
   let rev = await Review.findOne({
+    attributes: ["id", "spotId", "userId", "review", "stars", "createdAt", "updatedAt"],
     where: {
       userId : user.id,
       spotId : req.params.spotId
