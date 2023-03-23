@@ -108,7 +108,7 @@ router.put('/:reviewId', requireAuth, validateReviewBody, async (req, res, next)
     const { review, stars } = req.body;
 
     try {
-        await Review.update({ review, stars }, { where: { id: req.params.reviewId } });
+        await Review.update({ review, stars }, { where: {id: req.params.reviewId}, returning: true });
         let updatedReview = await Review.findByPk(req.params.reviewId, {
             attributes: ["id", "spotId", "userId", "review", "stars", "createdAt", "updatedAt"]
         });
