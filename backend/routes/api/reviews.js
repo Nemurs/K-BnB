@@ -43,5 +43,50 @@ router.get('/current', requireAuth, async (req, res, next) => {
 
 });
 
+/*** Add an image to a review based on the review's id ***/
+const validateReviewImageBody = [
+    check('url')
+        .exists({ checkFalsy: true })
+        .isURL()
+        .withMessage('URL is required'),
+    handleValidationErrors
+];
+
+router.post('/:reviewId/images', requireAuth, validateReviewImageBody, async (req, res, next) => {
+    const { user } = req;
+    let rev = await Review.findByPk(req.params.reviewId);
+    if (!rev) {
+        return next(makeError('Review Not Found', "Review couldn't be found", 404));
+    }
+    if (user.id != rev.userId) {
+        return next(makeError('Forbidden Review', "Review must belong to the current user", 403));
+    }
+    let imgCount = await rev.countReviewImages();
+    if (imgCount == 10) {
+        return next(makeError('Forbidden Action', "Maximum number of images (10) for this resource was reached", 403));
+    }
+
+    let { url } = req.body;
+    const reviewId = req.params.reviewId;
+    try {
+        let newRevImg = await ReviewImage.create({ reviewId, url })
+        newRevImg = newRevImg.toJSON();
+        delete newRevImg.reviewId;
+        delete newRevImg.updatedAt;
+        delete newRevImg.createdAt;
+        res.json(newRevImg)
+    } catch (error) {
+        return next(error)
+    }
+});
+
+/*** Helper Functions ***/
+function makeError(title = '', msg = '', status = 500) {
+    const err = new Error(title);
+    err.title = title;
+    err.errors = { message: msg };
+    err.status = status;
+    return err;
+  }
 
 module.exports = router;
