@@ -118,8 +118,8 @@ router.post('/:spotId/reviews', requireAuth, validateReviewBody, async (req, res
   if (!spot) {
     return next(makeError('Spot Not Found', "Spot couldn't be found", 404));
   }
-  if (user.id != spot.ownerId) {
-    return next(makeError('Forbidden Spot', "Spot must belong to the current user", 403));
+  if (user.id == spot.ownerId) {
+    return next(makeError('Forbidden Spot', "Spot must NOT belong to the current user", 403));
   }
   if (rev){
     return next(makeError('Duplicate Action', "User already has a review for this spot. Edit review instead.", 403));
