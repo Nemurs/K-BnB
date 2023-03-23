@@ -80,6 +80,42 @@ router.post('/:reviewId/images', requireAuth, validateReviewImageBody, async (re
     }
 });
 
+/*** Edit a review based on the review's id***/
+const validateReviewBody = [
+    check('review')
+      .exists({checkFalsy: true})
+      .isString()
+      .isLength({min: 3})
+      .withMessage('Review string of at least 3 characters is required'),
+    check('stars')
+      .exists()
+      .isInt({min: 1, max: 5})
+      .withMessage('Rating must be an integer between 1 and 5'),
+    handleValidationErrors
+  ];
+  router.put('/:reviewId', requireAuth, validateReviewBody, async (req, res, next) => {
+    const { user } = req;
+    let rev = await Review.findByPk(req.params.reviewId, {
+      attributes: ["id", "spotId", "userId", "review", "stars", "createdAt", "updatedAt"]
+    });
+    if (!rev) {
+      return next(makeError('Review Not Found', "Review couldn't be found", 404));
+    }
+    if (user.id != rev.userId) {
+      return next(makeError('Forbidden Review', "Review must belong to the current user", 403));
+    }
+
+    const {review, stars} = req.body;
+
+    try {
+      await Review.update({review, stars}, {where:{id: req.params.reviewId}});
+      let updatedReview = await Review.findByPk(req.params.reviewId);
+      res.json(updatedReview);
+    } catch (error) {
+      return next(error)
+    }
+  });
+
 /*** Helper Functions ***/
 function makeError(title = '', msg = '', status = 500) {
     const err = new Error(title);
