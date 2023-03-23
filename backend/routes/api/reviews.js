@@ -109,7 +109,9 @@ const validateReviewBody = [
 
     try {
       await Review.update({review, stars}, {where:{id: req.params.reviewId}});
-      let updatedReview = await Review.findByPk(req.params.reviewId);
+      let updatedReview = await Review.findByPk(req.params.reviewId, {
+        attributes: ["id", "spotId", "userId", "review", "stars", "createdAt", "updatedAt"]
+      });
       res.json(updatedReview);
     } catch (error) {
       return next(error)
