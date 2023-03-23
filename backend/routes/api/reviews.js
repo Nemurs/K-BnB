@@ -54,7 +54,7 @@ const validateReviewImageBody = [
 
 router.post('/:reviewId/images', requireAuth, validateReviewImageBody, async (req, res, next) => {
     const { user } = req;
-    let rev = await Review.findByPk(req.params.reviewId);
+    let rev = await Review.findByPk(req.params.reviewId, {attributes: ["id", "spotId", "userId", "review", "stars", "createdAt", "updatedAt"],});
     if (!rev) {
         return next(makeError('Review Not Found', "Review couldn't be found", 404));
     }
