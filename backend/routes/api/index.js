@@ -6,6 +6,7 @@ const spotsRouter = require('./spots.js');
 const reviewsRouter = require('./reviews.js');
 const bookingsRouter = require('./bookings.js');
 const spotImgRouter = require('./spot-images.js');
+const reviewImgRouter = require('./review-images.js');
 const { restoreUser } = require("../../utils/auth.js");
 
 // Add a XSRF-TOKEN cookie
@@ -34,6 +35,8 @@ router.use('/reviews', reviewsRouter);
 router.use('/bookings', bookingsRouter);
 
 router.use('/spot-images', spotImgRouter);
+
+router.use('/review-images', reviewImgRouter);
 
 router.post('/test', (req, res) => {
   res.json({ requestBody: req.body });
