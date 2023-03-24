@@ -120,6 +120,7 @@ router.put('/:bookingId', requireAuth, validateBookingBody, async (req, res, nex
       let endFlag = false;
 
       for(let book of books){
+        if (book.id == req.params.bookingId) continue;
         let start = new Date(book.startDate).getTime();
         let end = new Date(book.endDate).getTime();
         console.log(start, startDateTime, end)
