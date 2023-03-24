@@ -9,6 +9,7 @@ const router = express.Router();
 const { Spot, SpotImage, User, Review, ReviewImage, Booking } = require('../../db/models');
 const { Op } = require('sequelize');
 
+/**Gets sum, count, and average stars for a spot */
 async function getReviewAggs(spot) {
   let allReviews = await spot.getReviews({ attributes: ['stars'] });
   if (!allReviews) return [0, 0, 0];
@@ -74,15 +75,10 @@ const validateBookingBody = [
   handleValidationErrors
 ];
 router.post('/:spotId/bookings', requireAuth, validateBookingBody, async (req, res, next) => {
+  //Verify authorization and that the spot exists
   const { user } = req;
 
   let spot = await Spot.findByPk(req.params.spotId);
-  let books = await Booking.findAll({
-    attributes: ["id", "spotId", "userId", "startDate", "endDate", "createdAt", "updatedAt"],
-    where: {
-      spotId: req.params.spotId,
-      }
-  });
   if (!spot) {
     return next(makeError('Spot Not Found', "Spot couldn't be found", 404));
   }
@@ -90,7 +86,15 @@ router.post('/:spotId/bookings', requireAuth, validateBookingBody, async (req, r
     return next(makeError('Forbidden Spot', "Spot must NOT belong to the current user", 403));
   }
 
-  //verify that start date is before end date
+  //Find bookings
+  let books = await Booking.findAll({
+    attributes: ["id", "spotId", "userId", "startDate", "endDate", "createdAt", "updatedAt"],
+    where: {
+      spotId: req.params.spotId,
+      }
+  });
+
+  //Verify that start date is before end date
   let {startDate, endDate} = req.body;
   startDate = new Date(startDate);
   endDate = new Date(endDate);
@@ -148,6 +152,8 @@ router.post('/:spotId/bookings', requireAuth, validateBookingBody, async (req, r
     }
 
   }
+
+  //Create booking with request body parameters
   startDate = `${startDate.getFullYear()}-${startDate.getMonth()+1}-${startDate.getDate()}`;
   endDate = `${endDate.getFullYear()}-${endDate.getMonth()+1}-${endDate.getDate()}`;
   const userId = user.id;
@@ -268,6 +274,7 @@ const validateReviewBody = [
   handleValidationErrors
 ];
 router.post('/:spotId/reviews', requireAuth, validateReviewBody, async (req, res, next) => {
+  //Verify authorization and that the review exists
   const { user } = req;
   let spot = await Spot.findByPk(req.params.spotId);
   let rev = await Review.findOne({
@@ -287,6 +294,7 @@ router.post('/:spotId/reviews', requireAuth, validateReviewBody, async (req, res
     return next(makeError('Duplicate Action', "User already has a review for this spot. Edit review instead.", 403));
   }
 
+  //Create review with request body parameters
   const { review, stars } = req.body;
   const userId = user.id;
   const spotId = req.params.spotId;
@@ -343,7 +351,6 @@ router.get('/:id', async (req, res, next) => {
 });
 
 /*** Get all spots ***/
-/*** Create a review for a spot based on the spot's id***/
 const validateSpotQuery = [
   check('minLat')
     .optional()
@@ -408,6 +415,7 @@ router.get('', validateSpotQuery, async (req, res, next) => {
   minMaxFilter(where, 'lng', minLng, maxLng);
   minMaxFilter(where, 'price', minPrice, maxPrice);
 
+  //find spots, apply optional filters and apply pagination
   let spots = await Spot.findAll({
     include: SpotImage,
     where,
@@ -448,13 +456,14 @@ const validateImageBody = [
     .isURL()
     .withMessage('URL is required'),
   check('preview')
-    .if(check('preview').exists())
+    .optional()
     .isBoolean()
     .withMessage('Preview must be a boolean'),
   handleValidationErrors
 ];
 
 router.post('/:spotId/images', requireAuth, validateImageBody, async (req, res, next) => {
+  //Verify authorization and that the spot exists
   const { user } = req;
   let spot = await Spot.findByPk(req.params.spotId);
   if (!spot) {
@@ -463,7 +472,7 @@ router.post('/:spotId/images', requireAuth, validateImageBody, async (req, res, 
   if (user.id != spot.ownerId) {
     return next(makeError('Forbidden Spot', "Spot must belong to the current user", 403));
   }
-
+  //set preview to false if undefined
   let { url, preview } = req.body;
   preview = typeof preview === 'undefined' ? false : preview;
   const spotId = req.params.spotId;
@@ -489,11 +498,11 @@ const validateSpotBody = [
     .exists({ checkFalsy: true })
     .withMessage('Country is required'),
   check('lat')
-    .exists({ checkFalsy: true })
+    .exists()
     .isFloat()
     .withMessage('Latitude is not valid'),
   check('lng')
-    .exists({ checkFalsy: true })
+    .exists()
     .isFloat()
     .withMessage('Longitude is not valid'),
   check('name')
@@ -504,7 +513,7 @@ const validateSpotBody = [
     .exists({ checkFalsy: true })
     .withMessage('Description is required'),
   check('price')
-    .exists({ checkFalsy: true })
+    .exists()
     .withMessage('Price per day is required'),
   handleValidationErrors
 ];
@@ -513,6 +522,11 @@ router.post('/', requireAuth, validateSpotBody, async (req, res, next) => {
   const { user } = req;
   const ownerId = user.id;
 
+  if(isNaN(Number(price)) || Number(price) < 0){
+    return next(makeError('Bad Request', "Price must be a number greater or equal to 0", 400));
+  }
+
+  //Create spot with request body parameters
   try {
     let newSpot = await Spot.create({ ownerId, address, city, state, country, lat, lng, name, description, price });
     res.statusCode = 201;
@@ -524,6 +538,7 @@ router.post('/', requireAuth, validateSpotBody, async (req, res, next) => {
 
 /*** Edit a spot ***/
 router.put('/:spotId', requireAuth, validateSpotBody, async (req, res, next) => {
+  //Verify authorization and that the spot exists
   const { user } = req;
   let spot = await Spot.findByPk(req.params.spotId);
   if (!spot) {
@@ -545,6 +560,7 @@ router.put('/:spotId', requireAuth, validateSpotBody, async (req, res, next) => 
 
 /*** Delete a Spot ***/
 router.delete('/:spotId', requireAuth, async (req, res, next) => {
+  //Verify authorization and that the spot exists
   const { user } = req;
   let spot = await Spot.findByPk(req.params.spotId);
   if (!spot) {

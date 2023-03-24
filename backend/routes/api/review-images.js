@@ -1,4 +1,4 @@
-// backend/routes/api/spot-images.js
+// backend/routes/api/review-images.js
 const express = require('express');
 const { requireAuth } = require('../../utils/auth');
 
@@ -6,8 +6,9 @@ const { ReviewImage, Review } = require('../../db/models');
 
 const router = express.Router();
 
-/*** Delete a Spot Image ***/
+/*** Delete a Review Image ***/
 router.delete('/:imageId', requireAuth, async (req, res, next) => {
+    //Verify authorization and that the review image exists
     const { user } = req;
     let img = await ReviewImage.findByPk(req.params.imageId);
     if (!img) {
