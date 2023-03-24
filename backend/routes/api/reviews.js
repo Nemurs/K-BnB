@@ -53,6 +53,7 @@ const validateReviewImageBody = [
 ];
 
 router.post('/:reviewId/images', requireAuth, validateReviewImageBody, async (req, res, next) => {
+    //Verify authorization, that the review exists, and that there aren't too many images
     const { user } = req;
     let rev = await Review.findByPk(req.params.reviewId, { attributes: ["id", "spotId", "userId", "review", "stars", "createdAt", "updatedAt"], });
     if (!rev) {
@@ -66,6 +67,7 @@ router.post('/:reviewId/images', requireAuth, validateReviewImageBody, async (re
         return next(makeError('Forbidden Action', "Maximum number of images (10) for this resource was reached", 403));
     }
 
+    //Create review image with request body parameters
     let { url } = req.body;
     const reviewId = req.params.reviewId;
     try {
@@ -94,6 +96,7 @@ const validateReviewBody = [
     handleValidationErrors
 ];
 router.put('/:reviewId', requireAuth, validateReviewBody, async (req, res, next) => {
+    //Verify authorization and that the review exists
     const { user } = req;
     let rev = await Review.findByPk(req.params.reviewId, {
         attributes: ["id", "spotId", "userId", "review", "stars", "createdAt", "updatedAt"]
@@ -105,6 +108,7 @@ router.put('/:reviewId', requireAuth, validateReviewBody, async (req, res, next)
         return next(makeError('Forbidden Review', "Review must belong to the current user", 403));
     }
 
+    //Update review with request body parameters
     const { review, stars } = req.body;
 
     try {
@@ -120,6 +124,7 @@ router.put('/:reviewId', requireAuth, validateReviewBody, async (req, res, next)
 
 /*** Delete a review based on the review's id***/
 router.delete('/:reviewId', requireAuth, async (req, res, next) => {
+    //Verify authorization and that the review exists
     const { user } = req;
     let rev = await Review.findByPk(req.params.reviewId, {
         attributes: ["id", "spotId", "userId", "review", "stars", "createdAt", "updatedAt"]
@@ -131,6 +136,7 @@ router.delete('/:reviewId', requireAuth, async (req, res, next) => {
         return next(makeError('Forbidden Review', "Review must belong to the current user", 403));
     }
 
+    //Delete the review
     try {
         await rev.destroy();
         res.json({

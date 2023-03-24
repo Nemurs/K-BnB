@@ -36,9 +36,7 @@ router.get('/current', requireAuth, async (req, res, next) => {
 
     if (!bookings) {
         res.statusCode = 400;
-        return res.json({
-            message: "Current user has no bookings."
-        })
+        return res.json({Bookings: [], message: "Current user has no bookings."})
     }
 
     //convert reviews to POJOs
@@ -59,7 +57,7 @@ router.get('/current', requireAuth, async (req, res, next) => {
 
 });
 
-/*** Edit a booking for a spot based on the spot's id***/
+/*** Edit a booking based on the booking's id ***/
 const validateBookingBody = [
     check('startDate')
         .exists({ checkFalsy: true })
@@ -72,6 +70,7 @@ const validateBookingBody = [
     handleValidationErrors
 ];
 router.put('/:bookingId', requireAuth, validateBookingBody, async (req, res, next) => {
+    //Verify authorization and that the booking exists
     const { user } = req;
 
     let book = await Booking.findByPk(req.params.bookingId, {
@@ -157,6 +156,8 @@ router.put('/:bookingId', requireAuth, validateBookingBody, async (req, res, nex
         }
 
     }
+
+    //Update booking with request body parameters
     startDate = `${startDate.getFullYear()}-${startDate.getMonth() + 1}-${startDate.getDate()}`;
     endDate = `${endDate.getFullYear()}-${endDate.getMonth() + 1}-${endDate.getDate()}`;
     const userId = user.id;
@@ -176,9 +177,8 @@ router.put('/:bookingId', requireAuth, validateBookingBody, async (req, res, nex
 
 /*** Delete booking using booking id ***/
 router.delete('/:bookingId', requireAuth, async (req, res, next) => {
+    //Verify authorization and that the booking exists
     const { user } = req;
-
-    //find booking and verify authorization
     let booking = await Booking.findByPk(req.params.bookingId, {
         attributes: ["id", "spotId", "userId", "startDate", "endDate", "createdAt", "updatedAt"]
     });
