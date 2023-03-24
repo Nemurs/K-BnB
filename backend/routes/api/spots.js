@@ -7,6 +7,7 @@ const { handleValidationErrors } = require('../../utils/validation');
 const router = express.Router();
 
 const { Spot, SpotImage, User, Review, ReviewImage, Booking } = require('../../db/models');
+const { Op } = require('sequelize');
 
 async function getReviewAggs(spot) {
   let allReviews = await spot.getReviews({ attributes: ['stars'] });
@@ -342,7 +343,35 @@ router.get('/:id', async (req, res, next) => {
 });
 
 /*** Get all spots ***/
-router.get('', async (req, res, next) => {
+/*** Create a review for a spot based on the spot's id***/
+const validateSpotQuery = [
+  check('minLat')
+    .optional()
+    .isDecimal()
+    .withMessage('If provided, minLat must be a decimal'),
+  check('maxLat')
+    .optional()
+    .isDecimal()
+    .withMessage('If provided, maxLat must be a decimal'),
+  check('minLng')
+    .optional()
+    .isDecimal()
+    .withMessage('If provided, minLng must be a decimal'),
+  check('maxLng')
+    .optional()
+    .isDecimal()
+    .withMessage('If provided, maxLng must be a decimal'),
+  check('minPrice')
+    .optional()
+    .isFloat({min: 0.0})
+    .withMessage('If provided, minPrice must be a decimal greater than 0.0'),
+  check('maxPrice')
+    .optional()
+    .isFloat({min: 0.0})
+    .withMessage('If provided, maxPrice must be a decimal greater than 0.0'),
+  handleValidationErrors
+];
+router.get('', validateSpotQuery, async (req, res, next) => {
   //pagination
   let { page, size } = req.query;
 
@@ -354,10 +383,36 @@ router.get('', async (req, res, next) => {
   if (isNaN(size) || size < 0) size = 20;
   if(size > 20) size = 20;
 
+  //search filters
+  const {minLat, maxLat, minLng, maxLng, minPrice, maxPrice} = req.query;
+
+  let where = {};
+
+  function minMaxFilter(whereObj = {}, prop = '', minProp, maxProp){
+    if(minProp && maxProp){
+      whereObj[prop] = {
+        [Op.between] : [minProp, maxProp]
+      }
+    } else if(minProp) {
+      whereObj[prop] = {
+        [Op.gte] : minProp
+      }
+    } else if(maxProp) {
+      whereObj[prop] = {
+        [Op.lte] : maxProp
+      }
+    }
+  }
+
+  minMaxFilter(where, 'lat', minLat, maxLat);
+  minMaxFilter(where, 'lng', minLng, maxLng);
+  minMaxFilter(where, 'price', minPrice, maxPrice);
+
   let spots = await Spot.findAll({
     include: SpotImage,
+    where,
     limit: size,
-    offset: size * (page - 1),
+    offset: size * (page - 1)
   });
 
   //convert spots to POJOs
