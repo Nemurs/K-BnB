@@ -1,13 +1,12 @@
 // backend/routes/api/spots.js
 const express = require('express');
 const { requireAuth } = require('../../utils/auth');
-const { body, check } = require('express-validator');
+const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 
 const router = express.Router();
 
 const { Spot, SpotImage, User, Review, ReviewImage, Booking } = require('../../db/models');
-const { Op } = require('sequelize');
 
 async function getReviewAggs(spot) {
   let allReviews = await spot.getReviews({ attributes: ['stars'] });
@@ -70,7 +69,6 @@ const validateBookingBody = [
   check('endDate')
     .exists()
     .isDate()
-    // .isAfter({comparisonDate: String(body('startDate'))})
     .withMessage('End date property is required and it must be a valid date in the format yyyy-mm-dd.'),
   handleValidationErrors
 ];
