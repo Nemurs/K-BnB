@@ -343,7 +343,22 @@ router.get('/:id', async (req, res, next) => {
 
 /*** Get all spots ***/
 router.get('', async (req, res, next) => {
-  let spots = await Spot.findAll({ include: SpotImage });
+  //pagination
+  let { page, size } = req.query;
+
+  page = parseInt(page);
+  size = parseInt(size);
+
+  if (isNaN(page) || page < 0) page = 1;
+  if( page > 10) page = 10;
+  if (isNaN(size) || size < 0) size = 20;
+  if(size > 20) size = 20;
+
+  let spots = await Spot.findAll({
+    include: SpotImage,
+    limit: size,
+    offset: size * (page - 1),
+  });
 
   //convert spots to POJOs
   let out = [];
@@ -368,7 +383,7 @@ router.get('', async (req, res, next) => {
     delete spot.SpotImages;
   });
 
-  return res.json(out);
+  return res.json({...out, ...{page, size}});
 });
 
 /*** Add an image to a spot based on the spot's id ***/
