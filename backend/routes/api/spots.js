@@ -162,7 +162,7 @@ router.post('/:spotId/bookings', requireAuth, validateBookingBody, async (req, r
         spotId: req.params.spotId
       }
     })).id
-    res.statusCode = 201;
+    res.statusCode = 200;
     res.json(newBooking);
   } catch (error) {
     return next(error)
