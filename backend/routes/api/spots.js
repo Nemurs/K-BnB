@@ -60,6 +60,115 @@ router.get('/current', requireAuth, async (req, res, next) => {
 
 });
 
+/*** Create a booking for a spot based on the spot's id***/
+const validateBookingBody = [
+  check('startDate')
+    .exists({ checkFalsy: true })
+    .isDate()
+    .withMessage('Start date property is required and it must be a valid date in the format yyyy-mm-dd.'),
+  check('endDate')
+    .exists()
+    .isDate()
+    .withMessage('End date property is required and it must be a valid date in the format yyyy-mm-dd.'),
+  handleValidationErrors
+];
+router.post('/:spotId/bookings', requireAuth, validateBookingBody, async (req, res, next) => {
+  const { user } = req;
+
+  let spot = await Spot.findByPk(req.params.spotId);
+  let books = await Booking.findAll({
+    attributes: ["id", "spotId", "userId", "startDate", "endDate", "createdAt", "updatedAt"],
+    where: {
+      spotId: req.params.spotId,
+      }
+  });
+  if (!spot) {
+    return next(makeError('Spot Not Found', "Spot couldn't be found", 404));
+  }
+  if (user.id == spot.ownerId) {
+    return next(makeError('Forbidden Spot', "Spot must NOT belong to the current user", 403));
+  }
+
+  //verify that start date is before end date
+  let {startDate, endDate} = req.body;
+  startDate = new Date(startDate);
+  endDate = new Date(endDate);
+
+  const startDateTime = startDate.getTime();
+  const endDateTime = endDate.getTime();
+
+  if (startDateTime > endDateTime){
+    return next(makeError('Bad Request', "endDate cannot be on or before startDate", 400));
+  }
+
+  //verify that start date and end date are different
+  if (startDate.getDate() === endDate.getDate()){
+    return next(makeError('Bad Request', "startDate cannot be the same as endDate", 400));
+  }
+
+  //check for booking conflict
+  if (books) {
+    let startFlag = false;
+    let endFlag = false;
+
+    for(let book of books){
+      let start = new Date(book.startDate).getTime();
+      let end = new Date(book.endDate).getTime();
+      console.log(start, startDateTime, end)
+      if(startDateTime >= start && startDateTime <= end){
+        startFlag = true;
+      }
+      console.log(start, endDateTime, end)
+      if(endDateTime >= start && endDateTime <= end){
+        endFlag = true;
+      }
+      console.log(start, end, startDateTime, endDateTime)
+      if(endDateTime > end && startDateTime < start){
+        startFlag = true;
+        endFlag = true;
+      }
+    }
+
+    if(startFlag && endFlag){
+      return next(makeError('Duplicate Action', "Sorry, this spot is already booked for the specified dates", 403,
+      {startDate: "Start date conflicts with an existing booking",
+      endDate: "End date conflicts with an existing booking"}
+      ));
+    }
+    else if (startFlag){
+      return next(makeError('Duplicate Action', "Sorry, this spot is already booked for the specified dates", 403,
+      {startDate: "Start date conflicts with an existing booking"}
+      ));
+    }
+    else if (endFlag){
+      return next(makeError('Duplicate Action', "Sorry, this spot is already booked for the specified dates", 403,
+      {endDate: "End date conflicts with an existing booking"}
+      ));
+    }
+
+  }
+  startDate = `${startDate.getFullYear()}-${startDate.getMonth()+1}-${startDate.getDate()}`;
+  endDate = `${endDate.getFullYear()}-${endDate.getMonth()+1}-${endDate.getDate()}`;
+  const userId = user.id;
+  const spotId = Number(req.params.spotId);
+
+  try {
+    let newBooking = await Booking.create({ userId, spotId, startDate, endDate }, { returning: false })
+    newBooking = newBooking.toJSON();
+    newBooking.id = (await Booking.findOne({
+      attributes: ["id", "spotId", "userId", "startDate", "endDate", "createdAt", "updatedAt"],
+      where: {
+        userId: user.id,
+        spotId: req.params.spotId
+      }
+    })).id
+    res.statusCode = 201;
+    res.json(newBooking);
+  } catch (error) {
+    return next(error)
+  }
+});
+
 /*** Get all bookings by a spot's id***/
 router.get('/:spotId/bookings', requireAuth, async (req, res, next) => {
   //Check Spot and route parameter
@@ -387,10 +496,10 @@ router.delete('/:spotId', requireAuth, async (req, res, next) => {
 })
 
 /*** Helper Functions ***/
-function makeError(title = '', msg = '', status = 500) {
+function makeError(title = '', msg = '', status = 500, errors={}) {
   const err = new Error(title);
   err.title = title;
-  err.errors = { message: msg };
+  err.errors = { message: msg, ...errors };
   err.status = status;
   return err;
 }
