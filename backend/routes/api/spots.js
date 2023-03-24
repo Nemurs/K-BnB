@@ -246,7 +246,10 @@ router.get('/:spotId/reviews', async (req, res, next) => {
   //find spots's reviews
   let reviews = await Review.findAll({
     attributes: ["id", "spotId", "userId", "review", "stars", "createdAt", "updatedAt"],
-    include: [User, ReviewImage],
+    include: [
+      {model: User, attributes: ['id', 'firstName', 'lastName']},
+      {model: ReviewImage, attributes: ['id', 'url']},
+    ],
     where: {
       spotId: Number(req.params.spotId)
     }
@@ -478,6 +481,10 @@ router.post('/:spotId/images', requireAuth, validateImageBody, async (req, res, 
   const spotId = req.params.spotId;
   try {
     let newSpotImg = await SpotImage.create({ spotId, url, preview })
+    newSpotImg = newSpotImg.toJSON();
+    delete newSpotImg.spotId;
+    delete newSpotImg.createdAt;
+    delete newSpotImg.updatedAt;
     res.json(newSpotImg)
   } catch (error) {
     return next(error)
