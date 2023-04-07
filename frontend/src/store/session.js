@@ -37,7 +37,14 @@ export const logoutThunk = () => async (dispatch) => {
     });
     dispatch(removeUserAction());
     return response;
-  };
+};
+
+export const restoreUserThunk = () => async (dispatch) => {
+    const response = await csrfFetch("/api/session");
+    const data = await response.json();
+    dispatch(setUserAction(data.user));
+    return response;
+};
 
 const initialState = { user: null };
 
