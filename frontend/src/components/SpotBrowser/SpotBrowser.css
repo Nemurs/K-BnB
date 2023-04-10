@@ -3,10 +3,12 @@
     display: flex;
     flex-wrap: wrap;
     column-gap: 15px;
+    justify-content: center;
 }
 
 .spot-card-list-item{
     width: 25%;
+    min-width: 250px;
     box-sizing: border-box;
 }
 

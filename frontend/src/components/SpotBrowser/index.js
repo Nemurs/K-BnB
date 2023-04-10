@@ -20,7 +20,7 @@ const SpotBrowser = () => {
                 {spots.map((spot) => (
                     <li key={spot["id"]} className='spot-card-list-item'>
                         <Link to={`/spots/${spot["id"]}`} className='spot-card-link'>
-                            <SpotCard spot={spot} />
+                            <SpotCard spot={spot} tooltip={spot["name"]}/>
                         </Link>
                     </li>
                 ))}
