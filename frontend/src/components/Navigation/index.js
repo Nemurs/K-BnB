@@ -6,6 +6,7 @@ import OpenModalButton from "../OpenModalButton";
 import LoginFormModal from "../LoginFormModal";
 import SignupFormModal from "../SignupFormModal";
 import "./Navigation.css";
+import logo from "../../Assets/Images/logo.png";
 
 function Navigation({ isLoaded }) {
   const sessionUser = useSelector((state) => state.session.user);
@@ -33,13 +34,17 @@ function Navigation({ isLoaded }) {
   }
 
   return (
-    <ul>
+    <ul className="nav-list">
       <li>
-        <NavLink exact to="/">
-          Home
+        <NavLink exact to="/" className="nav-home-link" style={{ textDecoration: "none", color: "#f9385d", fontWeight: "bold", fontSize:"20px"}}>
+          <img src={logo} alt="Logo" />
+          K-BnB
         </NavLink>
       </li>
-      {isLoaded && sessionLinks}
+      <div className="menu-wrapper">
+        <i class="fas fa-bars" style={{ color: "black" }}></i>
+        {isLoaded && sessionLinks}
+      </div>
     </ul>
   );
 }

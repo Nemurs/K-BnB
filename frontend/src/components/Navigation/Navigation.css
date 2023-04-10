@@ -2,3 +2,32 @@
 .hidden{
     display: none;
 }
+
+.nav-list{
+    list-style-type: none;
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px rgba(223, 222, 222, 0.471) solid;
+    padding-bottom: 20px;
+    padding-right: 20px;
+}
+
+.nav-home-link{
+    display: flex;
+    align-items: center;
+}
+
+.menu-wrapper{
+    display: flex;
+    column-gap: 10px;
+    align-items: center;
+    border: #cdcdcd solid 1.5px;
+    padding: 12px;
+    border-radius: 35px;
+}
+
+.menu-wrapper:hover{
+    cursor: pointer;
+    box-shadow: 1px 3px 5px #d3d3d3 ;
+}
