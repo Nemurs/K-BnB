@@ -42,7 +42,7 @@ function Navigation({ isLoaded }) {
         </NavLink>
       </li>
       <div className="menu-wrapper">
-        <i class="fas fa-bars" style={{ color: "black" }}></i>
+        <i className="fas fa-bars" style={{ color: "black" }}></i>
         {isLoaded && sessionLinks}
       </div>
     </ul>
