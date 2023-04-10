@@ -1,0 +1,11 @@
+.spot-card-img{
+    width: 100%;
+    height: 20vw;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.spot-card-text{
+    display: flex;
+    justify-content: space-between;
+}
