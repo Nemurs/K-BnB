@@ -1,3 +1,4 @@
+/*IMAGES*/
 .detailed-spot-card{
     display: flex;
     flex-direction: column;
@@ -28,4 +29,30 @@
     height: 250px;
     object-fit: cover;
     margin-bottom: -4px;
+}
+
+/*TEXT*/
+h1{
+    font-size: 24px;
+}
+
+.detailed-spot-card-location-text{
+    margin-top: -2px;
+    margin-bottom: 20px;
+}
+
+.detailed-spot-card-host-text{
+    font-size: 18px;
+}
+
+
+/*MISC.*/
+.detailed-spot-card-bottom{
+    display: flex;
+    justify-content: space-between;
+}
+
+.detailed-spot-card-host-description{
+    width: fit-content;
+    max-width: 675px;
 }
