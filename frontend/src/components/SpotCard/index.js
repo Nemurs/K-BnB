@@ -16,7 +16,7 @@ const SpotCard = ({spot, tooltip}) => {
             <PriceText spot={spot}/>
         </div>
         <div className='spot-card-text-right'>
-           <ReviewAggText spot={spot} includeReviewCount={false} />
+           <ReviewAggText spot={spot} includeReviewCount={false}/>
         </div>
       </div>
       <Tooltip id="my-tooltip" />
