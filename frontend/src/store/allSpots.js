@@ -1,4 +1,4 @@
-// frontend/src/store/spots.js
+// frontend/src/store/allSpots.js
 import { csrfFetch } from "./csrf";
 
 const LOAD_ALL = "allSpots/loadAll";
@@ -35,6 +35,7 @@ const allSpotsReducer = (state = initialState, action) => {
       newState = {...action.payload.Spots};
       return newState;
     case LOAD_USER_OWNED:
+      //TODO
       return state;
     default:
       return state;

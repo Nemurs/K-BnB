@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Route, Switch, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import SpotCard from '../SpotCard';
 import { loadAllThunk } from '../../store/allSpots';
 import "./SpotBrowser.css";
@@ -25,12 +25,6 @@ const SpotBrowser = () => {
                     </li>
                 ))}
             </ul>
-
-            <Switch>
-                {/* <Route path='/spots/:id'>
-                        <DetailedSpot/>
-                    </Route> */}
-            </Switch>
         </div>
     );
 };
