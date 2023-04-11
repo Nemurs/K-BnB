@@ -14,7 +14,7 @@ const DetailedSpotCard = () => {
         dispatch(loadOneThunk(id));
     }, [dispatch]);
 
-    if (!spot) return (<h1>Spot: {id} Loading...</h1>)
+    if (!spot || !spot.Owner) return (<h1>Spot: {id} Loading...</h1>)
 
     const previewImage = spot.SpotImages?.find(img => img?.preview === true);
     const otherImages = spot.SpotImages?.filter(img => img?.preview !== true);
