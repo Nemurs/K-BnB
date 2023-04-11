@@ -4,8 +4,9 @@ import { useDispatch } from "react-redux";
 import { Switch } from "react-router-dom";
 import * as sessionActions from "./store/session";
 import Navigation from "./components/Navigation";
-import { Route } from "react-router-dom/cjs/react-router-dom.min";
+import { Route } from "react-router-dom";
 import SpotBrowser from "./components/SpotBrowser";
+import DetailedSpotCard from './components/DetailedSpotCard';
 
 function App() {
   const dispatch = useDispatch();
@@ -20,7 +21,10 @@ function App() {
       {isLoaded && (
         <Switch>
           <Route exact path={"/"}>
-            <SpotBrowser/>
+            <SpotBrowser />
+          </Route>
+          <Route exact path='/spots/:id'>
+            <DetailedSpotCard />
           </Route>
         </Switch>
       )}

@@ -25,12 +25,6 @@ const SpotBrowser = () => {
                     </li>
                 ))}
             </ul>
-
-            <Switch>
-                {/* <Route path='/spots/:id'>
-                        <DetailedSpot/>
-                    </Route> */}
-            </Switch>
         </div>
     );
 };
