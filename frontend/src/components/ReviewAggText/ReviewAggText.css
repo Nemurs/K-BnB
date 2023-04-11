@@ -1,0 +1,10 @@
+.review-agg-text{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 145px;
+}
+.review-agg-text-review-count{
+    text-decoration: underline;
+    text-underline-offset: 2px
+}

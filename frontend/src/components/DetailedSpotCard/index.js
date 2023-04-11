@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { loadOneThunk } from "../../store/singleSpot";
 import placeHolderImage from "../../Assets/Images/No-Image-Placeholder.png";
 import "./DetailedSpotCard.css";
+import ReserveSpot from "../ReserveSpot";
 
 const DetailedSpotCard = () => {
     const dispatch = useDispatch();
@@ -39,7 +40,7 @@ const DetailedSpotCard = () => {
                     <p className='detailed-spot-card-host-text'>Hosted by {spot.Owner.firstName} {spot.Owner.lastName}</p>
                     <p className='detailed-spot-card-description-text'>{spot.description}</p>
                 </div>
-                <button>TEMP</button>
+                <ReserveSpot spot={spot} />
             </div>
         </div>
     )
