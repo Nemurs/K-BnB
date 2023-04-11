@@ -1,0 +1,31 @@
+.detailed-spot-card{
+    display: flex;
+    flex-direction: column;
+    max-width: 1000px;
+    margin: 10px auto 10px;
+}
+.detailed-spot-card-img-wrapper {
+    height: 500px;
+    width: 1000px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.detailed-spot-card-img-wrapper-left, .detailed-spot-card-img-wrapper-right{
+    width: 500px;
+    height: 500px;
+}
+
+.detailed-spot-card-preview-img {
+    width: 500px;
+    height: 500px;
+    object-fit: cover;
+}
+
+.detailed-spot-card-img {
+    width: 250px;
+    height: 250px;
+    object-fit: cover;
+    margin-bottom: -4px;
+}
