@@ -10,7 +10,7 @@
     width: 1000px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
 }
 
 .detailed-spot-card-img-wrapper-left, .detailed-spot-card-img-wrapper-right{
@@ -25,10 +25,12 @@
 }
 
 .detailed-spot-card-img {
-    width: 250px;
-    height: 250px;
+    width: 242px;
+    height: 242px;
     object-fit: cover;
-    margin-bottom: -4px;
+    padding-left: 8px;
+    padding-bottom: 8px;
+    margin-top: 1px;
 }
 
 /*TEXT*/
@@ -50,6 +52,7 @@ h1{
 .detailed-spot-card-bottom{
     display: flex;
     justify-content: space-between;
+    margin-top: 15px;
 }
 
 .detailed-spot-card-host-description{
