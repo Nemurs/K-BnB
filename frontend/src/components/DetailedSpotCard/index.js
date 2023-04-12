@@ -10,6 +10,7 @@ const DetailedSpotCard = () => {
     const dispatch = useDispatch();
     const { id } = useParams();
     const spot = useSelector(state => state.spots.singleSpot);
+    const user = useSelector(state => state.session.user)
 
     useEffect(() => {
         dispatch(loadOneThunk(id));
@@ -37,7 +38,7 @@ const DetailedSpotCard = () => {
             </div>
             <div className="detailed-spot-card-bottom">
                 <div className='detailed-spot-card-host-description'>
-                    <p className='detailed-spot-card-host-text'>Hosted by {spot.Owner.firstName} {spot.Owner.lastName}</p>
+                    <p className='detailed-spot-card-host-text'>{user && user.id && user.id === spot.Owner.id ? `Hosted by You`: `Hosted by ${spot.Owner.firstName} ${spot.Owner.lastName}`}</p>
                     <p className='detailed-spot-card-description-text'>{spot.description}</p>
                 </div>
                 <ReserveSpot spot={spot} />

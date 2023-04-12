@@ -36,15 +36,21 @@ function Navigation({ isLoaded }) {
   return (
     <ul className="nav-list">
       <li>
-        <NavLink exact to="/" className="nav-home-link" style={{ textDecoration: "none", color: "#f9385d", fontWeight: "bold", fontSize:"20px"}}>
+        <NavLink exact to="/" className="nav-home-link" style={{ textDecoration: "none", color: "#f9385d", fontWeight: "bold", fontSize: "20px" }}>
           <img src={logo} alt="Logo" />
           K-BnB
         </NavLink>
       </li>
-      <div className="menu-wrapper">
-        <i className="fas fa-bars" style={{ color: "black" }}></i>
-        {isLoaded && sessionLinks}
+      <div className="nav-list-right">
+        {isLoaded && sessionUser && <NavLink exact to="/spots/new">
+          Create a new spot
+        </NavLink>}
+        <div className="menu-wrapper">
+          <i class="fas fa-bars" style={{ color: "black" }}></i>
+          {isLoaded && sessionLinks}
+        </div>
       </div>
+
     </ul>
   );
 }
