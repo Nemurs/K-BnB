@@ -121,15 +121,15 @@ router.put('/:bookingId', requireAuth, validateBookingBody, async (req, res, nex
             if (book.id == req.params.bookingId) continue;
             let start = new Date(book.startDate).getTime();
             let end = new Date(book.endDate).getTime();
-            console.log(start, startDateTime, end)
+            // console.log(start, startDateTime, end)
             if (startDateTime >= start && startDateTime <= end) {
                 startFlag = true;
             }
-            console.log(start, endDateTime, end)
+            // console.log(start, endDateTime, end)
             if (endDateTime >= start && endDateTime <= end) {
                 endFlag = true;
             }
-            console.log(start, end, startDateTime, endDateTime)
+            // console.log(start, end, startDateTime, endDateTime)
             if (endDateTime > end && startDateTime < start) {
                 startFlag = true;
                 endFlag = true;
