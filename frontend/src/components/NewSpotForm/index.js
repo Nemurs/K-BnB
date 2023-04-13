@@ -62,18 +62,18 @@ const NewSpotForm = () => {
             let spotRes = await dispatch(editSpotThunk({ id, ...newSpot }));
             if (spotRes.ok) {
                 let spotData = await spotRes.json();
-                console.log(spotData);
+                // console.log(spotData);
                 history.push(`/spots/${spotData.id}`);
             }
             else {
-                console.log("error with spot data")
-                console.log(await spotRes.json());
+                // console.log("error with spot data")
+                // console.log(await spotRes.json());
             }
         } else {
             let spotRes = await dispatch(createNewSpotThunk(newSpot));
             if (spotRes.ok) {
                 let spotData = await spotRes.json();
-                console.log(spotData);
+                // console.log(spotData);
                 let imgPayload = { id: spotData.id, body: { url: previewImageURL, preview: true } }
                 let imgRes = await dispatch(createNewSpotImageThunk(imgPayload));
                 if (imgRes.ok) {
@@ -81,14 +81,14 @@ const NewSpotForm = () => {
                     reset();
                 }
                 else {
-                    console.log("error with img data")
-                    console.log(imgRes);
-                    console.log(spotData);
+                    // console.log("error with img data")
+                    // console.log(imgRes);
+                    // console.log(spotData);
                 }
             }
             else {
-                console.log("error with spot data")
-                console.log(spotRes);
+                // console.log("error with spot data")
+                // console.log(spotRes);
             }
         }
 
