@@ -5,6 +5,7 @@ const LOAD_ALL = "allSpots/loadAll";
 const LOAD_USER_OWNED =  "allSpots/loadUserOwned";
 const CREATE_NEW_SPOT = "allSpots/createNewSpot";
 const CREATE_NEW_SPOT_IMAGE = "allSpots/createNewSpotImage";
+const DELETE_SPOT = "allSpots/deleteSpot";
 
 const loadAllAction = (data) => {
   return {
@@ -30,6 +31,13 @@ const createNewSpotAction = (data) => {
 const createNewSpotImageAction = (data) => {
   return {
     type: CREATE_NEW_SPOT_IMAGE,
+    payload: data
+  };
+};
+
+const deleteSpotAction = (data) => {
+  return {
+    type: DELETE_SPOT,
     payload: data
   };
 };
@@ -76,6 +84,18 @@ export const createNewSpotImageThunk = (payload) => async (dispatch) => {
   return response;
 };
 
+export const deleteSpotThunk = (payload) => async (dispatch) => {
+  const response = await csrfFetch(`/api/spots/${payload.id}`, {
+    method: 'DELETE',
+  });
+
+  if (response.ok) {
+    const spot = await response.clone().json();
+    dispatch(deleteSpotAction(spot));
+  }
+  return response;
+};
+
 const initialState = {};
 
 const allSpotsReducer = (state = initialState, action) => {
@@ -95,6 +115,10 @@ const allSpotsReducer = (state = initialState, action) => {
     case LOAD_USER_OWNED:
       newState = Object.assign({}, state);
       newState = {...action.payload.Spots};
+      return newState;
+    case DELETE_SPOT:
+      newState = Object.assign({}, state);
+      delete newState[action.payload.id]
       return newState;
     default:
       return state;
