@@ -23,6 +23,9 @@ const UserSpotBrowser = () => {
     return (
         <div>
             <h1>Manage Your Spots</h1>
+            <Link exact to="/spots/new">
+                <button onClick={(e)=> e.preventDefault}>Create a New Spot</button>
+            </Link>
             <ul className='spot-list'>
                 {spots.map((spot) => (
                     <li key={spot["id"]} className='spot-card-list-item'>
