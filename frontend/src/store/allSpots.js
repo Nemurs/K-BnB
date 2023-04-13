@@ -3,18 +3,35 @@ import { csrfFetch } from "./csrf";
 
 const LOAD_ALL = "allSpots/loadAll";
 const LOAD_USER_OWNED =  "allSpots/loadUserOwned";
+const CREATE_NEW_SPOT = "allSpots/createNewSpot";
+const CREATE_NEW_SPOT_IMAGE = "allSpots/createNewSpotImage";
 
 const loadAllAction = (data) => {
   return {
     type: LOAD_ALL,
-    payload:data
+    payload: data
   };
 };
 
-const loadUserOwnedAction = (user) => {
+//TODO:
+// const loadUserOwnedAction = (user) => {
+//   return {
+//     type: LOAD_USER_OWNED,
+//     payload: user
+//   };
+// };
+
+const createNewSpotAction = (data) => {
   return {
-    type: LOAD_USER_OWNED,
-    payload: user
+    type: CREATE_NEW_SPOT,
+    payload: data
+  };
+};
+
+const createNewSpotImageAction = (data) => {
+  return {
+    type: CREATE_NEW_SPOT,
+    payload: data
   };
 };
 
@@ -22,6 +39,34 @@ export const loadAllThunk = () => async (dispatch) => {
   const response = await csrfFetch("/api/spots");
   const data = await response.json();
   dispatch(loadAllAction(data));
+  return response;
+};
+
+export const createNewSpotThunk = (payload) => async (dispatch) => {
+  const response = await csrfFetch('/api/spots', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  if (response.ok) {
+    const spot = await response.clone().json();
+    dispatch(createNewSpotAction(spot));
+  }
+  return response;
+};
+
+export const createNewSpotImageThunk = (payload) => async (dispatch) => {
+  const response = await csrfFetch(`/api/spots/${payload.id}/images`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload.body)
+  });
+
+  if (response.ok) {
+    const spot = await response.clone().json();
+    dispatch(createNewSpotImageAction(spot));
+  }
   return response;
 };
 
@@ -33,6 +78,10 @@ const allSpotsReducer = (state = initialState, action) => {
     case LOAD_ALL:
       newState = Object.assign({}, state);
       newState = {...action.payload.Spots};
+      return newState;
+    case CREATE_NEW_SPOT:
+      newState = Object.assign({}, state);
+      newState[action.payload.id] = action.payload;
       return newState;
     case LOAD_USER_OWNED:
       //TODO

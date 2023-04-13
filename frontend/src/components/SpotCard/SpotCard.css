@@ -9,3 +9,7 @@
     display: flex;
     justify-content: space-between;
 }
+
+.spot-card-text-right{
+    margin-top: 15px;
+}

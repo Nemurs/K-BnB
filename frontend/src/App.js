@@ -7,6 +7,7 @@ import Navigation from "./components/Navigation";
 import { Route } from "react-router-dom";
 import SpotBrowser from "./components/SpotBrowser";
 import DetailedSpotCard from './components/DetailedSpotCard';
+import NewSpotForm from "./components/NewSpotForm";
 
 function App() {
   const dispatch = useDispatch();
@@ -20,11 +21,14 @@ function App() {
       <Navigation isLoaded={isLoaded} />
       {isLoaded && (
         <Switch>
-          <Route exact path={"/"}>
-            <SpotBrowser />
+          <Route exact path='/spots/new'>
+            <NewSpotForm />
           </Route>
           <Route exact path='/spots/:id'>
             <DetailedSpotCard />
+          </Route>
+          <Route exact path='/'>
+            <SpotBrowser />
           </Route>
         </Switch>
       )}

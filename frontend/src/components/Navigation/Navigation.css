@@ -31,3 +31,9 @@
     cursor: pointer;
     box-shadow: 1px 3px 5px #d3d3d3 ;
 }
+
+.nav-list-right{
+    display: flex;
+    align-items: center;
+    column-gap: 20px;
+}
