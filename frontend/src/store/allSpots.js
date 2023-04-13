@@ -30,7 +30,7 @@ const createNewSpotAction = (data) => {
 
 const createNewSpotImageAction = (data) => {
   return {
-    type: CREATE_NEW_SPOT,
+    type: CREATE_NEW_SPOT_IMAGE,
     payload: data
   };
 };
@@ -64,8 +64,8 @@ export const createNewSpotImageThunk = (payload) => async (dispatch) => {
   });
 
   if (response.ok) {
-    const spot = await response.clone().json();
-    dispatch(createNewSpotImageAction(spot));
+    const img = await response.clone().json();
+    dispatch(createNewSpotImageAction({img, spotId: payload.id}));
   }
   return response;
 };
@@ -83,6 +83,9 @@ const allSpotsReducer = (state = initialState, action) => {
       newState = Object.assign({}, state);
       newState[action.payload.id] = action.payload;
       return newState;
+    case CREATE_NEW_SPOT_IMAGE:
+      newState = Object.assign({}, state);
+      newState[action.payload.spotId].previewImage = action.payload.img.url;
     case LOAD_USER_OWNED:
       //TODO
       return state;
