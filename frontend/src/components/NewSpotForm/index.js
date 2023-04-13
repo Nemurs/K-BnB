@@ -2,14 +2,14 @@ import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { createNewSpotImageThunk, createNewSpotThunk, editSpotThunk, loadAllThunk } from '../../store/allSpots';
 import "./NewSpotForm.css";
-import { useHistory, useParams} from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 
 const NewSpotForm = () => {
     const dispatch = useDispatch();
     const history = useHistory();
     const { id } = useParams();
     const spot = useSelector(state => state.spots.singleSpot);
-    let prevImg = spot?.SpotImages?.find(img => img.preview === true);
+    // let prevImg = spot?.SpotImages?.find(img => img.preview === true); FOR LATER
     const user = useSelector(state => state.session.user)
 
     useEffect(() => {
@@ -28,7 +28,8 @@ const NewSpotForm = () => {
     const [description, setDescription] = useState(editBool ? spot.description : '');
     const [name, setName] = useState(editBool ? spot.name : '');
     const [price, setPrice] = useState(editBool ? String(spot.price) : '');
-    const [previewImageURL, setPreviewImageURL] = useState(editBool ? prevImg.url : '');
+    const [previewImageURL, setPreviewImageURL] = useState('');
+    // const [previewImageURL, setPreviewImageURL] = useState(editBool ? prevImg.url : ''); FOR LATER
     const [error, setError] = useState({});
     const [touched, setTouched] = useState({});
     const [submitState, setSubmitState] = useState(false);
@@ -56,23 +57,13 @@ const NewSpotForm = () => {
             alert(`Please fix the following errors before submitting: \n${alertMsg}`);
             return;
         };
-        if(editBool){
-            let spotRes = await dispatch(editSpotThunk({id, ...newSpot}));
+        if (editBool) {
+            //TODO: UPDATE IMAGES
+            let spotRes = await dispatch(editSpotThunk({ id, ...newSpot }));
             if (spotRes.ok) {
                 let spotData = await spotRes.json();
                 console.log(spotData);
                 history.push(`/spots/${spotData.id}`);
-                // let imgPayload = { id: spotData.id, body: { url: previewImageURL, preview: true } }
-                // let imgRes = await dispatch(createNewSpotImageThunk(imgPayload));
-                // if (imgRes.ok) {
-                //     history.push(`/spots/${spotData.id}`);
-                //     reset();
-                // }
-                // else {
-                //     console.log("error with img data")
-                //     console.log(imgRes);
-                //     console.log(spotData);
-                // }
             }
             else {
                 console.log("error with spot data")
@@ -129,7 +120,8 @@ const NewSpotForm = () => {
 
         if (description.length < 30 || description.length > 255) newErrors.description = "Description must be between 30 and 255 characters"
 
-        if (!(previewImageURL.endsWith(".png") || previewImageURL.endsWith(".jpg") || previewImageURL.endsWith(".jpeg") || previewImageURL.length)) {
+        if (!editBool && !(previewImageURL.endsWith(".png") || previewImageURL.endsWith(".jpg") || previewImageURL.endsWith(".jpeg") || previewImageURL.length)) {
+            //TODO: remove !editBool when implementing edit image feature
             newErrors.previewImageURL = "Image URL must end in .png, .jpg, or .jpeg"
         }
 
@@ -148,7 +140,7 @@ const NewSpotForm = () => {
 
     return (
         <div className='create-new-spot-page'>
-            <h1>{editBool? "Update your Spot": "Create a new Spot"}</h1>
+            <h1>{editBool ? "Update your Spot" : "Create a new Spot"}</h1>
 
             <div className='create-new-spot-form-div'>
                 <form className='create-new-spot-form' onSubmit={handleSubmit}>
@@ -253,7 +245,8 @@ const NewSpotForm = () => {
                         />
                         {((touched.price || submitState) && error.price) && <p className="form-error">{error.price}</p>}
                     </div>
-                    <div className='create-new-spot-form-image'>
+                    {!editBool && <div className='create-new-spot-form-image'>
+                        {/* TODO: remove !editBool when implementing edit image feature */}
                         <h3>Liven up your spot with photos</h3>
                         <p>Submit a link to one photo to publish your spot</p>
                         <input
@@ -265,8 +258,8 @@ const NewSpotForm = () => {
                             onBlur={() => setTouched({ ...touched, 'previewImageURL': true })}
                         />
                         {((touched.previewImageURL || submitState) && error.previewImageURL) && <p className="form-error">{error.previewImageURL}</p>}
-                    </div>
-                    <button type='submit'>{editBool? "Update Spot": "Create Spot"}</button>
+                    </div>}
+                    <button type='submit'>{editBool ? "Update Spot" : "Create Spot"}</button>
                 </form>
             </div>
         </div>
