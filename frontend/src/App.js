@@ -5,6 +5,7 @@ import { Switch } from "react-router-dom";
 import * as sessionActions from "./store/session";
 import Navigation from "./components/Navigation";
 import { Route } from "react-router-dom";
+import UserSpotBrowser from "./components/UserSpotBrowser";
 import SpotBrowser from "./components/SpotBrowser";
 import DetailedSpotCard from './components/DetailedSpotCard';
 import NewSpotForm from "./components/NewSpotForm";
@@ -23,6 +24,9 @@ function App() {
         <Switch>
           <Route exact path='/spots/new'>
             <NewSpotForm />
+          </Route>
+          <Route exact path='/spots/current'>
+            <UserSpotBrowser />
           </Route>
           <Route exact path='/spots/:id'>
             <DetailedSpotCard />
