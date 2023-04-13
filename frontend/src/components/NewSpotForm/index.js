@@ -94,7 +94,7 @@ const NewSpotForm = () => {
 
         if (isNaN(Number(latitude)) || Number(latitude) < -90 || Number(latitude) > 90) newErrors.latitude = "Latitude must be a number between -90 and 90";
 
-        if (isNaN(Number(longitude)) || Number(longitude) < -180 || Number(longitude) > 180) newErrors.longitude = "Longitude must be a number between -90 and 90";
+        if (isNaN(Number(longitude)) || Number(longitude) < -180 || Number(longitude) > 180) newErrors.longitude = "Longitude must be a number between -180 and 180";
 
         if (description.length < 30 || description.length > 255) newErrors.description = "Description must be between 30 and 255 characters"
 
