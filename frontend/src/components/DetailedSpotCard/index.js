@@ -5,6 +5,7 @@ import { loadOneThunk } from "../../store/singleSpot";
 import placeHolderImage from "../../Assets/Images/No-Image-Placeholder.png";
 import "./DetailedSpotCard.css";
 import ReserveSpot from "../ReserveSpot";
+import ReviewAggText from "../ReviewAggText";
 
 const DetailedSpotCard = () => {
     const dispatch = useDispatch();
@@ -22,26 +23,31 @@ const DetailedSpotCard = () => {
     const otherImages = spot.SpotImages?.filter(img => img?.preview !== true);
 
     return (
-        <div className="detailed-spot-card">
-            <h1>{spot.name}</h1>
-            <p className='detailed-spot-card-location-text'>{spot.city}, {spot.state}, {spot.country}</p>
-            <div className="detailed-spot-card-img-wrapper">
-                <div className="detailed-spot-card-img-wrapper-left">
-                    <img src={previewImage ? previewImage.url : placeHolderImage} className="detailed-spot-card-preview-img" />
+        <div className="detailed-spot-page">
+            <div className="detailed-spot-card">
+                <h1>{spot.name}</h1>
+                <p className='detailed-spot-card-location-text'>{spot.city}, {spot.state}, {spot.country}</p>
+                <div className="detailed-spot-card-img-wrapper">
+                    <div className="detailed-spot-card-img-wrapper-left">
+                        <img src={previewImage ? previewImage.url : placeHolderImage} className="detailed-spot-card-preview-img" />
+                    </div>
+                    <div className="detailed-spot-card-img-wrapper-right">
+                        <img src={otherImages && otherImages[0] ? otherImages[0].url : placeHolderImage} className="detailed-spot-card-img" />
+                        <img src={otherImages && otherImages[1] ? otherImages[1].url : placeHolderImage} className="detailed-spot-card-img" />
+                        <img src={otherImages && otherImages[2] ? otherImages[2].url : placeHolderImage} className="detailed-spot-card-img" />
+                        <img src={otherImages && otherImages[3] ? otherImages[3].url : placeHolderImage} className="detailed-spot-card-img" />
+                    </div>
                 </div>
-                <div className="detailed-spot-card-img-wrapper-right">
-                    <img src={otherImages && otherImages[0] ? otherImages[0].url : placeHolderImage} className="detailed-spot-card-img" />
-                    <img src={otherImages && otherImages[1] ? otherImages[1].url : placeHolderImage} className="detailed-spot-card-img" />
-                    <img src={otherImages && otherImages[2] ? otherImages[2].url : placeHolderImage} className="detailed-spot-card-img" />
-                    <img src={otherImages && otherImages[3] ? otherImages[3].url : placeHolderImage} className="detailed-spot-card-img" />
+                <div className="detailed-spot-card-bottom">
+                    <div className='detailed-spot-card-host-description'>
+                        <p className='detailed-spot-card-host-text'>{user && user.id && user.id === spot.Owner.id ? `Hosted by You` : `Hosted by ${spot.Owner.firstName} ${spot.Owner.lastName}`}</p>
+                        <p className='detailed-spot-card-description-text'>{spot.description}</p>
+                    </div>
+                    <ReserveSpot spot={spot} />
                 </div>
             </div>
-            <div className="detailed-spot-card-bottom">
-                <div className='detailed-spot-card-host-description'>
-                    <p className='detailed-spot-card-host-text'>{user && user.id && user.id === spot.Owner.id ? `Hosted by You`: `Hosted by ${spot.Owner.firstName} ${spot.Owner.lastName}`}</p>
-                    <p className='detailed-spot-card-description-text'>{spot.description}</p>
-                </div>
-                <ReserveSpot spot={spot} />
+            <div className="detailed-spot-reviews">
+                <ReviewAggText spot={spot} includeReviewCount={true} />
             </div>
         </div>
     )
