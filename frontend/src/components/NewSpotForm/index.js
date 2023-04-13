@@ -140,7 +140,6 @@ const NewSpotForm = () => {
                             value={address}
                             placeholder='Address'
                             name='address'
-                            required={true}
                         />
                         {(submitState && error.address) && <p className="form-error">{error.address}</p>}
                         <label>City</label>
@@ -150,7 +149,6 @@ const NewSpotForm = () => {
                             value={city}
                             placeholder='City'
                             name='city'
-                            required={true}
                         />
                         {(submitState && error.city) && <p className="form-error">{error.city}</p>}
                         <label>State</label>
@@ -160,7 +158,6 @@ const NewSpotForm = () => {
                             value={state}
                             placeholder='STATE'
                             name='state'
-                            required={true}
                         />
                         {(submitState && error.state) && <p className="form-error">{error.state}</p>}
                         <label>Latitude</label>
