@@ -28,6 +28,9 @@ function App() {
           <Route exact path='/spots/current'>
             <UserSpotBrowser />
           </Route>
+          <Route exact path='/spots/:id/edit'>
+            <NewSpotForm />
+          </Route>
           <Route exact path='/spots/:id'>
             <DetailedSpotCard />
           </Route>

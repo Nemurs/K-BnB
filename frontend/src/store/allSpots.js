@@ -6,6 +6,7 @@ const LOAD_USER_OWNED =  "allSpots/loadUserOwned";
 const CREATE_NEW_SPOT = "allSpots/createNewSpot";
 const CREATE_NEW_SPOT_IMAGE = "allSpots/createNewSpotImage";
 const DELETE_SPOT = "allSpots/deleteSpot";
+const EDIT_SPOT = "allSpots/editSpot";
 
 const loadAllAction = (data) => {
   return {
@@ -38,6 +39,13 @@ const createNewSpotImageAction = (data) => {
 const deleteSpotAction = (data) => {
   return {
     type: DELETE_SPOT,
+    payload: data
+  };
+};
+
+const editSpotAction = (data) => {
+  return {
+    type: EDIT_SPOT,
     payload: data
   };
 };
@@ -96,6 +104,20 @@ export const deleteSpotThunk = (payload) => async (dispatch) => {
   return response;
 };
 
+export const editSpotThunk = (payload) => async (dispatch) => {
+  const response = await csrfFetch(`/api/spots/${payload.id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  if (response.ok) {
+    const spot = await response.clone().json();
+    dispatch(editSpotAction(spot));
+  }
+  return response;
+};
+
 const initialState = {};
 
 const allSpotsReducer = (state = initialState, action) => {
@@ -103,7 +125,11 @@ const allSpotsReducer = (state = initialState, action) => {
   switch (action.type) {
     case LOAD_ALL:
       newState = Object.assign({}, state);
-      newState = {...action.payload.Spots};
+      let normalized = {};
+      action.payload.Spots.forEach(spot => {
+        normalized[spot.id] = spot
+      });
+      newState = {...normalized};
       return newState;
     case CREATE_NEW_SPOT:
       newState = Object.assign({}, state);
@@ -119,6 +145,10 @@ const allSpotsReducer = (state = initialState, action) => {
     case DELETE_SPOT:
       newState = Object.assign({}, state);
       delete newState[action.payload.id]
+      return newState;
+    case EDIT_SPOT:
+      newState = Object.assign({}, state);
+      newState[action.payload.id] = action.payload;
       return newState;
     default:
       return state;

@@ -1,27 +1,34 @@
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { createNewSpotImageThunk, createNewSpotThunk, loadAllThunk } from '../../store/allSpots';
+import { createNewSpotImageThunk, createNewSpotThunk, editSpotThunk, loadAllThunk } from '../../store/allSpots';
 import "./NewSpotForm.css";
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams} from 'react-router-dom';
 
 const NewSpotForm = () => {
     const dispatch = useDispatch();
     const history = useHistory();
+    const { id } = useParams();
+    const spot = useSelector(state => state.spots.singleSpot);
+    let prevImg = spot?.SpotImages?.find(img => img.preview === true);
+    const user = useSelector(state => state.session.user)
 
     useEffect(() => {
         dispatch(loadAllThunk());
     }, [dispatch]);
 
-    const [country, setCountry] = useState('');
-    const [address, setAddress] = useState('');
-    const [city, setCity] = useState('');
-    const [state, setState] = useState('');
-    const [latitude, setLatitude] = useState('');
-    const [longitude, setLongitude] = useState('');
-    const [description, setDescription] = useState('');
-    const [name, setName] = useState('');
-    const [price, setPrice] = useState('');
-    const [previewImageURL, setPreviewImageURL] = useState('');
+    let editBool = id && user && user?.id && user?.id === spot?.Owner?.id;
+
+
+    const [country, setCountry] = useState(editBool ? spot.country : '');
+    const [address, setAddress] = useState(editBool ? spot.address : '');
+    const [city, setCity] = useState(editBool ? spot.city : '');
+    const [state, setState] = useState(editBool ? spot.state : '');
+    const [latitude, setLatitude] = useState(editBool ? String(spot.lat) : '');
+    const [longitude, setLongitude] = useState(editBool ? String(spot.lng) : '');
+    const [description, setDescription] = useState(editBool ? spot.description : '');
+    const [name, setName] = useState(editBool ? spot.name : '');
+    const [price, setPrice] = useState(editBool ? String(spot.price) : '');
+    const [previewImageURL, setPreviewImageURL] = useState(editBool ? prevImg.url : '');
     const [error, setError] = useState({});
     const [touched, setTouched] = useState({});
     const [submitState, setSubmitState] = useState(false);
@@ -49,27 +56,51 @@ const NewSpotForm = () => {
             alert(`Please fix the following errors before submitting: \n${alertMsg}`);
             return;
         };
-
-        let spotRes = await dispatch(createNewSpotThunk(newSpot));
-        if (spotRes.ok) {
-            let spotData = await spotRes.json();
-            console.log(spotData);
-            let imgPayload = { id: spotData.id, body: { url: previewImageURL, preview: true } }
-            let imgRes = await dispatch(createNewSpotImageThunk(imgPayload));
-            if (imgRes.ok) {
+        if(editBool){
+            let spotRes = await dispatch(editSpotThunk({id, ...newSpot}));
+            if (spotRes.ok) {
+                let spotData = await spotRes.json();
+                console.log(spotData);
                 history.push(`/spots/${spotData.id}`);
-                reset();
+                // let imgPayload = { id: spotData.id, body: { url: previewImageURL, preview: true } }
+                // let imgRes = await dispatch(createNewSpotImageThunk(imgPayload));
+                // if (imgRes.ok) {
+                //     history.push(`/spots/${spotData.id}`);
+                //     reset();
+                // }
+                // else {
+                //     console.log("error with img data")
+                //     console.log(imgRes);
+                //     console.log(spotData);
+                // }
             }
             else {
-                console.log("error with img data")
-                console.log(imgRes);
+                console.log("error with spot data")
+                console.log(await spotRes.json());
+            }
+        } else {
+            let spotRes = await dispatch(createNewSpotThunk(newSpot));
+            if (spotRes.ok) {
+                let spotData = await spotRes.json();
                 console.log(spotData);
+                let imgPayload = { id: spotData.id, body: { url: previewImageURL, preview: true } }
+                let imgRes = await dispatch(createNewSpotImageThunk(imgPayload));
+                if (imgRes.ok) {
+                    history.push(`/spots/${spotData.id}`);
+                    reset();
+                }
+                else {
+                    console.log("error with img data")
+                    console.log(imgRes);
+                    console.log(spotData);
+                }
+            }
+            else {
+                console.log("error with spot data")
+                console.log(spotRes);
             }
         }
-        else {
-            console.log("error with spot data")
-            console.log(spotRes);
-        }
+
     };
 
     const reset = () => {
@@ -88,7 +119,7 @@ const NewSpotForm = () => {
     useEffect(() => {
         let newErrors = {}
         //Special Errors
-        if (name.length < 2 || name.length > 255) newErrors.name = "Name must be between 2 and 255 characters";
+        if (name.length < 2 || name.length > 50) newErrors.name = "Name must be between 2 and 50 characters";
 
         if (!price.length || isNaN(Number(price)) || Number(price) < 0) newErrors.price = "Price must be a number greater than 0";
 
@@ -117,7 +148,7 @@ const NewSpotForm = () => {
 
     return (
         <div className='create-new-spot-page'>
-            <h1>Create a new Spot</h1>
+            <h1>{editBool? "Update your Spot": "Create a new Spot"}</h1>
 
             <div className='create-new-spot-form-div'>
                 <form className='create-new-spot-form' onSubmit={handleSubmit}>
@@ -235,7 +266,7 @@ const NewSpotForm = () => {
                         />
                         {((touched.previewImageURL || submitState) && error.previewImageURL) && <p className="form-error">{error.previewImageURL}</p>}
                     </div>
-                    <button type='submit'>Create Spot</button>
+                    <button type='submit'>{editBool? "Update Spot": "Create Spot"}</button>
                 </form>
             </div>
         </div>

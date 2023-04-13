@@ -3,10 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 import SpotCard from '../SpotCard';
 import { loadUserOwnedThunk } from '../../store/allSpots';
+import { loadOneThunk } from "../../store/singleSpot";
 import "./UserSpotBrowser.css";
 import OpenModalButton from '../OpenModalButton';
 import DeleteSpotModal from '../DeleteSpotModal';
-import UpdateSpotModal from '../UpdateSpotModal';
 
 const UserSpotBrowser = () => {
     const dispatch = useDispatch();
@@ -23,6 +23,13 @@ const UserSpotBrowser = () => {
         if (!sessionUser) history.push("/");
     }, [sessionUser])
 
+    async function handleClick(e, id){
+        e.preventDefault();
+        console.log(id);
+        await dispatch(loadOneThunk(id));
+        history.push(`/spots/${id}/edit`);
+    }
+
     return (
         <div>
             <h1>Manage Your Spots</h1>
@@ -36,10 +43,9 @@ const UserSpotBrowser = () => {
                             <SpotCard spot={spot} tooltip={spot["name"]} />
                         </Link>
                         <div>
-                            <OpenModalButton
-                                buttonText="Update"
-                                modalComponent={<UpdateSpotModal spot={spot} />}
-                            />
+                            <Link to={`/spots/${spot["id"]}/edit`}>
+                                <button onClick={e => handleClick(e, spot["id"])}>Update</button>
+                            </Link>
                             <OpenModalButton
                                 buttonText="Delete"
                                 modalComponent={<DeleteSpotModal spotId={spot["id"]} />}
