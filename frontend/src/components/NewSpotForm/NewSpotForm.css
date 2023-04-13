@@ -1,8 +1,10 @@
-.create-new-spot-form, .create-new-spot-form-location, .create-new-spot-form-description{
+.create-new-spot-form, .create-new-spot-form-location{
     display: flex;
     flex-direction: column;
 }
 
-.create-new-spot-form{
-    row-gap: 20px;
+.form-error{
+    color: palevioletred;
+    font-size: 10px;
+
 }
