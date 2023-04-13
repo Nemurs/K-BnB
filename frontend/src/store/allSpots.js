@@ -13,13 +13,12 @@ const loadAllAction = (data) => {
   };
 };
 
-//TODO:
-// const loadUserOwnedAction = (user) => {
-//   return {
-//     type: LOAD_USER_OWNED,
-//     payload: user
-//   };
-// };
+const loadUserOwnedAction = (data) => {
+  return {
+    type: LOAD_USER_OWNED,
+    payload: data
+  };
+};
 
 const createNewSpotAction = (data) => {
   return {
@@ -39,6 +38,13 @@ export const loadAllThunk = () => async (dispatch) => {
   const response = await csrfFetch("/api/spots");
   const data = await response.json();
   dispatch(loadAllAction(data));
+  return response;
+};
+
+export const loadUserOwnedThunk = () => async (dispatch) => {
+  const response = await csrfFetch("/api/spots/current");
+  const data = await response.json();
+  dispatch(loadUserOwnedAction(data));
   return response;
 };
 
@@ -87,8 +93,9 @@ const allSpotsReducer = (state = initialState, action) => {
       newState = Object.assign({}, state);
       newState[action.payload.spotId].previewImage = action.payload.img.url;
     case LOAD_USER_OWNED:
-      //TODO
-      return state;
+      newState = Object.assign({}, state);
+      newState = {...action.payload.Spots};
+      return newState;
     default:
       return state;
   }
