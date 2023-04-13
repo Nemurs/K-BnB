@@ -192,10 +192,9 @@ const NewSpotForm = () => {
                             name='description'
                             placeholder='Please write at least 30 characters'
                             rows='10'
-                            required={true}
                             onBlur={() => setTouched({ ...touched, 'description': true })}
                         ></textarea>
-                        {(touched.description && error.description) && <p className="form-error">{error.description}</p>}
+                        {((touched.description || submitState) && error.description) && <p className="form-error">{error.description}</p>}
                     </div>
                     <div className='create-new-spot-form-name'>
                         <h3>Create a title for your spot</h3>
@@ -206,10 +205,9 @@ const NewSpotForm = () => {
                             value={name}
                             placeholder='Name of your spot'
                             name='name'
-                            required={true}
                             onBlur={() => setTouched({ ...touched, 'name': true })}
                         />
-                        {(touched.name && error.name) && <p className="form-error">{error.name}</p>}
+                        {((touched.name || submitState) && error.name) && <p className="form-error">{error.name}</p>}
                     </div>
                     <div className='create-new-spot-form-price'>
                         <h3>Set a base price for your spot</h3>
@@ -220,10 +218,9 @@ const NewSpotForm = () => {
                             value={price}
                             placeholder='Price per night (USD)'
                             name='price'
-                            required={true}
                             onBlur={() => setTouched({ ...touched, 'price': true })}
                         />
-                        {(touched.price && error.price) && <p className="form-error">{error.price}</p>}
+                        {((touched.price || submitState) && error.price) && <p className="form-error">{error.price}</p>}
                     </div>
                     <div className='create-new-spot-form-image'>
                         <h3>Liven up your spot with photos</h3>
@@ -234,10 +231,9 @@ const NewSpotForm = () => {
                             value={previewImageURL}
                             placeholder='Preview Image URL'
                             name='previewImageURL'
-                            required={true}
                             onBlur={() => setTouched({ ...touched, 'previewImageURL': true })}
                         />
-                        {(touched.previewImageURL && error.previewImageURL) && <p className="form-error">{error.previewImageURL}</p>}
+                        {((touched.previewImageURL || submitState) && error.previewImageURL) && <p className="form-error">{error.previewImageURL}</p>}
                     </div>
                     <button type='submit'>Create Spot</button>
                 </form>
