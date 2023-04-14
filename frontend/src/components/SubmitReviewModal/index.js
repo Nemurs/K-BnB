@@ -3,16 +3,28 @@ import { useDispatch } from "react-redux";
 import { useModal } from "../../context/Modal.js";
 import StarRatingInput from "../StarRatingInput";
 import "./SubmitReviewModal.css";
+import { createNewReviewThunk, loadAllReviewsThunk } from "../../store/singleSpotReviews.js";
+import { loadOneThunk } from "../../store/singleSpot.js";
 
-function SubmitReviewModal() {
+function SubmitReviewModal({spotId, user}) {
     const dispatch = useDispatch();
     const [reviewText, setReviewText] = useState("");
     const [rating, setRating] = useState(5);
     const { closeModal } = useModal();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        closeModal();
+
+        let res = await dispatch(createNewReviewThunk({spotId: Number(spotId), body:{review:reviewText, stars:rating}, user}));
+
+        if(!res.ok){
+            console.log(await res.json());
+            // console.log(spots);
+        } else {
+            await dispatch(loadAllReviewsThunk(spotId));
+            await dispatch(loadOneThunk(spotId));
+            closeModal();
+        }
     };
 
     const onChange = (number) => {

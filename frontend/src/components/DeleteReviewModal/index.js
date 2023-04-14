@@ -17,7 +17,7 @@ const DeleteReviewModal = ({revId, spotId}) => {
         } else {
             closeModal();
             await dispatch(loadAllReviewsThunk(spotId));
-            await dispatch(dispatch(loadOneThunk(spotId)))
+            await dispatch(loadOneThunk(spotId));
 
         }
     }

@@ -36,15 +36,15 @@ export const loadAllReviewsThunk = (id) => async (dispatch) => {
 };
 
 export const createNewReviewThunk = (payload) => async (dispatch) => {
-  const response = await csrfFetch('/api/spots', {
+  const response = await csrfFetch(`/api/spots/${payload.spotId}/reviews`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload.body)
   });
-
   if (response.ok) {
     const spot = await response.clone().json();
-    dispatch(createNewReviewAction(spot));
+    spot.spotId = Number(spot.spotId);
+    dispatch(createNewReviewAction({spot, user:payload.user}));
   }
   return response;
 };
@@ -77,7 +77,10 @@ const singleSpotReviews = (state = initialState, action) => {
       return newState;
     case CREATE_NEW_REVIEW:
       newState = Object.assign({}, state);
-      newState[action.payload.id] = action.payload;
+      newState[action.payload.spot.id] = action.payload.spot;
+      delete action.payload.user.email;
+      delete action.payload.user.username;
+      newState[action.payload.spot.id].User = action.payload.user
       return newState;
     case DELETE_REVIEW:
       newState = Object.assign({}, state);
