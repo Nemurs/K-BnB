@@ -33,6 +33,10 @@ const DetailedSpotCard = () => {
     const previewImage = spot.SpotImages?.find(img => img?.preview === true);
     const otherImages = spot.SpotImages?.filter(img => img?.preview !== true);
 
+    let isSpotOwnedByLoggedInUser = user && user.id && user.id === spot.Owner.id;
+
+    let isReviewedByLoggedInUser = user && user.id && reviews.find(rev => user.id === rev.User.id);
+
     return (
         <div className="detailed-spot-page">
             <div className="detailed-spot-card">
@@ -51,7 +55,7 @@ const DetailedSpotCard = () => {
                 </div>
                 <div className="detailed-spot-card-bottom">
                     <div className='detailed-spot-card-host-description'>
-                        <p className='detailed-spot-card-host-text'>{user && user.id && user.id === spot.Owner.id ? `Hosted by You` : `Hosted by ${spot.Owner.firstName} ${spot.Owner.lastName}`}</p>
+                        <p className='detailed-spot-card-host-text'>{isSpotOwnedByLoggedInUser ? `Hosted by You` : `Hosted by ${spot.Owner.firstName} ${spot.Owner.lastName}`}</p>
                         <p className='detailed-spot-card-description-text'>{spot.description}</p>
                     </div>
                     <ReserveSpot spot={spot} />
@@ -59,6 +63,7 @@ const DetailedSpotCard = () => {
             </div>
             <div className="detailed-spot-reviews">
                 <ReviewAggText spot={spot} includeReviewCount={true} style={"large"}/>
+                {user && !(isSpotOwnedByLoggedInUser || isReviewedByLoggedInUser) && <button>Post Your Review</button>}
                 <ul className="review-list">
                     {reviews.map((rev) => (
                         <li key={rev["id"]} className='review-list-item'>
