@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loadOneThunk } from "../../store/singleSpot";
+import { loadAllReviewsThunk } from "../../store/singleSpotReviews";
 import placeHolderImage from "../../Assets/Images/No-Image-Placeholder.png";
 import "./DetailedSpotCard.css";
 import ReserveSpot from "../ReserveSpot";
@@ -11,10 +12,12 @@ const DetailedSpotCard = () => {
     const dispatch = useDispatch();
     const { id } = useParams();
     const spot = useSelector(state => state.spots.singleSpot);
-    const user = useSelector(state => state.session.user)
+    const user = useSelector(state => state.session.user);
+    const reviews = useSelector(state => Object.values(state.reviews.spot));
 
     useEffect(() => {
         dispatch(loadOneThunk(id));
+        dispatch(loadAllReviewsThunk(id));
     }, [dispatch]);
 
     if (!spot || !spot.Owner) return (<h1>Spot: {id} Loading...</h1>)
@@ -48,6 +51,13 @@ const DetailedSpotCard = () => {
             </div>
             <div className="detailed-spot-reviews">
                 <ReviewAggText spot={spot} includeReviewCount={true} />
+                <ul className="review-list">
+                    {reviews.map((rev) => (
+                        <li key={rev["id"]} className='review-list-item'>
+                            {rev.review}
+                        </li>
+                    ))}
+                </ul>
             </div>
         </div>
     )
