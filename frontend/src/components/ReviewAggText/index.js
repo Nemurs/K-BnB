@@ -1,8 +1,9 @@
 import "./ReviewAggText.css";
 
-const ReviewAggText = ({ spot, includeReviewCount}) => {
+const ReviewAggText = ({ spot, includeReviewCount, style}) => {
+    console.log(style)
     return (
-        <div className="review-agg-text">
+        <div className={`review-agg-text ${style === 'large' ? "large" :""}`}>
             <span className='review-agg-text-rating'>
                 <i className='fas fa-star'></i>
                 {` ${spot.avgRating ? Number.parseFloat(spot.avgRating).toFixed(2) : "New"}`}
