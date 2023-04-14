@@ -9,6 +9,7 @@ import ReserveSpot from "../ReserveSpot";
 import ReviewAggText from "../ReviewAggText";
 import OpenModalButton from "../OpenModalButton";
 import DeleteReviewModal from "../DeleteReviewModal";
+import SubmitReviewModal from "../SubmitReviewModal";
 
 const DetailedSpotCard = () => {
     const dispatch = useDispatch();
@@ -17,10 +18,10 @@ const DetailedSpotCard = () => {
     const user = useSelector(state => state.session.user);
     const reviews = useSelector(state => Object.values(state.reviews.spot));
 
-    function processDate(dateString){
+    function processDate(dateString) {
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'Augus', 'September', 'October', 'November', 'December']
         let date = new Date(dateString);
-        return `${months[date.getMonth()-1]} ${date.getFullYear()}`;
+        return `${months[date.getMonth() - 1]} ${date.getFullYear()}`;
     }
 
     useEffect(() => {
@@ -32,6 +33,10 @@ const DetailedSpotCard = () => {
 
     const previewImage = spot.SpotImages?.find(img => img?.preview === true);
     const otherImages = spot.SpotImages?.filter(img => img?.preview !== true);
+
+    let isSpotOwnedByLoggedInUser = user && user.id && user.id === spot.Owner.id;
+
+    let isReviewedByLoggedInUser = user && user.id && reviews.length && reviews.find(rev => user.id === rev?.User?.id);
 
     return (
         <div className="detailed-spot-page">
@@ -51,26 +56,31 @@ const DetailedSpotCard = () => {
                 </div>
                 <div className="detailed-spot-card-bottom">
                     <div className='detailed-spot-card-host-description'>
-                        <p className='detailed-spot-card-host-text'>{user && user.id && user.id === spot.Owner.id ? `Hosted by You` : `Hosted by ${spot.Owner.firstName} ${spot.Owner.lastName}`}</p>
+                        <p className='detailed-spot-card-host-text'>{isSpotOwnedByLoggedInUser ? `Hosted by You` : `Hosted by ${spot?.Owner?.firstName} ${spot?.Owner?.lastName}`}</p>
                         <p className='detailed-spot-card-description-text'>{spot.description}</p>
                     </div>
                     <ReserveSpot spot={spot} />
                 </div>
             </div>
             <div className="detailed-spot-reviews">
-                <ReviewAggText spot={spot} includeReviewCount={true} style={"large"}/>
+                <ReviewAggText spot={spot} includeReviewCount={true} style={"large"} />
+                {user && !(isSpotOwnedByLoggedInUser || isReviewedByLoggedInUser) && <OpenModalButton
+                    buttonText="Post Your Review"
+                    modalComponent={<SubmitReviewModal spotId={spot.id} user={user}/>}
+                />}
+                {!reviews.length && <p>Be the first to post a review!</p>}
                 <ul className="review-list">
-                    {reviews.map((rev) => (
+                    {reviews.length? reviews.map((rev) => (
                         <li key={rev["id"]} className='review-list-item'>
                             <h3>{rev.User.firstName}</h3>
                             <h4>{processDate(rev.updatedAt)}</h4>
                             <p className="review-text">{rev.review}</p>
-                            {user && user.id === rev.User.id? <OpenModalButton
+                            {user && user.id === rev.User.id ? <OpenModalButton
                                 buttonText="Delete"
-                                modalComponent={<DeleteReviewModal revId={rev.id} spotId={spot.id}/>}
-                            />:<></>}
+                                modalComponent={<DeleteReviewModal revId={rev.id} spotId={spot.id} />}
+                            /> : <></>}
                         </li>
-                    ))}
+                    )) : <></>}
                 </ul>
             </div>
         </div>
