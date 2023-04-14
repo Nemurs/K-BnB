@@ -7,6 +7,8 @@ import placeHolderImage from "../../Assets/Images/No-Image-Placeholder.png";
 import "./DetailedSpotCard.css";
 import ReserveSpot from "../ReserveSpot";
 import ReviewAggText from "../ReviewAggText";
+import OpenModalButton from "../OpenModalButton";
+import DeleteReviewModal from "../DeleteReviewModal";
 
 const DetailedSpotCard = () => {
     const dispatch = useDispatch();
@@ -63,6 +65,10 @@ const DetailedSpotCard = () => {
                             <h3>{rev.User.firstName}</h3>
                             <h4>{processDate(rev.updatedAt)}</h4>
                             <p className="review-text">{rev.review}</p>
+                            {user && user.id === rev.User.id? <OpenModalButton
+                                buttonText="Delete"
+                                modalComponent={<DeleteReviewModal revId={rev.id} spotId={spot.id}/>}
+                            />:<></>}
                         </li>
                     ))}
                 </ul>

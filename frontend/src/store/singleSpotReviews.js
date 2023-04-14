@@ -28,12 +28,12 @@ const loadAllReviewsAction = (data) => {
 //   };
 // };
 
-// const deleteReviewAction = (data) => {
-//   return {
-//     type: DELETE_REVIEW,
-//     payload: data
-//   };
-// };
+const deleteReviewAction = (data) => {
+  return {
+    type: DELETE_REVIEW,
+    payload: data
+  };
+};
 
 
 export const loadAllReviewsThunk = (id) => async (dispatch) => {
@@ -64,17 +64,17 @@ export const loadAllReviewsThunk = (id) => async (dispatch) => {
 //   return response;
 // };
 
-// export const deleteReviewThunk = (payload) => async (dispatch) => {
-//   const response = await csrfFetch(`/api/spots/${payload.id}`, {
-//     method: 'DELETE',
-//   });
+export const deleteReviewThunk = (id) => async (dispatch) => {
+  const response = await csrfFetch(`/api/reviews/${id}`, {
+    method: 'DELETE',
+  });
 
-//   if (response.ok) {
-//     const spot = await response.clone().json();
-//     dispatch(deleteReviewAction(spot));
-//   }
-//   return response;
-// };
+  if (response.ok) {
+    const rev = await response.clone().json();
+    dispatch(deleteReviewAction(id));
+  }
+  return response;
+};
 
 
 const initialState = {};
@@ -98,10 +98,10 @@ const singleSpotReviews = (state = initialState, action) => {
     //   newState = Object.assign({}, state);
     //   newState = {...action.payload.Spots};
     //   return newState;
-    // case DELETE_REVIEW:
-    //   newState = Object.assign({}, state);
-    //   delete newState[action.payload.id]
-    //   return newState;
+    case DELETE_REVIEW:
+      newState = Object.assign({}, state);
+      delete newState[action.payload]
+      return newState;
     default:
       return state;
   }
