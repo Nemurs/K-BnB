@@ -1,0 +1,13 @@
+form{
+    display: flex;
+    flex-direction: column;
+}
+
+.star-rating-field{
+    display: flex;
+    column-gap: 10px;
+}
+
+.submit-review-modal{
+    padding: 20px;
+}
