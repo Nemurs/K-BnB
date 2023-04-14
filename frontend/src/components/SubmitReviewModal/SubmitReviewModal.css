@@ -3,12 +3,27 @@ form{
     flex-direction: column;
 }
 
-.star-rating-field{
+.star-rating-input{
     display: flex;
     column-gap: 10px;
+    padding-bottom: 10px;
+}
+.star-rating{
     align-self: center;
+    padding-top: 10px;
 }
 
 .submit-review-modal{
     padding: 20px;
+}
+
+button.submit-review-active{
+    color: white;
+    background-color: #f34669;
+}
+
+button.submit-review-inactive{
+    color: rgb(197, 197, 197);
+    background-color: white;
+    padding: 5px;
 }
