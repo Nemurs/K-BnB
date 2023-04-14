@@ -6,6 +6,7 @@ form{
 .star-rating-field{
     display: flex;
     column-gap: 10px;
+    align-self: center;
 }
 
 .submit-review-modal{
