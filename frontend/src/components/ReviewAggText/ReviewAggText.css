@@ -6,6 +6,11 @@
     width: fit-content;
     column-gap: 8px;
 }
+.large{
+    font-size: 20px;
+    max-width: 300px;
+    width: fit-content;
+}
 /* .review-agg-text-review-count{
     text-decoration: underline;
     text-underline-offset: 2px

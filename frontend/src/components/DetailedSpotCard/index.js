@@ -15,6 +15,12 @@ const DetailedSpotCard = () => {
     const user = useSelector(state => state.session.user);
     const reviews = useSelector(state => Object.values(state.reviews.spot));
 
+    function processDate(dateString){
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'Augus', 'September', 'October', 'November', 'December']
+        let date = new Date(dateString);
+        return `${months[date.getMonth()-1]} ${date.getFullYear()}`;
+    }
+
     useEffect(() => {
         dispatch(loadOneThunk(id));
         dispatch(loadAllReviewsThunk(id));
@@ -50,11 +56,13 @@ const DetailedSpotCard = () => {
                 </div>
             </div>
             <div className="detailed-spot-reviews">
-                <ReviewAggText spot={spot} includeReviewCount={true} />
+                <ReviewAggText spot={spot} includeReviewCount={true} style={"large"}/>
                 <ul className="review-list">
                     {reviews.map((rev) => (
                         <li key={rev["id"]} className='review-list-item'>
-                            {rev.review}
+                            <h3>{rev.User.firstName}</h3>
+                            <h4>{processDate(rev.updatedAt)}</h4>
+                            <p className="review-text">{rev.review}</p>
                         </li>
                     ))}
                 </ul>

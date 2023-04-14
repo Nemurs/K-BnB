@@ -53,6 +53,15 @@ h1{
     font-size: 18px;
 }
 
+h4{
+    color: rgb(199, 196, 196);
+    margin-top: -10px;
+}
+
+.review-text{
+    font-size: 12px;
+}
+
 
 /*MISC.*/
 .detailed-spot-card-bottom{
@@ -64,4 +73,9 @@ h1{
 .detailed-spot-card-host-description{
     width: fit-content;
     max-width: 675px;
+}
+
+.review-list{
+    list-style-type: none;
+    margin-left: -35px;
 }
