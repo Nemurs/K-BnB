@@ -1,7 +1,6 @@
 import "./ReviewAggText.css";
 
 const ReviewAggText = ({ spot, includeReviewCount, style}) => {
-    console.log(style)
     return (
         <div className={`review-agg-text ${style === 'large' ? "large" :""}`}>
             <span className='review-agg-text-rating'>

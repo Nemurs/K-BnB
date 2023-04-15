@@ -46,7 +46,7 @@ function Navigation({ isLoaded }) {
           Create a new spot
         </NavLink>}
         <div className="menu-wrapper">
-          <i class="fas fa-bars" style={{ color: "black" }}></i>
+          <i className="fas fa-bars" style={{ color: "black" }}></i>
           {isLoaded && sessionLinks}
         </div>
       </div>
