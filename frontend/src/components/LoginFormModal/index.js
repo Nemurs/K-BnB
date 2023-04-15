@@ -4,10 +4,11 @@ import * as sessionActions from "../../store/session";
 import { useDispatch } from "react-redux";
 import { useModal } from "../../context/Modal.js";
 import "./LoginFormModal.css";
-import { Link } from "react-router-dom/cjs/react-router-dom.min";
+import { Link, useHistory } from "react-router-dom";
 
 function LoginFormModal() {
   const dispatch = useDispatch();
+  const history = useHistory();
   const [credential, setCredential] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
@@ -16,6 +17,8 @@ function LoginFormModal() {
   const [touched, setTouched] = useState({});
   const [submitState, setSubmitState] = useState(false);
   const { closeModal } = useModal();
+
+  console.log(history);
 
   const handleSubmit = (e, demoUser = false) => {
     e.preventDefault();
@@ -83,7 +86,7 @@ function LoginFormModal() {
           {((touched.password || submitState) && clientError.password) && <p className="form-error">{clientError.password}</p>}
         <button disabled={disabled} type="submit" className={disabled ? "submit-login-inactive": "submit-login-active" }>Log In</button>
         <button className="demo-user-login" onClick={e=>handleSubmit(e, true)}>
-          <Link to='/' style={{color: "#f34669"}}>
+          <Link to={`${history.location.pathname}`} style={{color: "#f34669"}}>
             Demo User
           </Link>
         </button>
