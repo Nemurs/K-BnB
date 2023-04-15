@@ -27,3 +27,11 @@ button.submit-login-inactive{
     row-gap: 5px;
     width: 250px;
 }
+
+.demo-user-login{
+    width: fit-content;
+    align-self: center;
+    border: none;
+    background-color: white;
+    color: #f34669;
+}

@@ -4,6 +4,7 @@ import * as sessionActions from "../../store/session";
 import { useDispatch } from "react-redux";
 import { useModal } from "../../context/Modal.js";
 import "./LoginFormModal.css";
+import { Link } from "react-router-dom/cjs/react-router-dom.min";
 
 function LoginFormModal() {
   const dispatch = useDispatch();
@@ -16,12 +17,12 @@ function LoginFormModal() {
   const [submitState, setSubmitState] = useState(false);
   const { closeModal } = useModal();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e, demoUser = false) => {
     e.preventDefault();
     setErrors({});
     setSubmitState(true);
 
-    return dispatch(sessionActions.loginThunk({ credential, password }))
+    return dispatch(sessionActions.loginThunk(demoUser ?{ credential:"Demo-lition", password:"password" } : { credential, password }))
       .then(closeModal)
       .catch(async (res) => {
         const data = await res.json();
@@ -81,6 +82,11 @@ function LoginFormModal() {
           />
           {((touched.password || submitState) && clientError.password) && <p className="form-error">{clientError.password}</p>}
         <button disabled={disabled} type="submit" className={disabled ? "submit-login-inactive": "submit-login-active" }>Log In</button>
+        <button className="demo-user-login" onClick={e=>handleSubmit(e, true)}>
+          <Link to='/' style={{color: "#f34669"}}>
+            Demo User
+          </Link>
+        </button>
       </form>
     </div>
   );
