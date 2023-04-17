@@ -71,7 +71,7 @@ const DetailedSpotCard = () => {
                     modalComponent={<SubmitReviewModal spotId={spot.id} user={user}
                     />}
                 />}
-                {!reviews.length && <p>Be the first to post a review!</p>}
+                {!reviews.length && user && !(isSpotOwnedByLoggedInUser || isReviewedByLoggedInUser) && <p>Be the first to post a review!</p>}
                 <ul className="review-list">
                     {reviews.length? reviews.map((rev) => (
                         <li key={rev["id"]} className='review-list-item'>
@@ -80,6 +80,7 @@ const DetailedSpotCard = () => {
                             <p className="review-text">{rev.review}</p>
                             {user && user.id === rev.User.id ? <OpenModalButton
                                 buttonText="Delete"
+                                cssClass={"detailed-spot-post-delete-button"}
                                 modalComponent={<DeleteReviewModal revId={rev.id} spotId={spot.id} />}
                             /> : <></>}
                         </li>

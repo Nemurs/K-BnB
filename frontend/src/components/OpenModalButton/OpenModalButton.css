@@ -1,8 +1,17 @@
-.detailed-spot-post-review-button{
+.detailed-spot-post-review-button, .detailed-spot-post-delete-button{
     background-color: #f9385d;
     color: white;
     border: none;
     padding: 5px;
     border-radius: 10px;
     cursor: pointer;
+}
+
+.user-spot-delete-button{
+    border: none;
+    padding: 5px;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: rgb(120, 120, 120);
+    color: white;
 }
