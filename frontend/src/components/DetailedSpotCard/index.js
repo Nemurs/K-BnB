@@ -71,7 +71,7 @@ const DetailedSpotCard = () => {
                     modalComponent={<SubmitReviewModal spotId={spot.id} user={user}
                     />}
                 />}
-                {!reviews.length && <p>Be the first to post a review!</p>}
+                {!reviews.length && user && !(isSpotOwnedByLoggedInUser || isReviewedByLoggedInUser) && <p>Be the first to post a review!</p>}
                 <ul className="review-list">
                     {reviews.length? reviews.map((rev) => (
                         <li key={rev["id"]} className='review-list-item'>
