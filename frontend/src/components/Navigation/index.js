@@ -20,13 +20,15 @@ function Navigation({ isLoaded }) {
     );
   } else {
     sessionLinks = (
-      <li>
+      <li className="session-butons-li">
         <OpenModalButton
           buttonText="Log In"
+          cssClass={"user-login-button"}
           modalComponent={<LoginFormModal />}
         />
         <OpenModalButton
           buttonText="Sign Up"
+          cssClass={"user-signup-button"}
           modalComponent={<SignupFormModal />}
         />
       </li>
@@ -42,7 +44,7 @@ function Navigation({ isLoaded }) {
         </NavLink>
       </li>
       <div className="nav-list-right">
-        {isLoaded && sessionUser && <NavLink exact to="/spots/new">
+        {isLoaded && sessionUser && <NavLink exact to="/spots/new" className="spot-creation-link">
           Create a new spot
         </NavLink>}
         <div className="menu-wrapper">

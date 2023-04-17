@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useModal } from "../../context/Modal";
 import * as sessionActions from "../../store/session";
@@ -12,13 +12,18 @@ function SignupFormModal() {
   const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [errors, setErrors] = useState({});
+  const [disabled, setDisabled] = useState(true);
+  const [error, setError] = useState({});
+  const [clientError, setClientError] = useState({});
+  const [touched, setTouched] = useState({});
+  const [submitState, setSubmitState] = useState(false);
   const { closeModal } = useModal();
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setSubmitState(true);
     if (password === confirmPassword) {
-      setErrors({});
+      setError({});
       return dispatch(
         sessionActions.signupThunk({
           email,
@@ -32,19 +37,56 @@ function SignupFormModal() {
         .catch(async (res) => {
           const data = await res.json();
           if (data && data.errors) {
-            setErrors(data.errors);
+            setError(data.errors);
           }
+          console.log(data);
         });
     }
-    return setErrors({
+    return setError({
       confirmPassword: "Confirm Password field must be the same as the Password field"
     });
   };
 
+  useEffect(() => {
+    let newErrors = {};
+
+    if (username.length < 4 || username.length > 255) {
+      newErrors.username = "Username must be between 4 and 255 characters";
+      setDisabled(true);
+    }
+    else delete newErrors.username;
+
+    if (password.length < 6 || password.length > 255) {
+      newErrors.password = "Password must be between 4 and 255 characters";
+      setDisabled(true);
+    }
+    else delete newErrors.password;
+
+    setClientError(newErrors)
+
+    return () => setClientError({});
+  }, [username, password])
+
+  useEffect(() => {
+    if (!(email.length && firstName.length && lastName.length && confirmPassword.length)) {
+      let newErrors = { ...clientError };
+      newErrors.allFields = "All fields are required"
+      setClientError(newErrors);
+      setDisabled(true);
+    } else delete clientError.allFields
+
+    return () => setClientError({ ...clientError });
+
+  }, [email, firstName, lastName, confirmPassword])
+
+  useEffect(() => {
+    if (username.length >= 4 && password.length >= 6 && !clientError.email && !clientError.password && !clientError.allFields) setDisabled(false);
+  }, [clientError])
+
   return (
-    <>
+    <div className="signup-form-modal">
       <h1>Sign Up</h1>
-      <form onSubmit={handleSubmit}>
+      <form className="signup-form" onSubmit={handleSubmit}>
         <label>
           Email
           <input
@@ -52,9 +94,10 @@ function SignupFormModal() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+
           />
         </label>
-        {errors.email && <p>{errors.email}</p>}
+        {error.email && <p className="form-error">{error.email}</p>}
         <label>
           Username
           <input
@@ -62,9 +105,11 @@ function SignupFormModal() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
+            onBlur={() => setTouched({ ...touched, 'username': true })}
           />
         </label>
-        {errors.username && <p>{errors.username}</p>}
+        {error.username && <p className="form-error">{error.username}</p>}
+        {((touched.username || submitState) && clientError.username) && <p className="form-error">{clientError.username}</p>}
         <label>
           First Name
           <input
@@ -74,7 +119,7 @@ function SignupFormModal() {
             required
           />
         </label>
-        {errors.firstName && <p>{errors.firstName}</p>}
+        {error.firstName && <p className="form-error">{error.firstName}</p>}
         <label>
           Last Name
           <input
@@ -84,7 +129,7 @@ function SignupFormModal() {
             required
           />
         </label>
-        {errors.lastName && <p>{errors.lastName}</p>}
+        {error.lastName && <p className="form-error">{error.lastName}</p>}
         <label>
           Password
           <input
@@ -92,9 +137,11 @@ function SignupFormModal() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            onBlur={() => setTouched({ ...touched, 'password': true })}
           />
         </label>
-        {errors.password && <p>{errors.password}</p>}
+        {error.password && <p className="form-error">{error.password}</p>}
+        {((touched.password || submitState) && clientError.password) && <p className="form-error">{clientError.password}</p>}
         <label>
           Confirm Password
           <input
@@ -104,12 +151,13 @@ function SignupFormModal() {
             required
           />
         </label>
-        {errors.confirmPassword && (
-          <p>{errors.confirmPassword}</p>
+        {error.confirmPassword && (
+          <p className="form-error">{error.confirmPassword}</p>
         )}
-        <button type="submit">Sign Up</button>
+        {(submitState && clientError.allFields) && <p className="form-error">{clientError.allFields}</p>}
+        <button disabled={disabled} className={disabled ? "submit-login-inactive" : "submit-login-active"} type="submit">Sign Up</button>
       </form>
-    </>
+    </div>
   );
 }
 

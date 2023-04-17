@@ -3,9 +3,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { useDispatch } from 'react-redux';
 import * as sessionActions from '../../store/session';
 import { Link } from "react-router-dom";
+import "./Navigation.css";
+import { useHistory } from "react-router-dom";
 
 function ProfileButton({ user }) {
   const dispatch = useDispatch();
+  const history = useHistory();
   const [showMenu, setShowMenu] = useState(false);
   const ulRef = useRef();
 
@@ -31,6 +34,7 @@ function ProfileButton({ user }) {
   const logout = (e) => {
     e.preventDefault();
     dispatch(sessionActions.logoutThunk());
+    history.push("/");
   };
 
   const ulClassName = "profile-dropdown" + (showMenu ? "" : " hidden");
@@ -41,8 +45,7 @@ function ProfileButton({ user }) {
         <i className="fas fa-user-circle" />
       </button>
       <ul className={ulClassName} ref={ulRef}>
-        <li>{user.username}</li>
-        <li>{user.firstName} {user.lastName}</li>
+        <li>{`Hello, ${user.firstName}`}</li>
         <li>{user.email}</li>
         <li>
           <Link to={'/spots/current'} className='spot-management-link'>
@@ -50,7 +53,7 @@ function ProfileButton({ user }) {
           </Link>
         </li>
         <li>
-          <button onClick={logout}>Log Out</button>
+          <button className="user-logout-button" onClick={logout}>Log Out</button>
         </li>
       </ul>
     </>
