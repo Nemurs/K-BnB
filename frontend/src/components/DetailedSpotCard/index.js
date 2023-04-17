@@ -67,7 +67,9 @@ const DetailedSpotCard = () => {
                 <ReviewAggText spot={spot} includeReviewCount={true} style={"large"} />
                 {user && !(isSpotOwnedByLoggedInUser || isReviewedByLoggedInUser) && <OpenModalButton
                     buttonText="Post Your Review"
-                    modalComponent={<SubmitReviewModal spotId={spot.id} user={user}/>}
+                    cssClass={"detailed-spot-post-review-button"}
+                    modalComponent={<SubmitReviewModal spotId={spot.id} user={user}
+                    />}
                 />}
                 {!reviews.length && <p>Be the first to post a review!</p>}
                 <ul className="review-list">
