@@ -34,7 +34,7 @@ const UserSpotBrowser = () => {
         <div>
             <h1>Manage Your Spots</h1>
             <Link to="/spots/new">
-                <button onClick={(e) => e.preventDefault}>Create a New Spot</button>
+                <button className="user-spot-create-button" onClick={(e) => e.preventDefault}>Create a New Spot</button>
             </Link>
             <ul className='spot-list'>
                 {spots.map((spot) => (
@@ -42,12 +42,13 @@ const UserSpotBrowser = () => {
                         <Link to={`/spots/${spot["id"]}`} className='spot-card-link'>
                             <SpotCard spot={spot} tooltip={spot["name"]} />
                         </Link>
-                        <div>
+                        <div className='user-spot-buttons'>
                             <Link to={`/spots/${spot["id"]}/edit`}>
-                                <button onClick={e => handleClick(e, spot["id"])}>Update</button>
+                                <button className="user-spot-update-button" onClick={e => handleClick(e, spot["id"])}>Update</button>
                             </Link>
                             <OpenModalButton
                                 buttonText="Delete"
+                                cssClass={"user-spot-delete-button"}
                                 modalComponent={<DeleteSpotModal spotId={spot["id"]} />}
                             />
                         </div>

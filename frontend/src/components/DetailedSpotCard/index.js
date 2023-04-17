@@ -80,6 +80,7 @@ const DetailedSpotCard = () => {
                             <p className="review-text">{rev.review}</p>
                             {user && user.id === rev.User.id ? <OpenModalButton
                                 buttonText="Delete"
+                                cssClass={"detailed-spot-post-delete-button"}
                                 modalComponent={<DeleteReviewModal revId={rev.id} spotId={spot.id} />}
                             /> : <></>}
                         </li>
