@@ -1,6 +1,23 @@
-/* TODO: Add Navigation page Styling */
-.hidden{
-    display: none;
+.spot-management-link, .spot-creation-link{
+    text-decoration: none;
+    color: #47bbff;
+}
+
+.spot-management-link{
+    border-top: 1px solid lightgray;
+    border-bottom: 1px solid lightgray;
+    padding: 5px 0px;
+}
+
+
+.user-logout-button{
+    background-color: #f9385d;
+    color: white;
+    border: none;
+    padding: 5px;
+    border-radius: 10px;
+    cursor: pointer;
+    align-self: center;
 }
 
 .nav-list{
@@ -36,4 +53,29 @@
     display: flex;
     align-items: center;
     column-gap: 20px;
+}
+.profile-dropdown{
+    position: fixed;
+    z-index: 2;
+    margin-top: 20px;
+    margin-left: -100px;
+    border: black solid 2px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+}
+ul.hidden{
+    display: none;
+}
+
+.profile-dropdown > li{
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    margin-left: -40px;
+    padding: 10px;
+    background-color: white;
+    width: fit-content;
 }

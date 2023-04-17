@@ -78,8 +78,8 @@ const singleSpotReviews = (state = initialState, action) => {
     case CREATE_NEW_REVIEW:
       newState = Object.assign({}, state);
       newState[action.payload.spot.id] = action.payload.spot;
-      delete action.payload.user.email;
-      delete action.payload.user.username;
+      // delete action.payload.user.email;
+      // delete action.payload.user.username;
       newState[action.payload.spot.id].User = action.payload.user
       return newState;
     case DELETE_REVIEW:
