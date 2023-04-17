@@ -4,12 +4,13 @@
     justify-content: space-between;
     max-width: 145px;
     width: fit-content;
-    column-gap: 8px;
+    column-gap: 2px;
 }
 .large{
     font-size: 20px;
     max-width: 300px;
     width: fit-content;
+    margin-bottom: 10px;
 }
 /* .review-agg-text-review-count{
     text-decoration: underline;

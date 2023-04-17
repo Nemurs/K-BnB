@@ -17,6 +17,7 @@ const DetailedSpotCard = () => {
     const spot = useSelector(state => state.spots.singleSpot);
     const user = useSelector(state => state.session.user);
     const reviews = useSelector(state => Object.values(state.reviews.spot));
+    reviews.sort((a,b) => Date.parse(b["createdAt"]) - Date.parse(a["createdAt"]));
 
     function processDate(dateString) {
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'Augus', 'September', 'October', 'November', 'December']
@@ -66,7 +67,9 @@ const DetailedSpotCard = () => {
                 <ReviewAggText spot={spot} includeReviewCount={true} style={"large"} />
                 {user && !(isSpotOwnedByLoggedInUser || isReviewedByLoggedInUser) && <OpenModalButton
                     buttonText="Post Your Review"
-                    modalComponent={<SubmitReviewModal spotId={spot.id} user={user}/>}
+                    cssClass={"detailed-spot-post-review-button"}
+                    modalComponent={<SubmitReviewModal spotId={spot.id} user={user}
+                    />}
                 />}
                 {!reviews.length && <p>Be the first to post a review!</p>}
                 <ul className="review-list">

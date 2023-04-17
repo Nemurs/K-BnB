@@ -13,3 +13,8 @@
 * {
     font-family: "Montserrat";
   }
+
+#modal-content{
+    border-radius: 15px;
+    padding: 20px;
+}
