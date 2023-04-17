@@ -140,7 +140,7 @@ const NewSpotForm = () => {
 
     return (
         <div className='create-new-spot-page'>
-            <h1>{editBool ? "Update your Spot" : "Create a new Spot"}</h1>
+            <h1 className='create-new-spot-page-title'>{editBool ? "Update your Spot" : "Create a new Spot"}</h1>
 
             <div className='create-new-spot-form-div'>
                 <form className='create-new-spot-form' onSubmit={handleSubmit}>
@@ -165,50 +165,57 @@ const NewSpotForm = () => {
                             name='address'
                         />
                         {(submitState && error.address) && <p className="form-error">{error.address}</p>}
-                        <label>City</label>
-                        <input
-                            type='text'
-                            onChange={(e) => setCity(e.target.value)}
-                            value={city}
-                            placeholder='City'
-                            name='city'
-                        />
-                        {(submitState && error.city) && <p className="form-error">{error.city}</p>}
-                        <label>State</label>
-                        <input
-                            type='text'
-                            onChange={(e) => setState(e.target.value)}
-                            value={state}
-                            placeholder='STATE'
-                            name='state'
-                        />
-                        {(submitState && error.state) && <p className="form-error">{error.state}</p>}
-                        <label>Latitude</label>
-                        <input
-                            type='text'
-                            onChange={(e) => setLatitude(e.target.value)}
-                            value={latitude}
-                            placeholder='Latitude'
-                            name='latitude'
-                            onBlur={() => setTouched({ ...touched, 'latitude': true })}
-                        />
-                        {(touched.latitude && error.latitude) && <p className="form-error">{error.latitude}</p>}
-                        <label>Longitude</label>
-                        <input
-                            type='text'
-                            onChange={(e) => setLongitude(e.target.value)}
-                            value={longitude}
-                            placeholder='Longitude'
-                            name='longitude'
-                            onBlur={() => setTouched({ ...touched, 'longitude': true })}
-                        />
-                        {(touched.longitude && error.longitude) && <p className="form-error">{error.longitude}</p>}
+                        <div className='create-new-spot-form-city-state'>
+                            <label>{"City\t"}</label>
+                            <input
+                                type='text'
+                                onChange={(e) => setCity(e.target.value)}
+                                value={city}
+                                placeholder='City'
+                                name='city'
+                                className='city-input'
+                            />
+                            {(submitState && error.city) && <p className="form-error">{error.city}</p>} {",\t"}
+                            <label>{"State\t"}</label>
+                            <input
+                                type='text'
+                                onChange={(e) => setState(e.target.value)}
+                                value={state}
+                                placeholder='STATE'
+                                name='state'
+                                className='state-input'
+                            />
+                            {(submitState && error.state) && <p className="form-error">{error.state}</p>}
+                        </div>
+                        <div className='create-new-spot-form-lng-lat'>
+                            <label>{"Latitude\t"}</label>
+                            <input
+                                type='text'
+                                onChange={(e) => setLatitude(e.target.value)}
+                                value={latitude}
+                                placeholder='Latitude'
+                                name='latitude'
+                                className='latitude-input'
+                                onBlur={() => setTouched({ ...touched, 'latitude': true })}
+                            />
+                            {(touched.latitude && error.latitude) && <p className="form-error">{error.latitude}</p>}
+                            {"\t,\t"}
+                            <label>{"Longitude\t"}</label>
+                            <input
+                                type='text'
+                                onChange={(e) => setLongitude(e.target.value)}
+                                value={longitude}
+                                placeholder='Longitude'
+                                name='longitude'
+                                className='longitude-input'
+                                onBlur={() => setTouched({ ...touched, 'longitude': true })}
+                            />
+                            {(touched.longitude && error.longitude) && <p className="form-error">{error.longitude}</p>}
+                        </div>
                     </div>
                     <div className='create-new-spot-form-description'>
                         <h3>Describe your place to guests</h3>
                         <p>Mention the best features of your space, any special amentities like fast wifi or parking, and what you love about the neighborhood.</p>
-                        <label>Description</label>
-                        <br />
                         <textarea
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
@@ -235,6 +242,7 @@ const NewSpotForm = () => {
                     <div className='create-new-spot-form-price'>
                         <h3>Set a base price for your spot</h3>
                         <p>Competitive pricing can help your listing stand out and rank higher in search results. </p>
+                        {"$   "}
                         <input
                             type='text'
                             onChange={(e) => setPrice(e.target.value)}
@@ -248,7 +256,7 @@ const NewSpotForm = () => {
                     {!editBool && <div className='create-new-spot-form-image'>
                         {/* TODO: remove !editBool when implementing edit image feature */}
                         <h3>Liven up your spot with photos</h3>
-                        <p>Submit a link to one photo to publish your spot</p>
+                        <p>Submit a link to one photo in odrder to publish your spot</p>
                         <input
                             type='text'
                             onChange={(e) => setPreviewImageURL(e.target.value)}
@@ -259,7 +267,7 @@ const NewSpotForm = () => {
                         />
                         {((touched.previewImageURL || submitState) && error.previewImageURL) && <p className="form-error">{error.previewImageURL}</p>}
                     </div>}
-                    <button type='submit'>{editBool ? "Update Spot" : "Create Spot"}</button>
+                    <button className="create-new-spot-button" type='submit'>{editBool ? "Update Spot" : "Create Spot"}</button>
                 </form>
             </div>
         </div>
