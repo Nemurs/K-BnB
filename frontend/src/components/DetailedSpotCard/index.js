@@ -17,6 +17,7 @@ const DetailedSpotCard = () => {
     const spot = useSelector(state => state.spots.singleSpot);
     const user = useSelector(state => state.session.user);
     const reviews = useSelector(state => Object.values(state.reviews.spot));
+    reviews.sort((a,b) => Date.parse(b["createdAt"]) - Date.parse(a["createdAt"]));
 
     function processDate(dateString) {
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'Augus', 'September', 'October', 'November', 'December']
