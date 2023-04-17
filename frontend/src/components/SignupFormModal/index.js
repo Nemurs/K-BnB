@@ -67,26 +67,26 @@ function SignupFormModal() {
     return () => setClientError({});
   }, [username, password])
 
-  useEffect(()=>{
-    if(!(email.length && firstName.length && lastName.length  && confirmPassword.length)){
-      let newErrors = {...clientError};
-      newErrors.allFields ="All fields are required"
+  useEffect(() => {
+    if (!(email.length && firstName.length && lastName.length && confirmPassword.length)) {
+      let newErrors = { ...clientError };
+      newErrors.allFields = "All fields are required"
       setClientError(newErrors);
       setDisabled(true);
     } else delete clientError.allFields
 
-    return () => setClientError({...clientError});
+    return () => setClientError({ ...clientError });
 
   }, [email, firstName, lastName, confirmPassword])
 
   useEffect(() => {
     if (username.length >= 4 && password.length >= 6 && !clientError.email && !clientError.password && !clientError.allFields) setDisabled(false);
-}, [clientError])
+  }, [clientError])
 
   return (
-    <>
+    <div className="signup-form-modal">
       <h1>Sign Up</h1>
-      <form onSubmit={handleSubmit}>
+      <form className="signup-form" onSubmit={handleSubmit}>
         <label>
           Email
           <input
@@ -106,7 +106,7 @@ function SignupFormModal() {
             onChange={(e) => setUsername(e.target.value)}
             required
             onBlur={() => setTouched({ ...touched, 'username': true })}
-            />
+          />
         </label>
         {error.username && <p className="form-error">{error.username}</p>}
         {((touched.username || submitState) && clientError.username) && <p className="form-error">{clientError.username}</p>}
@@ -155,9 +155,9 @@ function SignupFormModal() {
           <p className="form-error">{error.confirmPassword}</p>
         )}
         {(submitState && clientError.allFields) && <p className="form-error">{clientError.allFields}</p>}
-        <button disabled={disabled}type="submit">Sign Up</button>
+        <button disabled={disabled} className={disabled ? "submit-login-inactive" : "submit-login-active"} type="submit">Sign Up</button>
       </form>
-    </>
+    </div>
   );
 }
 
