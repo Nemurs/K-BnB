@@ -79,3 +79,8 @@ ul.hidden{
     background-color: white;
     width: fit-content;
 }
+
+li.session-butons-li{
+    display: flex;
+    column-gap: 5px;
+}
