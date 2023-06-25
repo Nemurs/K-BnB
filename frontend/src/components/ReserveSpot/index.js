@@ -10,7 +10,7 @@ const ReserveSpot = ({spot}) => {
                 <PriceText spot={spot}/>
                 <ReviewAggText  spot={spot} includeReviewCount={true} />
             </div>
-            <ReserveButton/>
+            <ReserveButton spotId={spot.id}/>
         </div>
     )
 }

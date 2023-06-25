@@ -1,8 +1,11 @@
+import { useHistory } from 'react-router-dom';
 import "./ReserveButton.css";
 
-const ReserveButton = () => {
+const ReserveButton = ({spotId}) => {
+    const history = useHistory();
+
     function onClick(){
-        alert("Feature Coming Soon");
+        history.push(`/reserve/${spotId}`)
     }
     return (
         <button
