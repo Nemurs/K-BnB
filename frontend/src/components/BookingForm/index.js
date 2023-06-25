@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip'
-import { createNewSpotImageThunk, createNewSpotThunk, editSpotThunk } from '../../store/allSpots';
 import { loadOneThunk } from '../../store/singleSpot';
 import { addDays, differenceInDays } from 'date-fns';
 import { DateRange } from 'react-date-range';
@@ -22,19 +21,24 @@ const BookingForm = () => {
     const user = useSelector(state => state.session.user)
 
     const [error, setError] = useState({});
+    const [nightCount, setNightCount] = useState(2);
     const [state, setState] = useState([
         {
-          startDate: TOMORROW,
-          endDate: addDays(TOMORROW, +2),
-          key: 'selection'
+            startDate: TOMORROW,
+            endDate: addDays(TOMORROW, +2),
+            key: 'selection'
         }
-      ]);
+    ]);
 
     useEffect(() => {
-        if(!spot || spot.id !== id){
+        if (!spot || spot.id !== id) {
             dispatch(loadOneThunk(id));
         }
     }, [dispatch]);
+
+    useEffect(() => {
+        setNightCount(differenceInDays(state[0].endDate, state[0].startDate))
+    }, [state[0].startDate, state[0].endDate]);
 
     if (!spot || !spot.SpotImages || !user) return (<></>)
 
@@ -79,24 +83,28 @@ const BookingForm = () => {
     };
 
     return (
-        <div className='create-new-spot-page'>
-            <h1 className='create-new-spot-page-title'>{isBooked ? "Update your Booking" : "Create a new Booking"}</h1>
-            <img src={prevImg? prevImg.url : placeHolderImage} alt={spot.name} className='spot-card-img' />
-            <div className='create-new-spot-form-div'>
-                <form className='create-new-spot-form' onSubmit={handleSubmit}>
-                    <DateRange
-                        editableDateInputs={true}
-                        onChange={item => setState([item.selection])}
-                        moveRangeOnFirstSelection={false}
-                        minDate={TOMORROW}
-                        ranges={state}
-                        months={2}
-                        direction='horizontal'
-                    />
-                    <h3>Total: ${(differenceInDays(state[0].endDate,state[0].startDate)*spot.price).toFixed(2)}</h3>
-                    <button className="reserve-button" type='submit'>{isBooked ? "Update Booking" : "Create Booking"}</button>
-                </form>
-            </div>
+        <div className='create-new-booking-page'>
+            <h1 className='create-new-booking-page-title'>{isBooked ? "Update your Booking" : "Create a Booking"}</h1>
+            <img src={prevImg ? prevImg.url : placeHolderImage} alt={spot.name}
+                className='spot-card-img'
+                data-tooltip-id="my-tooltip"
+                data-tooltip-content={spot.name}
+            />
+            <form className='create-new-booking-form' onSubmit={handleSubmit}>
+                <DateRange
+                    editableDateInputs={true}
+                    onChange={item => setState([item.selection])}
+                    moveRangeOnFirstSelection={false}
+                    minDate={TOMORROW}
+                    ranges={state}
+                    months={2}
+                    direction='horizontal'
+                />
+                <h3>Total: <span>${(nightCount * spot.price).toFixed(2)}</span></h3>
+                <h4>{nightCount} night{nightCount === 1 ? "" : "s"} at ${spot.price} / night</h4>
+                <button className="reserve-button" type='submit'>{isBooked ? "Update Booking" : "Create Booking"}</button>
+            </form>
+            <Tooltip id="my-tooltip" place='right'/>
         </div>
     )
 }

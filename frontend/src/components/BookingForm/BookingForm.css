@@ -1,6 +1,7 @@
 /*Text*/
-.create-new-spot-page-title{
+.create-new-booking-page-title{
     font-size: 32px;
+    margin: -5px 0px -5px;
 }
 
 /*Colors*/
@@ -9,60 +10,27 @@
     font-size: 10px;
 }
 
-.create-new-spot-button{
-    color: white;
-    background-color: #f34669;
-    margin-top: 20px;
-    padding: 15px;
-    width: 100px;
-    align-self: center;
-    border-radius: 15px;
-    border: none;
-}
-
 /*Align Items*/
-.create-new-spot-form{
-    display: flex;
-    flex-direction: column;
-    width: 600px;
-}
-
-.create-new-spot-page{
+.create-new-booking-page{
     display: flex;
     flex-direction: column;
     justify-content: center;
     width: fit-content;
     margin: 0px auto 0px;
+    row-gap: 15px;
 }
 
-.create-new-spot-form-location{
+.create-new-booking-form{
     display: flex;
     flex-direction: column;
-    row-gap: 5px;
     width: 600px;
+    /* row-gap: 5px; */
 }
 
-.create-new-spot-form-location > h3{
-    margin-bottom: -5px;
-    margin-top: -5px;
+.create-new-booking-form > h3{
+    margin-top: -10px;
 }
 
-.create-new-spot-form-price > input{
-    width: 576px;
-}
-
-.create-new-spot-form-image > input, .create-new-spot-form-name > input, .create-new-spot-form-description > textarea{
-    width: 590px;
-}
-
-.city-input{
-    width: 342px;
-}
-
-.latitude-input{
-    width: 200px;
-}
-
-.longitude-input{
-    width: 212px;
+.create-new-booking-form > h3 > span{
+    font-weight: normal;
 }
