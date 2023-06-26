@@ -81,8 +81,8 @@ export const createNewSpotThunk = (payload) => async (dispatch) => {
 export const createNewSpotImageThunk = (payload) => async (dispatch) => {
   const response = await csrfFetch(`/api/spots/${payload.id}/images`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload.body)
+    // headers: { 'Content-Type': 'application/json' },
+    body: payload.formData
   });
 
   if (response.ok) {

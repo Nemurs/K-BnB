@@ -28,8 +28,10 @@ const NewSpotForm = () => {
     const [description, setDescription] = useState(editBool ? spot.description : '');
     const [name, setName] = useState(editBool ? spot.name : '');
     const [price, setPrice] = useState(editBool ? String(spot.price) : '');
-    const [previewImageURL, setPreviewImageURL] = useState('');
+    // const [previewImageURL, setPreviewImageURL] = useState('');
     // const [previewImageURL, setPreviewImageURL] = useState(editBool ? prevImg.url : ''); FOR LATER
+    const [image, setImage] = useState(null);
+    const [imageLoading, setImageLoading] = useState(false);
     const [error, setError] = useState({});
     const [touched, setTouched] = useState({});
     const [submitState, setSubmitState] = useState(false);
@@ -37,6 +39,9 @@ const NewSpotForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitState(true);
+
+        const formData = new FormData();
+        formData.append("image", image);
 
         const newSpot = {
             country,
@@ -74,13 +79,17 @@ const NewSpotForm = () => {
             if (spotRes.ok) {
                 let spotData = await spotRes.json();
                 // console.log(spotData);
-                let imgPayload = { id: spotData.id, body: { url: previewImageURL, preview: true } }
-                let imgRes = await dispatch(createNewSpotImageThunk(imgPayload));
+                // let imgPayload = { id: spotData.id, body: { url: previewImageURL, preview: true } }
+                // let imgRes = await dispatch(createNewSpotImageThunk(imgPayload));
+                setImageLoading(true);
+                const id = spotData.id
+                let imgRes = await dispatch(createNewSpotImageThunk({formData, id}));
                 if (imgRes.ok) {
-                    history.push(`/spots/${spotData.id}`);
+                    history.push(`/spots/${id}`);
                     reset();
                 }
                 else {
+                    setImageLoading(false)
                     // console.log("error with img data")
                     // console.log(imgRes);
                     // console.log(spotData);
@@ -104,7 +113,7 @@ const NewSpotForm = () => {
         setDescription('');
         setName('');
         setPrice('');
-        setPreviewImageURL('');
+        // setPreviewImageURL('');
     };
 
     useEffect(() => {
@@ -120,10 +129,10 @@ const NewSpotForm = () => {
 
         if (description.length < 30 || description.length > 255) newErrors.description = "Description must be between 30 and 255 characters"
 
-        if (!editBool && !(previewImageURL.endsWith(".png") || previewImageURL.endsWith(".jpg") || previewImageURL.endsWith(".jpeg") || previewImageURL.length)) {
-            //TODO: remove !editBool when implementing edit image feature
-            newErrors.previewImageURL = "Image URL must end in .png, .jpg, or .jpeg"
-        }
+        // if (!editBool && !(previewImageURL.endsWith(".png") || previewImageURL.endsWith(".jpg") || previewImageURL.endsWith(".jpeg") || previewImageURL.length)) {
+        //     //TODO: remove !editBool when implementing edit image feature
+        //     newErrors.previewImageURL = "Image URL must end in .png, .jpg, or .jpeg"
+        // }
 
         //Missing Required Field Errors
         if (!country.length) newErrors.country = "Country is Required";
@@ -136,14 +145,14 @@ const NewSpotForm = () => {
         return () => setError({});
 
 
-    }, [country, address, city, state, latitude, longitude, description, name, price, previewImageURL]);
+    }, [country, address, city, state, latitude, longitude, description, name, price]);
 
     return (
         <div className='create-new-spot-page'>
             <h1 className='create-new-spot-page-title'>{editBool ? "Update your Spot" : "Create a new Spot"}</h1>
 
             <div className='create-new-spot-form-div'>
-                <form className='create-new-spot-form' onSubmit={handleSubmit}>
+                <form className='create-new-spot-form' onSubmit={handleSubmit} encType="multipart/form-data">
                     <div className='create-new-spot-form-location'>
                         <h3>Where's your place located?</h3>
                         <p>Guests will only get your exact address once they booked a reservation</p>
@@ -258,6 +267,12 @@ const NewSpotForm = () => {
                         <h3>Liven up your spot with photos</h3>
                         <p>Submit a link to one photo in odrder to publish your spot</p>
                         <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => setImage(e.target.files[0])}
+                        />
+                        {(imageLoading)&& <p>Loading...</p>}
+                        {/* <input
                             type='text'
                             onChange={(e) => setPreviewImageURL(e.target.value)}
                             value={previewImageURL}
@@ -265,7 +280,7 @@ const NewSpotForm = () => {
                             name='previewImageURL'
                             onBlur={() => setTouched({ ...touched, 'previewImageURL': true })}
                         />
-                        {((touched.previewImageURL || submitState) && error.previewImageURL) && <p className="form-error">{error.previewImageURL}</p>}
+                        {((touched.previewImageURL || submitState) && error.previewImageURL) && <p className="form-error">{error.previewImageURL}</p>} */}
                     </div>}
                     <button className="create-new-spot-button" type='submit'>{editBool ? "Update Spot" : "Create Spot"}</button>
                 </form>

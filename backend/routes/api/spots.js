@@ -8,6 +8,7 @@ const router = express.Router();
 
 const { Spot, SpotImage, User, Review, ReviewImage, Booking } = require('../../db/models');
 const { Op } = require('sequelize');
+const {uploadImage} = require("../../utils/aws")
 
 /**Gets sum, count, and average stars for a spot */
 async function getReviewAggs(spot) {
@@ -460,21 +461,26 @@ router.get('', validateSpotQuery, async (req, res, next) => {
 });
 
 /*** Add an image to a spot based on the spot's id ***/
-const validateImageBody = [
-  check('url')
-    .exists({ checkFalsy: true })
-    .isURL()
-    .withMessage('URL is required'),
-  check('preview')
-    .optional()
-    .isBoolean()
-    .withMessage('Preview must be a boolean'),
-  handleValidationErrors
-];
+// const validateImageBody = [
+//   check('url')
+//     .exists({ checkFalsy: true })
+//     .isURL()
+//     .withMessage('URL is required'),
+//   check('preview')
+//     .optional()
+//     .isBoolean()
+//     .withMessage('Preview must be a boolean'),
+//   handleValidationErrors
+// ];
 
-router.post('/:spotId/images', requireAuth, validateImageBody, async (req, res, next) => {
+router.post('/:spotId/images', requireAuth, uploadImage.single('image'), async (req, res, next) => {
   //Verify authorization and that the spot exists
   const { user } = req;
+  let data = {}
+  if(req.file) {
+      data.imageUrl = req.file.location
+      console.log("AWS URL--->", req.file.location)
+  }
   let spot = await Spot.findByPk(req.params.spotId);
   if (!spot) {
     return next(makeError('Spot Not Found', "Spot couldn't be found", 404));
@@ -482,10 +488,10 @@ router.post('/:spotId/images', requireAuth, validateImageBody, async (req, res, 
   if (user.id != spot.ownerId) {
     return next(makeError('Forbidden Spot', "Spot must belong to the current user", 403));
   }
-  //set preview to false if undefined
-  let { url, preview } = req.body;
-  preview = typeof preview === 'undefined' ? false : preview;
+  //set preview to true for now
+  const preview = true;
   const spotId = req.params.spotId;
+  const url = data.imageUrl
   try {
     let newSpotImg = await SpotImage.create({ spotId, url, preview })
     newSpotImg = newSpotImg.toJSON();
