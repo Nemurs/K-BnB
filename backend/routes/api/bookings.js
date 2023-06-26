@@ -39,7 +39,7 @@ router.get('/current', requireAuth, async (req, res, next) => {
         return res.json({Bookings: [], message: "Current user has no bookings."})
     }
 
-    //convert reviews to POJOs
+    //convert bookings to POJOs
     let out = [];
     bookings.forEach(booking => out.push(booking.toJSON()));
     out = { Bookings: out };
@@ -54,6 +54,31 @@ router.get('/current', requireAuth, async (req, res, next) => {
     }
 
     res.json(out);
+
+});
+
+/*** Get a booking of a specific spot for the current user ***/
+router.get('/current/:spotId', requireAuth, async (req, res, next) => {
+    //Verify authorization and that the booking exists
+    const { user } = req;
+
+    let book = await Booking.findAll(
+        {where: {spotId: req.params.spotId, userId: user.id}, order:[['endDate', 'DESC']]},
+        {attributes: ["id", "spotId", "userId", "startDate", "endDate", "createdAt", "updatedAt"]}
+    );
+    console.log("bookings---->", book)
+    book = book[0];
+    if (!book) {
+        return next(makeError('Booking Not Found', "Booking couldn't be found", 404));
+    }
+    if (user.id != book.userId) {
+        return next(makeError('Forbidden Booking', "Booking must belong to the current user", 403));
+    }
+
+    //convert booking to POJO
+    book = book.toJSON()
+    book.expired = (new Date(book.endDate)).getTime() < (new Date()).getTime()
+    res.json(book);
 
 });
 

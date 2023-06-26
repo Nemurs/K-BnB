@@ -3,14 +3,14 @@ import ReserveButton from "../ReserveButton";
 import ReviewAggText from "../ReviewAggText";
 import "./ReserveSpot.css";
 
-const ReserveSpot = ({spot}) => {
+const ReserveSpot = ({spot, isSpotOwnedByLoggedInUser}) => {
     return (
         <div className="reserve-spot">
             <div className="reserve-spot-top">
                 <PriceText spot={spot}/>
                 <ReviewAggText  spot={spot} includeReviewCount={true} />
             </div>
-            <ReserveButton spotId={spot.id}/>
+            {isSpotOwnedByLoggedInUser? <button className="reserve-button">Manage Bookings</button> : <ReserveButton spotId={spot.id}/>}
         </div>
     )
 }

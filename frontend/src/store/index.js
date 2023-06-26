@@ -3,6 +3,8 @@ import thunk from "redux-thunk";
 import sessionReducer from "./session";
 import allSpotsReducer from "./allSpots";
 import singleSpotReducer from "./singleSpot";
+import allBookingsReducer from "./allBookings";
+import singleBookingReducer from "./singleBooking";
 import singleSpotReviewsReducer from "./singleSpotReviews";
 
 const rootReducer = combineReducers({
@@ -10,6 +12,10 @@ const rootReducer = combineReducers({
   spots: combineReducers({
     allSpots: allSpotsReducer,
     singleSpot: singleSpotReducer
+  }),
+  bookings: combineReducers({
+    allBookings: allBookingsReducer,
+    singleBooking: singleBookingReducer
   }),
   reviews: combineReducers({
     spot: singleSpotReviewsReducer

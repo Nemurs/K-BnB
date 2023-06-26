@@ -65,13 +65,13 @@ router.get('/current', requireAuth, async (req, res, next) => {
 /*** Create a booking for a spot based on the spot's id***/
 const validateBookingBody = [
   check('startDate')
-    .exists({ checkFalsy: true })
-    .isDate()
-    .withMessage('Start date property is required and it must be a valid date in the format yyyy-mm-dd.'),
-  check('endDate')
     .exists()
     .isDate()
-    .withMessage('End date property is required and it must be a valid date in the format yyyy-mm-dd.'),
+    .withMessage('Start date property is required and it must be a valid date in the format yyyy/mm/dd.'),
+  check('endDate')
+    .exists()
+    .isDate({format:'YYYY/MM/DD', strictMode:true})
+    .withMessage('End date property is required and it must be a valid date in the format yyyy/mm/dd.'),
   handleValidationErrors
 ];
 router.post('/:spotId/bookings', requireAuth, validateBookingBody, async (req, res, next) => {
