@@ -124,10 +124,10 @@ router.get('/current/:spotId', requireAuth, async (req, res, next) => {
     //Verify authorization and that the booking exists
     const { user } = req;
 
-    let book = await Booking.findAll(
-        { where: { spotId: req.params.spotId, userId: user.id }, order: [['endDate', 'DESC']] },
-        { attributes: ["id", "spotId", "userId", "startDate", "endDate", "createdAt", "updatedAt"] }
-    );
+    let book = await Booking.findAll({
+        where: { spotId: req.params.spotId, userId: user.id }, order: [['endDate', 'DESC']],
+        attributes: ["id", "spotId", "userId", "startDate", "endDate", "createdAt", "updatedAt"]
+    });
     book = book[0];
 
     if (!book) {

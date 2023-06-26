@@ -23,7 +23,7 @@ function LoginFormModal() {
   const handleSubmit = (e, demoUser = false) => {
     e.preventDefault();
     setErrors({});
-    setSubmitState(true);
+    if (!demoUser) setSubmitState(true);
 
     return dispatch(sessionActions.loginThunk(demoUser ?{ credential:"Demo-lition", password:"password" } : { credential, password }))
       .then(closeModal)
