@@ -66,8 +66,8 @@ router.get('/current/:spotId', requireAuth, async (req, res, next) => {
         {where: {spotId: req.params.spotId, userId: user.id}, order:[['endDate', 'DESC']]},
         {attributes: ["id", "spotId", "userId", "startDate", "endDate", "createdAt", "updatedAt"]}
     );
-    console.log("bookings---->", book)
     book = book[0];
+
     if (!book) {
         return next(makeError('Booking Not Found', "Booking couldn't be found", 404));
     }

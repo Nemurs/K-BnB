@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams, Link } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip'
 import { loadOneThunk } from '../../store/singleSpot';
-import { addDays, differenceInDays, format } from 'date-fns';
+import { addDays, differenceInDays, format, eachDayOfInterval } from 'date-fns';
 import { DateRange } from 'react-date-range';
 import placeHolderImage from "../../Assets/Images/No-Image-Placeholder.png";
 import 'react-date-range/dist/styles.css'; // react-date-range main css file
@@ -58,10 +58,29 @@ const BookingForm = () => {
 
     let prevImg = spot.SpotImages.find(img => img.preview === true);
 
-    console.log(booking)
+    let forbiddenDates = [];
+    spot.Bookings.forEach(book => {
+        if(book.id !== booking.id){
+            forbiddenDates.push(...eachDayOfInterval({start: new Date(book.startDate), end: new Date(book.endDate)}))
+        }
+    });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        let start = state[0].startDate;
+        let end = state[0].endDate;
+
+        let isForbidden = false;
+        for (let date of forbiddenDates){
+            if ((date.getFullYear() === start.getFullYear() && date.getMonth() === start.getMonth() && date.getDate() === start.getDate()) || (date.getFullYear() === end.getFullYear() && date.getMonth() === end.getMonth() && date.getDate() === end.getDate())){
+                alert("Sorry, this spot is already booked for those days!");
+                isForbidden = true
+                break;
+            }
+        }
+
+        if(isForbidden) return;
 
         const book = {
             startDate: format(state[0].startDate, "yyyy/MM/dd"),
@@ -112,6 +131,7 @@ const BookingForm = () => {
                     onChange={item => setState([item.selection])}
                     moveRangeOnFirstSelection={false}
                     minDate={TOMORROW}
+                    disabledDates={forbiddenDates}
                     ranges={state}
                     months={2}
                     direction='horizontal'

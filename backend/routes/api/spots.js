@@ -343,6 +343,13 @@ router.get('/:id', async (req, res, next) => {
     SpotImages.push(image.toJSON())
   });
 
+  //find spot bookings
+  let allBookings = await spot.getBookings({ attributes: ["id", "spotId", "userId", "startDate", "endDate", "createdAt", "updatedAt"] });
+  let Bookings = [];
+  allBookings.forEach(book => {
+    Bookings.push(book.toJSON())
+  });
+
   //find spot owner
   let Owner = await User.findByPk(spot.ownerId, { attributes: ['id', 'firstName', 'lastName'] });
 
@@ -350,7 +357,7 @@ router.get('/:id', async (req, res, next) => {
   spot = spot.toJSON();
   spot.numReviews = count;
   spot.avgRating = avg;
-  return res.json({ ...spot, SpotImages, Owner })
+  return res.json({ ...spot, SpotImages, Bookings ,Owner })
 });
 
 /*** Get all spots ***/
