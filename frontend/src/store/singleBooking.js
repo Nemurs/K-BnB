@@ -11,7 +11,7 @@ const loadOneAction = (data) => {
   };
 };
 
-const clearSingleBookingAction = () => {
+export const clearSingleBookingAction = () => {
   return {
     type: CLEAR,
   };
@@ -24,10 +24,10 @@ export const loadOneBookingThunk = (spotId) => async (dispatch) => {
       if (!data.expired){
         dispatch(loadOneAction(data));
       } else{
-        dispatch(clearSingleBookingAction)
+        dispatch(clearSingleBookingAction())
       }
   } else{
-    dispatch(clearSingleBookingAction)
+    dispatch(clearSingleBookingAction())
   }
   return response;
 };

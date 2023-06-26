@@ -5,6 +5,7 @@ import * as sessionActions from '../../store/session';
 import { Link } from "react-router-dom";
 import "./Navigation.css";
 import { useHistory } from "react-router-dom";
+import { clearSingleBookingAction } from "../../store/singleBooking";
 
 function ProfileButton({ user }) {
   const dispatch = useDispatch();
@@ -34,6 +35,7 @@ function ProfileButton({ user }) {
   const logout = (e) => {
     e.preventDefault();
     dispatch(sessionActions.logoutThunk());
+    dispatch(clearSingleBookingAction())
     history.push("/");
   };
 
