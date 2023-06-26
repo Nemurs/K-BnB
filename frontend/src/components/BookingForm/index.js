@@ -11,6 +11,8 @@ import 'react-date-range/dist/theme/default.css'; // react-date-range theme css 
 import "./BookingForm.css";
 import { loadOneBookingThunk } from '../../store/singleBooking';
 import { createNewBookingThunk, editBookingThunk } from '../../store/allBookings';
+import OpenModalButton from '../OpenModalButton';
+import DeleteBookingModal from '../DeleteBookingModal';
 
 const TODAY = new Date();
 const TOMORROW = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate() + 1);
@@ -27,10 +29,10 @@ const BookingForm = () => {
 
     const [nightCount, setNightCount] = useState(2);
     const [state, setState] = useState([{
-            startDate: TOMORROW,
-            endDate: addDays(TOMORROW, +2),
-            key: 'selection'
-        }
+        startDate: TOMORROW,
+        endDate: addDays(TOMORROW, +2),
+        key: 'selection'
+    }
     ]);
 
     useEffect(() => {
@@ -44,13 +46,13 @@ const BookingForm = () => {
         setNightCount(differenceInDays(state[0].endDate, state[0].startDate))
     }, [state[0].startDate, state[0].endDate]);
 
-    useEffect(()=> {
-        if (isBooked){
+    useEffect(() => {
+        if (isBooked) {
             setState([{
-                    startDate: new Date(booking.startDate),
-                    endDate: new Date(booking.endDate),
-                    key: 'selection'
-                }])
+                startDate: new Date(booking.startDate),
+                endDate: new Date(booking.endDate),
+                key: 'selection'
+            }])
         }
     }, [booking])
 
@@ -60,8 +62,8 @@ const BookingForm = () => {
 
     let forbiddenDates = [];
     spot.Bookings.forEach(book => {
-        if(book.id !== booking.id){
-            forbiddenDates.push(...eachDayOfInterval({start: new Date(book.startDate), end: new Date(book.endDate)}))
+        if (book.id !== booking.id) {
+            forbiddenDates.push(...eachDayOfInterval({ start: new Date(book.startDate), end: new Date(book.endDate) }))
         }
     });
 
@@ -72,15 +74,15 @@ const BookingForm = () => {
         let end = state[0].endDate;
 
         let isForbidden = false;
-        for (let date of forbiddenDates){
-            if ((date.getFullYear() === start.getFullYear() && date.getMonth() === start.getMonth() && date.getDate() === start.getDate()) || (date.getFullYear() === end.getFullYear() && date.getMonth() === end.getMonth() && date.getDate() === end.getDate())){
+        for (let date of forbiddenDates) {
+            if ((date.getFullYear() === start.getFullYear() && date.getMonth() === start.getMonth() && date.getDate() === start.getDate()) || (date.getFullYear() === end.getFullYear() && date.getMonth() === end.getMonth() && date.getDate() === end.getDate())) {
                 alert("Sorry, this spot is already booked for those days!");
                 isForbidden = true
                 break;
             }
         }
 
-        if(isForbidden) return;
+        if (isForbidden || nightCount < 1) return;
 
         const book = {
             startDate: format(state[0].startDate, "yyyy/MM/dd"),
@@ -88,7 +90,7 @@ const BookingForm = () => {
         }
 
         if (isBooked) {
-            let bookRes = await dispatch(editBookingThunk({bookingId:booking.id, book}));
+            let bookRes = await dispatch(editBookingThunk({ bookingId: booking.id, book }));
             if (bookRes.ok) {
                 let bookData = await bookRes.json();
                 console.log(bookData);
@@ -99,7 +101,7 @@ const BookingForm = () => {
                 // console.log(await spotRes.json());
             }
         } else {
-            let bookRes = await dispatch(createNewBookingThunk({spotId:id, book}));
+            let bookRes = await dispatch(createNewBookingThunk({ spotId: id, book }));
             if (bookRes.ok) {
                 let bookData = await bookRes.json();
                 console.log(bookData);
@@ -122,7 +124,7 @@ const BookingForm = () => {
                 data-tooltip-id="my-tooltip"
                 data-tooltip-content={spot.name}
                 onClick={(e) => history.push(`../spots/${spot.id}`)}
-                style={{cursor:"pointer"}}
+                style={{ cursor: "pointer" }}
             />
             <form className='create-new-booking-form' onSubmit={handleSubmit}>
                 <DateRange
@@ -139,6 +141,12 @@ const BookingForm = () => {
                 <h4>{nightCount} night{nightCount === 1 ? "" : "s"} at ${spot.price} / night</h4>
                 <button className="reserve-button" type='submit'>{isBooked ? "Update Booking" : "Create Booking"}</button>
             </form>
+            {isBooked ?
+            <OpenModalButton
+                buttonText="Cancel Booking"
+                cssClass={"user-spot-delete-button"}
+                modalComponent={<DeleteBookingModal bookingId={booking.id} />}
+            /> : <></>}
             <Tooltip id="my-tooltip" place='right' />
         </div>
     )

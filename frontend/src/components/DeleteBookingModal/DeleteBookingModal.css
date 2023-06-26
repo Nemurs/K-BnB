@@ -1,0 +1,21 @@
+.delete-booking-modal{
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+    align-items: center;
+}
+
+.delete-booking-modal > button{
+    width: 350px;
+    padding: 15px;
+}
+
+.delete-booking-modal-button-yes{
+    background-color: #f9385d;
+    color: white;
+}
+
+.delete-booking-modal-button-no{
+    background-color: rgb(120, 120, 120);
+    color: white;
+}
