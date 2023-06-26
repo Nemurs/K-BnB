@@ -8,7 +8,7 @@ const { Booking, Spot, SpotImage, User } = require('../../db/models');
 
 const router = express.Router();
 
-/*** Get bookings of the current user***/
+/*** Get ALL bookings of the current user***/
 router.get('/current', requireAuth, async (req, res, next) => {
     const { user } = req;
 
@@ -36,10 +36,10 @@ router.get('/current', requireAuth, async (req, res, next) => {
 
     if (!bookings) {
         res.statusCode = 400;
-        return res.json({Bookings: [], message: "Current user has no bookings."})
+        return res.json({ Bookings: [], message: "Current user has no bookings." })
     }
 
-    //convert reviews to POJOs
+    //convert bookings to POJOs
     let out = [];
     bookings.forEach(booking => out.push(booking.toJSON()));
     out = { Bookings: out };
@@ -57,16 +57,103 @@ router.get('/current', requireAuth, async (req, res, next) => {
 
 });
 
+/*** Get most recent bookings of the current user***/
+router.get('/current/mostRecent', requireAuth, async (req, res, next) => {
+    const { user } = req;
+
+    //find user's bookings
+    let bookings = await Booking.findAll({
+        attributes: ["id", "spotId", "userId", "startDate", "endDate", "createdAt", "updatedAt"],
+        include: [
+            {
+                model: Spot,
+                attributes: {
+                    exclude: ['description', 'createdAt', 'updatedAt']
+                },
+                include: {
+                    model: SpotImage,
+                    attributes: ['url'],
+                    where: {
+                        preview: true
+                    }
+                }
+            }],
+        where: {
+            userId: user.id
+        },
+        group: Booking.spotId,
+        order: [['endDate', 'DESC']]
+    });
+
+    if (!bookings) {
+        res.statusCode = 400;
+        return res.json({ Bookings: [], message: "Current user has no bookings." })
+    }
+
+    //convert bookings to POJOs
+    let out = {};
+    bookings.forEach(book => {
+        let id = book.spotId;
+        if (!out[`${id}`]){
+            out[`${id}`] = book.toJSON()
+        }
+    });
+
+    out = Object.values(out);
+    out.forEach(book => {
+        book.expired = (new Date(book.endDate)).getTime() < (new Date()).getTime()
+    })
+    out.sort((a,b)=> a.startDate.getTime() - b.startDate.getTime())
+    out = { Bookings: Object.values(out) };
+
+    //change SpotImages to previewImage
+    for (let i = 0; i < out.Bookings.length; i++) {
+        let spot = out.Bookings[i].Spot;
+        if (spot.SpotImages[0].url) {
+            spot.previewImage = spot.SpotImages[0].url
+            delete spot.SpotImages;
+        }
+    }
+
+    res.json(out);
+
+});
+
+/*** Get a booking of a specific spot for the current user ***/
+router.get('/current/:spotId', requireAuth, async (req, res, next) => {
+    //Verify authorization and that the booking exists
+    const { user } = req;
+
+    let book = await Booking.findAll(
+        { where: { spotId: req.params.spotId, userId: user.id }, order: [['endDate', 'DESC']] },
+        { attributes: ["id", "spotId", "userId", "startDate", "endDate", "createdAt", "updatedAt"] }
+    );
+    book = book[0];
+
+    if (!book) {
+        return next(makeError('Booking Not Found', "Booking couldn't be found", 404));
+    }
+    if (user.id != book.userId) {
+        return next(makeError('Forbidden Booking', "Booking must belong to the current user", 403));
+    }
+
+    //convert booking to POJO
+    book = book.toJSON()
+    book.expired = (new Date(book.endDate)).getTime() < (new Date()).getTime()
+    res.json(book);
+
+});
+
 /*** Edit a booking based on the booking's id ***/
 const validateBookingBody = [
     check('startDate')
-        .exists({ checkFalsy: true })
-        .isDate()
-        .withMessage('Start date property is required and it must be a valid date in the format yyyy-mm-dd.'),
+        .exists()
+        .isDate({ format: 'YYYY/MM/DD', strictMode: true })
+        .withMessage('Start date property is required and it must be a valid date in the format yyyy/mm/dd.'),
     check('endDate')
         .exists()
-        .isDate()
-        .withMessage('End date property is required and it must be a valid date in the format yyyy-mm-dd.'),
+        .isDate({ format: 'YYYY/MM/DD', strictMode: true })
+        .withMessage('End date property is required and it must be a valid date in the format yyyy/mm/dd.'),
     handleValidationErrors
 ];
 router.put('/:bookingId', requireAuth, validateBookingBody, async (req, res, next) => {

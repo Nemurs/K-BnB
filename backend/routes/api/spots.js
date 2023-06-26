@@ -65,13 +65,13 @@ router.get('/current', requireAuth, async (req, res, next) => {
 /*** Create a booking for a spot based on the spot's id***/
 const validateBookingBody = [
   check('startDate')
-    .exists({ checkFalsy: true })
-    .isDate()
-    .withMessage('Start date property is required and it must be a valid date in the format yyyy-mm-dd.'),
+    .exists()
+    .isDate({format:'YYYY/MM/DD', strictMode:true})
+    .withMessage('Start date property is required and it must be a valid date in the format yyyy/mm/dd.'),
   check('endDate')
     .exists()
-    .isDate()
-    .withMessage('End date property is required and it must be a valid date in the format yyyy-mm-dd.'),
+    .isDate({format:'YYYY/MM/DD', strictMode:true})
+    .withMessage('End date property is required and it must be a valid date in the format yyyy/mm/dd.'),
   handleValidationErrors
 ];
 router.post('/:spotId/bookings', requireAuth, validateBookingBody, async (req, res, next) => {
@@ -343,6 +343,13 @@ router.get('/:id', async (req, res, next) => {
     SpotImages.push(image.toJSON())
   });
 
+  //find spot bookings
+  let allBookings = await spot.getBookings({ attributes: ["id", "spotId", "userId", "startDate", "endDate", "createdAt", "updatedAt"] });
+  let Bookings = [];
+  allBookings.forEach(book => {
+    Bookings.push(book.toJSON())
+  });
+
   //find spot owner
   let Owner = await User.findByPk(spot.ownerId, { attributes: ['id', 'firstName', 'lastName'] });
 
@@ -350,7 +357,7 @@ router.get('/:id', async (req, res, next) => {
   spot = spot.toJSON();
   spot.numReviews = count;
   spot.avgRating = avg;
-  return res.json({ ...spot, SpotImages, Owner })
+  return res.json({ ...spot, SpotImages, Bookings ,Owner })
 });
 
 /*** Get all spots ***/

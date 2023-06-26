@@ -1,13 +1,17 @@
+import { useHistory } from 'react-router-dom';
 import "./ReserveButton.css";
 
-const ReserveButton = () => {
+const ReserveButton = ({spotId, isDisabled}) => {
+    const history = useHistory();
+
     function onClick(){
-        alert("Feature Coming Soon");
+        history.push(`/reserve/${spotId}`)
     }
     return (
         <button
-            className="reserve-button"
+            className={`reserve-button ${isDisabled?"disabled-button":""}`}
             onClick={onClick}
+            disabled={isDisabled}
         >
             Reserve
         </button>

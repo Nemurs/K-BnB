@@ -1,0 +1,36 @@
+/*Text*/
+.create-new-booking-page-title{
+    font-size: 32px;
+    margin: -5px 0px -5px;
+}
+
+/*Colors*/
+.form-error{
+    color: palevioletred;
+    font-size: 10px;
+}
+
+/*Align Items*/
+.create-new-booking-page{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: fit-content;
+    margin: 0px auto 0px;
+    row-gap: 15px;
+}
+
+.create-new-booking-form{
+    display: flex;
+    flex-direction: column;
+    width: 600px;
+    /* row-gap: 5px; */
+}
+
+.create-new-booking-form > h3{
+    margin-top: -10px;
+}
+
+.create-new-booking-form > h3 > span{
+    font-weight: normal;
+}
