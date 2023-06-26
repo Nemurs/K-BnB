@@ -51,7 +51,7 @@ export const loadAllThunk = () => async (dispatch) => {
 };
 
 export const loadUserOwnedThunk = () => async (dispatch) => {
-    const response = await csrfFetch("/api/bookings/current");
+    const response = await csrfFetch("/api/bookings/current/mostRecent");
     const data = await response.json();
     dispatch(loadUserOwnedAction(data));
     return response;

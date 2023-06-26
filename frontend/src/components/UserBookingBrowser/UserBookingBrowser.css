@@ -1,0 +1,13 @@
+.user-spot-update-button, .user-spot-create-button{
+    background-color: #f9385d;
+    color: white;
+    border: none;
+    padding: 5px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.user-spot-buttons{
+    display: flex;
+    column-gap: 10px;
+}

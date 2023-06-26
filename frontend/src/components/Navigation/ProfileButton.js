@@ -55,6 +55,11 @@ function ProfileButton({ user }) {
           </Link>
         </li>
         <li>
+          <Link to={'/bookings/current'} className='spot-management-link'>
+            Manage Bookings
+          </Link>
+        </li>
+        <li>
           <button className="user-logout-button" onClick={logout}>Log Out</button>
         </li>
       </ul>

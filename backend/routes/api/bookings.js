@@ -8,7 +8,7 @@ const { Booking, Spot, SpotImage, User } = require('../../db/models');
 
 const router = express.Router();
 
-/*** Get bookings of the current user***/
+/*** Get ALL bookings of the current user***/
 router.get('/current', requireAuth, async (req, res, next) => {
     const { user } = req;
 
@@ -43,6 +43,68 @@ router.get('/current', requireAuth, async (req, res, next) => {
     let out = [];
     bookings.forEach(booking => out.push(booking.toJSON()));
     out = { Bookings: out };
+
+    //change SpotImages to previewImage
+    for (let i = 0; i < out.Bookings.length; i++) {
+        let spot = out.Bookings[i].Spot;
+        if (spot.SpotImages[0].url) {
+            spot.previewImage = spot.SpotImages[0].url
+            delete spot.SpotImages;
+        }
+    }
+
+    res.json(out);
+
+});
+
+/*** Get most recent bookings of the current user***/
+router.get('/current/mostRecent', requireAuth, async (req, res, next) => {
+    const { user } = req;
+
+    //find user's bookings
+    let bookings = await Booking.findAll({
+        attributes: ["id", "spotId", "userId", "startDate", "endDate", "createdAt", "updatedAt"],
+        include: [
+            {
+                model: Spot,
+                attributes: {
+                    exclude: ['description', 'createdAt', 'updatedAt']
+                },
+                include: {
+                    model: SpotImage,
+                    attributes: ['url'],
+                    where: {
+                        preview: true
+                    }
+                }
+            }],
+        where: {
+            userId: user.id
+        },
+        group: Booking.spotId,
+        order: [['endDate', 'DESC']]
+    });
+
+    if (!bookings) {
+        res.statusCode = 400;
+        return res.json({ Bookings: [], message: "Current user has no bookings." })
+    }
+
+    //convert bookings to POJOs
+    let out = {};
+    bookings.forEach(book => {
+        let id = book.spotId;
+        if (!out[`${id}`]){
+            out[`${id}`] = book.toJSON()
+        }
+    });
+
+    out = Object.values(out);
+    out.forEach(book => {
+        book.expired = (new Date(book.endDate)).getTime() < (new Date()).getTime()
+    })
+    out.sort((a,b)=> a.startDate.getTime() - b.startDate.getTime())
+    out = { Bookings: Object.values(out) };
 
     //change SpotImages to previewImage
     for (let i = 0; i < out.Bookings.length; i++) {

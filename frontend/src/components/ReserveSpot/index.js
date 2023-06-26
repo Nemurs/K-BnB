@@ -10,7 +10,7 @@ const ReserveSpot = ({spot, user, isSpotOwnedByLoggedInUser}) => {
                 <PriceText spot={spot}/>
                 <ReviewAggText  spot={spot} includeReviewCount={true} />
             </div>
-            {isSpotOwnedByLoggedInUser? <button className="reserve-button" style={{cursor:"not-allowed"}}>Manage Bookings</button> : <ReserveButton spotId={spot.id} isDisabled={typeof(user) !== "object"} />}
+            {isSpotOwnedByLoggedInUser? <button className="reserve-button" style={{cursor:"not-allowed"}}>Manage Bookings</button> : <ReserveButton spotId={spot.id} isDisabled={Object.is(user, null)} />}
         </div>
     )
 }

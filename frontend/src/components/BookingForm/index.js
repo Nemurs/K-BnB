@@ -94,7 +94,7 @@ const BookingForm = () => {
             if (bookRes.ok) {
                 let bookData = await bookRes.json();
                 console.log(bookData);
-                history.push(`../`);
+                history.push(`../bookings/current`);
             }
             else {
                 // console.log("error with spot data")
@@ -105,8 +105,7 @@ const BookingForm = () => {
             if (bookRes.ok) {
                 let bookData = await bookRes.json();
                 console.log(bookData);
-                history.push("../")
-                // history.push(`/bookings/current`);
+                history.push(`../bookings/current`)
             }
             else {
                 // console.log("error with spot data")

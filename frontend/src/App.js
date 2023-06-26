@@ -10,6 +10,7 @@ import SpotBrowser from "./components/SpotBrowser";
 import DetailedSpotCard from './components/DetailedSpotCard';
 import NewSpotForm from "./components/NewSpotForm";
 import BookingForm from "./components/BookingForm";
+import UserBookingBrowser from "./components/UserBookingBrowser";
 
 function App() {
   const dispatch = useDispatch();
@@ -28,6 +29,9 @@ function App() {
           </Route>
           <Route exact path='/spots/current'>
             <UserSpotBrowser />
+          </Route>
+          <Route exact path='/bookings/current'>
+            <UserBookingBrowser />
           </Route>
           <Route exact path='/spots/:id/edit'>
             <NewSpotForm />

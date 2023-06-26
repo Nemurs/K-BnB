@@ -1,13 +1,14 @@
 import { useModal } from "../../context/Modal.js";
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteBookingThunk } from "../../store/allBookings.js";
+import { deleteBookingThunk, loadUserOwnedThunk } from "../../store/allBookings.js";
 import "./DeleteBookingModal.css";
 import { clearSingleBookingAction } from "../../store/singleBooking.js";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 
 const DeleteBookingModal = ({bookingId}) => {
     const dispatch = useDispatch();
     const history = useHistory();
+    const location = useLocation();
     const { closeModal } = useModal();
     const bookings = useSelector(state => Object.values(state.bookings.allBookings));
 
@@ -19,7 +20,8 @@ const DeleteBookingModal = ({bookingId}) => {
             // console.log(bookings);
         } else {
             await dispatch(clearSingleBookingAction());
-            history.push("../")
+            await dispatch(loadUserOwnedThunk())
+            if (location.pathname.startsWith("reserve")) history.push("../");
             closeModal();
         }
     }
