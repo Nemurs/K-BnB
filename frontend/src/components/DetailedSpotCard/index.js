@@ -60,7 +60,7 @@ const DetailedSpotCard = () => {
                         <p className='detailed-spot-card-host-text'>{isSpotOwnedByLoggedInUser ? `Hosted by You` : `Hosted by ${spot?.Owner?.firstName} ${spot?.Owner?.lastName}`}</p>
                         <p className='detailed-spot-card-description-text'>{spot.description}</p>
                     </div>
-                    <ReserveSpot spot={spot} {...{isSpotOwnedByLoggedInUser}}/>
+                    <ReserveSpot spot={spot} {...{user, isSpotOwnedByLoggedInUser}}/>
                 </div>
             </div>
             <div className="detailed-spot-reviews">

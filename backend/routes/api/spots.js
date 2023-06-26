@@ -66,7 +66,7 @@ router.get('/current', requireAuth, async (req, res, next) => {
 const validateBookingBody = [
   check('startDate')
     .exists()
-    .isDate()
+    .isDate({format:'YYYY/MM/DD', strictMode:true})
     .withMessage('Start date property is required and it must be a valid date in the format yyyy/mm/dd.'),
   check('endDate')
     .exists()

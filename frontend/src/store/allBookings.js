@@ -58,7 +58,6 @@ export const loadUserOwnedThunk = () => async (dispatch) => {
 };
 
 export const createNewBookingThunk = (payload) => async (dispatch) => {
-    console.log(JSON.stringify(payload.book))
     const response = await csrfFetch(`/api/spots/${payload.spotId}/bookings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -72,6 +71,20 @@ export const createNewBookingThunk = (payload) => async (dispatch) => {
     return response;
 };
 
+export const editBookingThunk = (payload) => async (dispatch) => {
+    const response = await csrfFetch(`/api/bookings/${payload.bookingId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload.book)
+    });
+
+    if (response.ok) {
+        const booking = await response.clone().json();
+        dispatch(editBookingAction(booking));
+    }
+    return response;
+};
+
 export const deleteBookingThunk = (payload) => async (dispatch) => {
     const response = await csrfFetch(`/api/bookings/${payload.id}`, {
         method: 'DELETE',
@@ -80,20 +93,6 @@ export const deleteBookingThunk = (payload) => async (dispatch) => {
     if (response.ok) {
         const booking = await response.clone().json();
         dispatch(deleteBookingAction(booking));
-    }
-    return response;
-};
-
-export const editBookingThunk = (payload) => async (dispatch) => {
-    const response = await csrfFetch(`/api/bookings/${payload.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    });
-
-    if (response.ok) {
-        const booking = await response.clone().json();
-        dispatch(editBookingAction(booking));
     }
     return response;
 };

@@ -10,7 +10,7 @@ import 'react-date-range/dist/styles.css'; // react-date-range main css file
 import 'react-date-range/dist/theme/default.css'; // react-date-range theme css file
 import "./BookingForm.css";
 import { loadOneBookingThunk } from '../../store/singleBooking';
-import { createNewBookingThunk } from '../../store/allBookings';
+import { createNewBookingThunk, editBookingThunk } from '../../store/allBookings';
 
 const TODAY = new Date();
 const TOMORROW = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate() + 1);
@@ -88,12 +88,11 @@ const BookingForm = () => {
         }
 
         if (isBooked) {
-            //TODO: UPDATE IMAGES
-            let bookRes = await dispatch();
+            let bookRes = await dispatch(editBookingThunk({bookingId:booking.id, book}));
             if (bookRes.ok) {
                 let bookData = await bookRes.json();
-                // console.log(bookData);
-                history.push(`/bookings/current`);
+                console.log(bookData);
+                history.push(`../`);
             }
             else {
                 // console.log("error with spot data")

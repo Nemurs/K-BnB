@@ -36,7 +36,7 @@ router.get('/current', requireAuth, async (req, res, next) => {
 
     if (!bookings) {
         res.statusCode = 400;
-        return res.json({Bookings: [], message: "Current user has no bookings."})
+        return res.json({ Bookings: [], message: "Current user has no bookings." })
     }
 
     //convert bookings to POJOs
@@ -63,8 +63,8 @@ router.get('/current/:spotId', requireAuth, async (req, res, next) => {
     const { user } = req;
 
     let book = await Booking.findAll(
-        {where: {spotId: req.params.spotId, userId: user.id}, order:[['endDate', 'DESC']]},
-        {attributes: ["id", "spotId", "userId", "startDate", "endDate", "createdAt", "updatedAt"]}
+        { where: { spotId: req.params.spotId, userId: user.id }, order: [['endDate', 'DESC']] },
+        { attributes: ["id", "spotId", "userId", "startDate", "endDate", "createdAt", "updatedAt"] }
     );
     book = book[0];
 
@@ -85,13 +85,13 @@ router.get('/current/:spotId', requireAuth, async (req, res, next) => {
 /*** Edit a booking based on the booking's id ***/
 const validateBookingBody = [
     check('startDate')
-        .exists({ checkFalsy: true })
-        .isDate()
-        .withMessage('Start date property is required and it must be a valid date in the format yyyy-mm-dd.'),
+        .exists()
+        .isDate({ format: 'YYYY/MM/DD', strictMode: true })
+        .withMessage('Start date property is required and it must be a valid date in the format yyyy/mm/dd.'),
     check('endDate')
         .exists()
-        .isDate()
-        .withMessage('End date property is required and it must be a valid date in the format yyyy-mm-dd.'),
+        .isDate({ format: 'YYYY/MM/DD', strictMode: true })
+        .withMessage('End date property is required and it must be a valid date in the format yyyy/mm/dd.'),
     handleValidationErrors
 ];
 router.put('/:bookingId', requireAuth, validateBookingBody, async (req, res, next) => {
