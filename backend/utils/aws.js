@@ -34,14 +34,15 @@ const multiplePublicFileUpload = async (files) => {
 const singlePublicFileDelete = async (s3URL) => {
     let Key = s3URL.split("/");
     Key = Key[Key.length-1]
+
     const params = {
       Bucket: NAME_OF_BUCKET,
       Key
     };
-    const result = await s3.deleteObject(params).promise();
 
+    const result = await s3.deleteObject(params).promise();
     // return results of deletion from aws
-    return result.DeleteMarker;
+    return result.Errors;
   };
 
   const multiplePublicFileDelete = async (urlArr) => {
@@ -51,14 +52,15 @@ const singlePublicFileDelete = async (s3URL) => {
         key = key[key.length-1]
         keys.push({"Key" : key});
     }
+
     const params = {
       Bucket: NAME_OF_BUCKET,
       Delete: {
         Objects: keys
       }
     };
+
     const result = await s3.deleteObjects(params).promise();
-    console.log(result)
     // return results of deletion from aws
     return result.Errors;
   };

@@ -32,11 +32,45 @@ const NewSpotForm = () => {
     // const [previewImageURL, setPreviewImageURL] = useState('');
     // const [previewImageURL, setPreviewImageURL] = useState(editBool ? prevImg.url : ''); FOR LATER
     const [previewImg, setPreviewImg] = useState(null);
+    const [previewImgURL, setPreviewImgURL] = useState(null);
     const [images, setImages] = useState([]);
+    const [imageURLs, setImageURLs] = useState([]);
     const [imageLoading, setImageLoading] = useState(false);
     const [error, setError] = useState({});
     const [touched, setTouched] = useState({});
     const [submitState, setSubmitState] = useState(false);
+
+    useEffect(() => {
+        if (!previewImg) {
+            setPreviewImgURL(null);
+            return;
+        }
+
+        const objectUrl = URL.createObjectURL(previewImg);
+        setPreviewImgURL(objectUrl);
+
+        // free memory when ever this component is unmounted
+        return () => URL.revokeObjectURL(objectUrl);
+    }, [previewImg])
+
+    useEffect(() => {
+        if (!images.length) {
+            setImageURLs([]);
+            return;
+        }
+        let urls = []
+        for (let img of images){
+            urls.push(URL.createObjectURL(img));
+        }
+        setImageURLs(urls);
+
+        // free memory when ever this component is unmounted
+        return () => {
+            for (let url of imageURLs){
+                URL.revokeObjectURL(url)
+            }
+        };
+    }, [images])
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -46,8 +80,8 @@ const NewSpotForm = () => {
         previewImgformData.append("image", previewImg);
         previewImgformData.append("preview", true);
 
-        let forms  = []
-        for (let idx = 0; idx < images.length; idx++){
+        let forms = []
+        for (let idx = 0; idx < images.length; idx++) {
             let img = images[idx]
             forms.push(new FormData())
             forms[idx].append("image", img)
@@ -97,11 +131,11 @@ const NewSpotForm = () => {
                 const id = spotData.id
 
                 let imgResponses = []
-                for (let form of forms){
+                for (let form of forms) {
                     form.append("spot_id", id)
                     imgResponses.push(await dispatch(createNewSpotImageThunk(form)));
                 }
-                if (imgResponses.every(res=>res.ok)) {
+                if (imgResponses.every(res => res.ok)) {
                     history.push(`/spots/${id}`);
                     reset();
                 }
@@ -285,13 +319,13 @@ const NewSpotForm = () => {
                     {!editBool && <div className='create-new-spot-form-image'>
                         {/* TODO: remove !editBool when implementing edit image feature */}
                         <h3>Liven up your spot with a preview photo</h3>
-                        {/* <p>Submit a link to one photo in odrder to publish your spot</p> */}
                         <input
                             type="file"
                             accept="image/*"
                             name='image'
                             onChange={(e) => setPreviewImg(e.target.files[0])}
                         />
+                        {previewImg ? <img src={previewImgURL} className='preview-image' /> : <></>}
                         <h3>Add up to 4 more images</h3>
                         <input
                             type="file"
@@ -299,16 +333,14 @@ const NewSpotForm = () => {
                             multiple
                             onChange={(e) => setImages(e.target.files)}
                         />
-                        {(imageLoading)&& <p>Loading...</p>}
-                        {/* <input
-                            type='text'
-                            onChange={(e) => setPreviewImageURL(e.target.value)}
-                            value={previewImageURL}
-                            placeholder='Preview Image URL'
-                            name='previewImageURL'
-                            onBlur={() => setTouched({ ...touched, 'previewImageURL': true })}
-                        />
-                        {((touched.previewImageURL || submitState) && error.previewImageURL) && <p className="form-error">{error.previewImageURL}</p>} */}
+                        {images.length ?
+                            <div>
+                                {imageURLs.map(url => (
+                                    <img src={url} className='preview-image' />
+                                ))}
+                            </div>
+                        : <></>}
+                        {(imageLoading) && <p>Loading...</p>}
                     </div>}
                     <button className="create-new-spot-button" type='submit'>{editBool ? "Update Spot" : "Create Spot"}</button>
                 </form>
