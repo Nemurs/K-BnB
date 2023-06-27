@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { createNewSpotImageThunk, createNewSpotThunk, editSpotThunk, loadAllThunk } from '../../store/allSpots';
 import "./NewSpotForm.css";
 import { useHistory, useParams } from 'react-router-dom';
+import { loadOneThunk } from '../../store/singleSpot';
 
 const NewSpotForm = () => {
     const dispatch = useDispatch();
@@ -42,6 +43,7 @@ const NewSpotForm = () => {
 
         const formData = new FormData();
         formData.append("image", image);
+        formData.append("preview", true);
 
         const newSpot = {
             country,
@@ -83,7 +85,8 @@ const NewSpotForm = () => {
                 // let imgRes = await dispatch(createNewSpotImageThunk(imgPayload));
                 setImageLoading(true);
                 const id = spotData.id
-                let imgRes = await dispatch(createNewSpotImageThunk({formData, id}));
+                formData.append("spot_id", id)
+                let imgRes = await dispatch(createNewSpotImageThunk(formData));
                 if (imgRes.ok) {
                     history.push(`/spots/${id}`);
                     reset();
@@ -264,11 +267,12 @@ const NewSpotForm = () => {
                     </div>
                     {!editBool && <div className='create-new-spot-form-image'>
                         {/* TODO: remove !editBool when implementing edit image feature */}
-                        <h3>Liven up your spot with photos</h3>
-                        <p>Submit a link to one photo in odrder to publish your spot</p>
+                        <h3>Liven up your spot with a preview photo</h3>
+                        {/* <p>Submit a link to one photo in odrder to publish your spot</p> */}
                         <input
                             type="file"
                             accept="image/*"
+                            name='image'
                             onChange={(e) => setImage(e.target.files[0])}
                         />
                         {(imageLoading)&& <p>Loading...</p>}

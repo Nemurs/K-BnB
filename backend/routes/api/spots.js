@@ -8,7 +8,7 @@ const router = express.Router();
 
 const { Spot, SpotImage, User, Review, ReviewImage, Booking } = require('../../db/models');
 const { Op } = require('sequelize');
-const {uploadImage} = require("../../utils/aws")
+const {singleMulterUpload, singlePublicFileUpload} = require("../../utils/aws")
 
 /**Gets sum, count, and average stars for a spot */
 async function getReviewAggs(spot) {
@@ -473,14 +473,9 @@ router.get('', validateSpotQuery, async (req, res, next) => {
 //   handleValidationErrors
 // ];
 
-router.post('/:spotId/images', requireAuth, uploadImage.single('image'), async (req, res, next) => {
+router.post('/:spotId/images', singleMulterUpload("image"), requireAuth, async (req, res, next) => {
   //Verify authorization and that the spot exists
   const { user } = req;
-  let data = {}
-  if(req.file) {
-      data.imageUrl = req.file.location
-      console.log("AWS URL--->", req.file.location)
-  }
   let spot = await Spot.findByPk(req.params.spotId);
   if (!spot) {
     return next(makeError('Spot Not Found', "Spot couldn't be found", 404));
@@ -488,11 +483,16 @@ router.post('/:spotId/images', requireAuth, uploadImage.single('image'), async (
   if (user.id != spot.ownerId) {
     return next(makeError('Forbidden Spot', "Spot must belong to the current user", 403));
   }
-  //set preview to true for now
-  const preview = true;
+
+
+  //set preview to true if there are no other images
+  let { preview } = req.body;
+  console.log(preview)
+  preview = preview ? preview : !spot.images?.length;
   const spotId = req.params.spotId;
-  const url = data.imageUrl
   try {
+    // console.log(req.body)
+    const url = await singlePublicFileUpload(req.file);
     let newSpotImg = await SpotImage.create({ spotId, url, preview })
     newSpotImg = newSpotImg.toJSON();
     delete newSpotImg.spotId;

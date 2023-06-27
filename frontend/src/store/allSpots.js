@@ -79,15 +79,15 @@ export const createNewSpotThunk = (payload) => async (dispatch) => {
 };
 
 export const createNewSpotImageThunk = (payload) => async (dispatch) => {
-  const response = await csrfFetch(`/api/spots/${payload.id}/images`, {
+  const response = await csrfFetch(`/api/spots/${payload.get("spot_id")}/images`, {
     method: 'POST',
-    // headers: { 'Content-Type': 'application/json' },
-    body: payload.formData
+    headers: { 'Content-Type': 'multipart/form-data' },
+    body: payload
   });
 
   if (response.ok) {
     const img = await response.clone().json();
-    dispatch(createNewSpotImageAction({img, spotId: payload.id}));
+    dispatch(createNewSpotImageAction({img, spotId: payload.get("spot_id")}));
   }
   return response;
 };
