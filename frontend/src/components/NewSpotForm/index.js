@@ -31,7 +31,8 @@ const NewSpotForm = () => {
     const [price, setPrice] = useState(editBool ? String(spot.price) : '');
     // const [previewImageURL, setPreviewImageURL] = useState('');
     // const [previewImageURL, setPreviewImageURL] = useState(editBool ? prevImg.url : ''); FOR LATER
-    const [image, setImage] = useState(null);
+    const [previewImg, setPreviewImg] = useState(null);
+    const [images, setImages] = useState([]);
     const [imageLoading, setImageLoading] = useState(false);
     const [error, setError] = useState({});
     const [touched, setTouched] = useState({});
@@ -41,9 +42,18 @@ const NewSpotForm = () => {
         e.preventDefault();
         setSubmitState(true);
 
-        const formData = new FormData();
-        formData.append("image", image);
-        formData.append("preview", true);
+        const previewImgformData = new FormData();
+        previewImgformData.append("image", previewImg);
+        previewImgformData.append("preview", true);
+
+        let forms  = []
+        for (let idx = 0; idx < images.length; idx++){
+            let img = images[idx]
+            forms.push(new FormData())
+            forms[idx].append("image", img)
+            forms[idx].append("preview", false);
+        }
+        forms.push(previewImgformData)
 
         const newSpot = {
             country,
@@ -85,9 +95,13 @@ const NewSpotForm = () => {
                 // let imgRes = await dispatch(createNewSpotImageThunk(imgPayload));
                 setImageLoading(true);
                 const id = spotData.id
-                formData.append("spot_id", id)
-                let imgRes = await dispatch(createNewSpotImageThunk(formData));
-                if (imgRes.ok) {
+
+                let imgResponses = []
+                for (let form of forms){
+                    form.append("spot_id", id)
+                    imgResponses.push(await dispatch(createNewSpotImageThunk(form)));
+                }
+                if (imgResponses.every(res=>res.ok)) {
                     history.push(`/spots/${id}`);
                     reset();
                 }
@@ -116,6 +130,8 @@ const NewSpotForm = () => {
         setDescription('');
         setName('');
         setPrice('');
+        setPreviewImg(null);
+        setImages([]);
         // setPreviewImageURL('');
     };
 
@@ -142,13 +158,14 @@ const NewSpotForm = () => {
         if (!address.length) newErrors.address = "Address is Required";
         if (!city.length) newErrors.city = "City is Required";
         if (!state.length) newErrors.state = "State is Required";
+        if (!previewImg) newErrors.previewImg = "Preview Image is Required";
 
         setError(newErrors)
 
         return () => setError({});
 
 
-    }, [country, address, city, state, latitude, longitude, description, name, price]);
+    }, [country, address, city, state, latitude, longitude, description, name, price, previewImg]);
 
     return (
         <div className='create-new-spot-page'>
@@ -273,7 +290,14 @@ const NewSpotForm = () => {
                             type="file"
                             accept="image/*"
                             name='image'
-                            onChange={(e) => setImage(e.target.files[0])}
+                            onChange={(e) => setPreviewImg(e.target.files[0])}
+                        />
+                        <h3>Add up to 4 more images</h3>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={(e) => setImages(e.target.files)}
                         />
                         {(imageLoading)&& <p>Loading...</p>}
                         {/* <input

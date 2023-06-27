@@ -137,7 +137,8 @@ const allSpotsReducer = (state = initialState, action) => {
       return newState;
     case CREATE_NEW_SPOT_IMAGE:
       newState = Object.assign({}, state);
-      newState[action.payload.spotId].previewImage = action.payload.img.url;
+      newState[action.payload.spotId].previewImage = action.payload.img.preview ? action.payload.img.url : newState[action.payload.spotId].previewImage
+      return newState;
     case LOAD_USER_OWNED:
       newState = Object.assign({}, state);
       newState = {...action.payload.Spots};
