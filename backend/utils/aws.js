@@ -4,7 +4,7 @@ const multer = require("multer");
 const NAME_OF_BUCKET = process.env.S3_BUCKET;
 const s3 = new AWS.S3({ apiVersion: "2006-03-01" });
 
-// --------------------------- Public UPLOAD ------------------------
+// --------------------------- Public ------------------------
 
 const singlePublicFileUpload = async (file) => {
   const { originalname, mimetype, buffer } = await file;
@@ -30,6 +30,38 @@ const multiplePublicFileUpload = async (files) => {
     })
   );
 };
+
+const singlePublicFileDelete = async (s3URL) => {
+    let Key = s3URL.split("/");
+    Key = Key[Key.length-1]
+    const params = {
+      Bucket: NAME_OF_BUCKET,
+      Key
+    };
+    const result = await s3.deleteObject(params).promise();
+
+    // return results of deletion from aws
+    return result.DeleteMarker;
+  };
+
+  const multiplePublicFileDelete = async (urlArr) => {
+    let keys = [];
+    for (let url of urlArr){
+        let key = url.split("/");
+        key = key[key.length-1]
+        keys.push({"Key" : key});
+    }
+    const params = {
+      Bucket: NAME_OF_BUCKET,
+      Delete: {
+        Objects: keys
+      }
+    };
+    const result = await s3.deleteObjects(params).promise();
+    console.log(result)
+    // return results of deletion from aws
+    return result.Errors;
+  };
 
 // --------------------------- Prviate UPLOAD ------------------------
 
@@ -85,6 +117,8 @@ module.exports = {
   s3,
   singlePublicFileUpload,
   multiplePublicFileUpload,
+  singlePublicFileDelete,
+  multiplePublicFileDelete,
   singlePrivateFileUpload,
   multiplePrivateFileUpload,
   retrievePrivateFile,

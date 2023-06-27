@@ -8,7 +8,7 @@ const router = express.Router();
 
 const { Spot, SpotImage, User, Review, ReviewImage, Booking } = require('../../db/models');
 const { Op } = require('sequelize');
-const {singleMulterUpload, singlePublicFileUpload} = require("../../utils/aws")
+const {singleMulterUpload, singlePublicFileUpload, multiplePublicFileDelete} = require("../../utils/aws")
 
 /**Gets sum, count, and average stars for a spot */
 async function getReviewAggs(spot) {
@@ -582,15 +582,21 @@ router.put('/:spotId', requireAuth, validateSpotBody, async (req, res, next) => 
 router.delete('/:spotId', requireAuth, async (req, res, next) => {
   //Verify authorization and that the spot exists
   const { user } = req;
-  let spot = await Spot.findByPk(req.params.spotId);
+  let spot = await Spot.findByPk(req.params.spotId, {include:{model:SpotImage}});
   if (!spot) {
     return next(makeError('Spot Not Found', "Spot couldn't be found", 404));
   }
   if (user.id != spot.ownerId) {
     return next(makeError('Forbidden Spot', "Spot must belong to the current user", 403));
   }
-
+  // console.log(spot.SpotImages)
+  let urlArr = spot.SpotImages.map(img=>img.url);
   try {
+    if (urlArr.length){
+      let errors = await multiplePublicFileDelete(urlArr)
+      if (errors.length > 0) throw makeError('Error Deleting Images', "Could not delete images from AWS", 500);
+      console.log("Spot Images Deleted from AWS!")
+    }
     spot.destroy();
     res.json({
       message: "Successfully deleted"
