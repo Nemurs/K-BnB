@@ -131,17 +131,17 @@ const NewSpotForm = () => {
 
 
         let forms = []
-        if (images.length){
+        if (images.length) {
             for (let idx = 0; idx < images.length; idx++) {
                 let img = images[idx]
-                if (img){
+                if (img) {
                     forms.push(new FormData())
                     forms[idx].append("image", img)
                     forms[idx].append("preview", false);
                 }
             }
         }
-        if(previewImg){
+        if (previewImg) {
             const previewImgformData = new FormData();
             previewImgformData.append("image", previewImg);
             previewImgformData.append("preview", true);
@@ -173,8 +173,8 @@ const NewSpotForm = () => {
             if (spotRes.ok) {
                 let spotData = await spotRes.json();
                 setImageLoading(true);
-                for (let id of deleteIds){
-                    await dispatch(deleteSpotImageThunk({spotId: spot.id, imgId: id}));
+                for (let id of deleteIds) {
+                    await dispatch(deleteSpotImageThunk({ spotId: spot.id, imgId: id }));
                 }
                 let imgResponses = []
                 for (let form of forms) {
@@ -275,7 +275,7 @@ const NewSpotForm = () => {
 
         if (description.length < 30 || description.length > 255) newErrors.description = "Description must be between 30 and 255 characters"
 
-        if((images.length + oldImgs.filter(img => !deleteIds.includes(img.id)).length) > 4) newErrors.additionalImgs = "Only 4 non-preview images are allows";
+        if ((images.length + oldImgs.filter(img => !deleteIds.includes(img.id)).length) > 4) newErrors.additionalImgs = "Only 4 non-preview images are allows";
 
         //Missing Required Field Errors
         if (!country.length) newErrors.country = "Country is Required";
@@ -407,82 +407,85 @@ const NewSpotForm = () => {
                         {((touched.price || submitState) && error.price) && <p className="form-error">{error.price}</p>}
                     </div>
                     <div className='create-new-spot-form-image'>
-                        <h3>Liven up your spot with a preview photo</h3>
-                        {editBool && (
-                            <div className='edit-spot-preview-images-wrapper'>
-                                {oldPrevImg && !deleteIds.includes(oldPrevImg.id) && (<div>
-                                    <p>Old Image</p>
-                                    <div className='preview-image-wrapper' onClick={e => (removeOldImg(e, oldPrevImg.id))}><img src={oldPrevImg.url} className='preview-image' /></div>
-                                </div>)}
-                                {previewImg && (
-                                    <div>
-                                        <p>New Image</p>
-                                        <div className='preview-image-wrapper' onClick={e => (removeImg(e, true))}><img src={previewImgURL} className='preview-image' /></div>
+                        {editBool && spot.id < 6 ? <h3>To edit images please make a new spot</h3> : (
+                            <>
+                                <h3>Liven up your spot with a preview photo</h3>
+                                {editBool && (
+                                    <div className='edit-spot-preview-images-wrapper'>
+                                        {oldPrevImg && !deleteIds.includes(oldPrevImg.id) && (<div>
+                                            <p>Old Image</p>
+                                            <div className='preview-image-wrapper' onClick={e => (removeOldImg(e, oldPrevImg.id))}><img src={oldPrevImg.url} className='preview-image' /></div>
+                                        </div>)}
+                                        {previewImg && (
+                                            <div>
+                                                <p>New Image</p>
+                                                <div className='preview-image-wrapper' onClick={e => (removeImg(e, true))}><img src={previewImgURL} className='preview-image' /></div>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
-                            </div>
-                        )}
-                        <input
-                            type="file"
-                            accept="image/*"
-                            id='spotPreviewImgFileInput'
-                            onChange={(e) => setPreviewImg(e.target.files[0])}
-                            style={{ marginTop: "5px" }}
-                        />
-                        {!editBool && previewImg ? <div className='preview-image-wrapper' onClick={e => (removeImg(e, true))} style={{marginTop:"5px"}}><img src={previewImgURL} className='preview-image' /></div> : <></>}
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    id='spotPreviewImgFileInput'
+                                    onChange={(e) => setPreviewImg(e.target.files[0])}
+                                    style={{ marginTop: "5px" }}
+                                />
+                                {!editBool && previewImg ? <div className='preview-image-wrapper' onClick={e => (removeImg(e, true))} style={{ marginTop: "5px" }}><img src={previewImgURL} className='preview-image' /></div> : <></>}
 
-                        {!editBool ?
-                            (<h3>Add up to {images.length ? `${4 - images.length}` : 4} more image{images.length === 3 ? "" : "s"}</h3>)
-                            :
-                            (<h3>Add up to {images.length || oldImgs.length ? `${4 - (images.length + oldImgs.filter(img => !deleteIds.includes(img.id)).length)}` : 4} more image{(images.length + oldImgs.filter(img => deleteIds.includes(img.id)).length) === 3 ? "" : "s"}</h3>
-                            )}
-                        {editBool && (
-                            <div className='edit-spot-image-gallery-wrapper'>
-                                {oldImgs.length && oldImgs.filter(img => deleteIds.includes(img.id)).length !== oldImgs.length ? <div>
-                                    <p>Old Images</p>
-                                    <div className='preview-image-gallery'>
-                                        {oldImgs.map(img => {
-                                            if (!deleteIds.includes(img.id)) {
-                                                return (
-                                                    <div className='preview-image-wrapper' onClick={e => (removeOldImg(e, img.id))}><img src={img.url} className='preview-image' /></div>
-                                                )
-                                            } else return (<></>)
-                                        })}
-                                    </div>
-                                </div>:<></>}
-                                {images.length ? (
-                                    <div>
-                                        <p>New Images</p>
-                                        <div className='preview-image-gallery'>
-                                            {imageURLs.map((url, idx) => (
-                                                <div className='preview-image-wrapper' onClick={e => (removeImg(e, false, idx))}>
-                                                    <img src={url} className='preview-image' />
+                                {!editBool ?
+                                    (<h3>Add up to {images.length ? `${4 - images.length}` : 4} more image{images.length === 3 ? "" : "s"}</h3>)
+                                    :
+                                    (<h3>Add up to {images.length || oldImgs.length ? `${4 - (images.length + oldImgs.filter(img => !deleteIds.includes(img.id)).length)}` : 4} more image{(images.length + oldImgs.filter(img => deleteIds.includes(img.id)).length) === 3 ? "" : "s"}</h3>
+                                    )}
+                                {editBool && (
+                                    <div className='edit-spot-image-gallery-wrapper'>
+                                        {oldImgs.length && oldImgs.filter(img => deleteIds.includes(img.id)).length !== oldImgs.length ? <div>
+                                            <p>Old Images</p>
+                                            <div className='preview-image-gallery'>
+                                                {oldImgs.map(img => {
+                                                    if (!deleteIds.includes(img.id)) {
+                                                        return (
+                                                            <div className='preview-image-wrapper' onClick={e => (removeOldImg(e, img.id))}><img src={img.url} className='preview-image' /></div>
+                                                        )
+                                                    } else return (<></>)
+                                                })}
+                                            </div>
+                                        </div> : <></>}
+                                        {images.length ? (
+                                            <div>
+                                                <p>New Images</p>
+                                                <div className='preview-image-gallery'>
+                                                    {imageURLs.map((url, idx) => (
+                                                        <div className='preview-image-wrapper' onClick={e => (removeImg(e, false, idx))}>
+                                                            <img src={url} className='preview-image' />
+                                                        </div>
+                                                    ))}
                                                 </div>
-                                            ))}
-                                        </div>
+                                            </div>
+                                        ) : <></>}
+                                        {!oldImgs.length && !images.length ? (<p>No Images {":("}</p>) : (<></>)}
                                     </div>
-                                ):<></>}
-                                {!oldImgs.length && !images.length ? (<p>No Images {":("}</p>):(<></>)}
-                            </div>
-                        )}
-                        <input
-                            type="file"
-                            accept="image/*"
-                            id='spotImgFileInput'
-                            multiple
-                            onChange={(e) => setImages(Array.from(e.target.files))}
-                            style={{ marginTop: "5px" }}
-                        />
-                        {!editBool && images.length ?
-                            <div className='preview-image-gallery'>
-                                {imageURLs.map((url, idx) => (
-                                    <div className='preview-image-wrapper' onClick={e => (removeImg(e, false, idx))}>
-                                        <img src={url} className='preview-image' />
+                                )}
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    id='spotImgFileInput'
+                                    multiple
+                                    onChange={(e) => setImages(Array.from(e.target.files))}
+                                    style={{ marginTop: "5px" }}
+                                />
+                                {!editBool && images.length ?
+                                    <div className='preview-image-gallery'>
+                                        {imageURLs.map((url, idx) => (
+                                            <div className='preview-image-wrapper' onClick={e => (removeImg(e, false, idx))}>
+                                                <img src={url} className='preview-image' />
+                                            </div>
+                                        ))}
                                     </div>
-                                ))}
-                            </div>
-                            : <></>}
-                        {(imageLoading) && <Loader size={50}/>}
+                                    : <></>}
+                                {(imageLoading) && <Loader size={50} />}
+                            </>)}
                     </div>
                     <button className="create-new-spot-button" type='submit'>{editBool ? "Update Spot" : "Create Spot"}</button>
                 </form>
