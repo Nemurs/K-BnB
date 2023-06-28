@@ -2,44 +2,97 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { createNewSpotImageThunk, createNewSpotThunk, editSpotThunk, loadAllThunk } from '../../store/allSpots';
 import "./NewSpotForm.css";
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory, useParams, useLocation } from 'react-router-dom';
 import { loadOneThunk } from '../../store/singleSpot';
 
 const NewSpotForm = () => {
     const dispatch = useDispatch();
     const history = useHistory();
+    const location = useLocation();
     const { id } = useParams();
     const spot = useSelector(state => state.spots.singleSpot);
-    // let prevImg = spot?.SpotImages?.find(img => img.preview === true); FOR LATER
     const user = useSelector(state => state.session.user)
 
     useEffect(() => {
         dispatch(loadAllThunk());
-    }, [dispatch]);
+        if (id) {
+            dispatch(loadOneThunk(id))
+        } else {
+            reset()
+        }
+    }, [dispatch, id]);
 
-    let editBool = id && user && user?.id && user?.id === spot?.Owner?.id;
-
-
-    const [country, setCountry] = useState(editBool ? spot.country : '');
-    const [address, setAddress] = useState(editBool ? spot.address : '');
-    const [city, setCity] = useState(editBool ? spot.city : '');
-    const [state, setState] = useState(editBool ? spot.state : '');
-    const [latitude, setLatitude] = useState(editBool ? String(spot.lat) : '');
-    const [longitude, setLongitude] = useState(editBool ? String(spot.lng) : '');
-    const [description, setDescription] = useState(editBool ? spot.description : '');
-    const [name, setName] = useState(editBool ? spot.name : '');
-    const [price, setPrice] = useState(editBool ? String(spot.price) : '');
+    const [editBool, setEditBool] = useState(false);
+    const [country, setCountry] = useState('');
+    const [address, setAddress] = useState('');
+    const [city, setCity] = useState('');
+    const [state, setState] = useState('');
+    const [latitude, setLatitude] = useState('');
+    const [longitude, setLongitude] = useState('');
+    const [description, setDescription] = useState('');
+    const [name, setName] = useState('');
+    const [price, setPrice] = useState('');
     // const [previewImageURL, setPreviewImageURL] = useState('');
     // const [previewImageURL, setPreviewImageURL] = useState(editBool ? prevImg.url : ''); FOR LATER
     const [previewImg, setPreviewImg] = useState(null);
+    // const [oldPreviewImgURL, setOldPreviewImg] = useState(editBool && oldPrevImg ? oldPrevImg.url : "");
+    const [oldPrevImg, setOldPrevImg] = useState(null);
+    const [oldImgs, setOldImgs] = useState([]);
     const [previewImgURL, setPreviewImgURL] = useState(null);
     const [images, setImages] = useState([]);
     const [imageURLs, setImageURLs] = useState([]);
     const [imageLoading, setImageLoading] = useState(false);
+    const [deleteIds, setDeleteIds] = useState([]);
     const [error, setError] = useState({});
     const [touched, setTouched] = useState({});
     const [submitState, setSubmitState] = useState(false);
 
+    const reset = () => {
+        setEditBool(false);
+        setCountry('');
+        setAddress('');
+        setCity('');
+        setState('');
+        setLatitude('');
+        setLongitude('');
+        setDescription('');
+        setName('');
+        setPrice('');
+        setPreviewImg(null);
+        setPreviewImgURL(null);
+        setOldPrevImg(null)
+        setImages([]);
+        setImageURLs([]);
+        setOldImgs([]);
+        setImageLoading(false);
+        setDeleteIds([]);
+        setError({});
+        setTouched({});
+        setSubmitState(false);
+    };
+
+    useEffect(() => {
+        setEditBool(id && user && user?.id && user.id === spot.Owner?.id)
+    }, [spot, user])
+
+    useEffect(() => {
+        if (editBool) {
+            setCountry(spot.country);
+            setAddress(spot.address);
+            setCity(spot.city);
+            setState(spot.state);
+            setLatitude(spot.latitude ? String(spot.latitude) : "");
+            setLongitude(spot.longitude ? String(spot.longitude) : "");
+            setDescription(spot.description);
+            setName(spot.name);
+            setPrice(String(spot.price));
+            setOldPrevImg(spot?.SpotImages?.find(img => img.preview === true))
+            setOldImgs(spot?.SpotImages?.filter(img => img.preview === false))
+        }
+    }, [editBool])
+
+
+    /* PREVIEW IMAGES FOR UPLOADS */
     useEffect(() => {
         if (!previewImg) {
             setPreviewImgURL(null);
@@ -59,14 +112,14 @@ const NewSpotForm = () => {
             return;
         }
         let urls = []
-        for (let img of images){
+        for (let img of images) {
             urls.push(URL.createObjectURL(img));
         }
         setImageURLs(urls);
 
         // free memory when ever this component is unmounted
         return () => {
-            for (let url of imageURLs){
+            for (let url of imageURLs) {
                 URL.revokeObjectURL(url)
             }
         };
@@ -74,7 +127,7 @@ const NewSpotForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setSubmitState(true);
+        setSubmitState(true); //Display errors ony after submission
 
         const previewImgformData = new FormData();
         previewImgformData.append("image", previewImg);
@@ -154,35 +207,23 @@ const NewSpotForm = () => {
 
     };
 
-    const reset = () => {
-        setCountry('');
-        setAddress('');
-        setCity('');
-        setState('');
-        setLatitude('');
-        setLongitude('');
-        setDescription('');
-        setName('');
-        setPrice('');
-        setPreviewImg(null);
-        setImages([]);
-    };
+
 
     const removeImg = (e, isPreviewImg = false, idx) => {
         e.preventDefault()
 
-        if (isPreviewImg){
+        if (isPreviewImg) {
             setPreviewImg(null);
             let previewImgInput = document.getElementById('spotPreviewImgFileInput')
-            previewImgInput.value=""
-        } else{
+            previewImgInput.value = ""
+        } else {
             let list = new DataTransfer();
             // list.items.clear()
             // console.log(list)
             let newImgList = [...images]
             newImgList.splice(idx, 1)
             setImages(newImgList)
-            for(let file of newImgList){
+            for (let file of newImgList) {
                 list.items.add(file)
             }
             // console.log(list)
@@ -193,6 +234,13 @@ const NewSpotForm = () => {
             previewImgInput.files = myFileList;
             // console.log(previewImgInput.files)
         }
+    }
+
+    const removeOldImg = (e, imageId) => {
+        e.preventDefault()
+        setDeleteIds(prev => [...prev, imageId])
+        console.log(deleteIds)
+        return;
     }
 
     useEffect(() => {
@@ -213,14 +261,14 @@ const NewSpotForm = () => {
         if (!address.length) newErrors.address = "Address is Required";
         if (!city.length) newErrors.city = "City is Required";
         if (!state.length) newErrors.state = "State is Required";
-        if (!previewImg) newErrors.previewImg = "Preview Image is Required";
+        if (!previewImg && deleteIds.includes(oldPrevImg?.id)) newErrors.previewImg = "Preview Image is Required";
 
         setError(newErrors)
 
         return () => setError({});
 
 
-    }, [country, address, city, state, latitude, longitude, description, name, price, previewImg]);
+    }, [country, address, city, state, latitude, longitude, description, name, price, previewImg, deleteIds]);
 
     return (
         <div className='create-new-spot-page'>
@@ -337,17 +385,65 @@ const NewSpotForm = () => {
                         />
                         {((touched.price || submitState) && error.price) && <p className="form-error">{error.price}</p>}
                     </div>
-                    {!editBool && <div className='create-new-spot-form-image'>
-                        {/* TODO: remove !editBool when implementing edit image feature */}
+                    <div className='create-new-spot-form-image'>
                         <h3>Liven up your spot with a preview photo</h3>
+                        {editBool && (
+                            <div className='edit-spot-preview-images-wrapper'>
+                                {oldPrevImg && !deleteIds.includes(oldPrevImg.id) && (<div>
+                                    <p>Old Image</p>
+                                    <div className='preview-image-wrapper' onClick={e => (removeOldImg(e, oldPrevImg.id))}><img src={oldPrevImg.url} className='preview-image' /></div>
+                                </div>)}
+                                {previewImg && (
+                                    <div>
+                                        <p>New Image</p>
+                                        <div className='preview-image-wrapper' onClick={e => (removeImg(e, true))}><img src={previewImgURL} className='preview-image' /></div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                         <input
                             type="file"
                             accept="image/*"
                             id='spotPreviewImgFileInput'
                             onChange={(e) => setPreviewImg(e.target.files[0])}
+                            style={{ marginTop: "5px" }}
                         />
-                        {previewImg ? <div className='preview-image-wrapper' onClick={e=>(removeImg(e, true))}><img src={previewImgURL} className='preview-image' /></div> : <></>}
-                        <h3>Add up to 4 more images</h3>
+                        {!editBool && previewImg ? <div className='preview-image-wrapper' onClick={e => (removeImg(e, true))}><img src={previewImgURL} className='preview-image' /></div> : <></>}
+
+                        {!editBool ?
+                            (<h3>Add up to {images.length ? `${4 - images.length}` : 4} more image{images.length === 3 ? "" : "s"}</h3>)
+                            :
+                            (<h3>Add up to {images.length || oldImgs.length ? `${4 - (images.length + oldImgs.filter(img => !deleteIds.includes(img.id)).length)}` : 4} more image{(images.length + oldImgs.filter(img => deleteIds.includes(img.id)).length) === 3 ? "" : "s"}</h3>
+                            )}
+                        {editBool && (
+                            <div className='edit-spot-image-gallery-wrapper'>
+                                {oldImgs.length && oldImgs.filter(img => deleteIds.includes(img.id)).length !== oldImgs.length ? <div>
+                                    <p>Old Images</p>
+                                    <div className='preview-image-gallery'>
+                                        {oldImgs.map(img => {
+                                            if (!deleteIds.includes(img.id)) {
+                                                return (
+                                                    <div className='preview-image-wrapper' onClick={e => (removeOldImg(e, img.id))}><img src={img.url} className='preview-image' /></div>
+                                                )
+                                            } else return (<></>)
+                                        })}
+                                    </div>
+                                </div>:<></>}
+                                {images.length ? (
+                                    <div>
+                                        <p>New Images</p>
+                                        <div className='preview-image-gallery'>
+                                            {imageURLs.map((url, idx) => (
+                                                <div className='preview-image-wrapper' onClick={e => (removeImg(e, false, idx))}>
+                                                    <img src={url} className='preview-image' />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ):<></>}
+                                {!oldImgs.length && !images.length ? (<p>No Images {":("}</p>):(<></>)}
+                            </div>
+                        )}
                         <input
                             type="file"
                             accept="image/*"
@@ -355,17 +451,17 @@ const NewSpotForm = () => {
                             multiple
                             onChange={(e) => setImages(Array.from(e.target.files))}
                         />
-                        {images.length ?
+                        {!editBool && images.length ?
                             <div className='preview-image-gallery'>
                                 {imageURLs.map((url, idx) => (
-                                    <div className='preview-image-wrapper' onClick={e=>(removeImg(e, false, idx))}>
+                                    <div className='preview-image-wrapper' onClick={e => (removeImg(e, false, idx))}>
                                         <img src={url} className='preview-image' />
                                     </div>
                                 ))}
                             </div>
-                        : <></>}
+                            : <></>}
                         {(imageLoading) && <p>Loading...</p>}
-                    </div>}
+                    </div>
                     <button className="create-new-spot-button" type='submit'>{editBool ? "Update Spot" : "Create Spot"}</button>
                 </form>
             </div>

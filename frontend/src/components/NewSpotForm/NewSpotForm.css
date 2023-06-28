@@ -4,6 +4,11 @@
 }
 
 /*Images*/
+.edit-spot-preview-images-wrapper{
+    display: flex;
+    align-items: center;
+    column-gap:20px;
+}
 .preview-image-gallery{
     display: flex;
     align-items: center;
@@ -12,9 +17,6 @@
     width: 50px;
     height: 50px;
     box-sizing: border-box;
-    /* display: flex;
-    justify-content: center;
-    align-items: center; */
 }
 .preview-image-wrapper:hover{
     background-image: url('../../../public/red-x-clear-background.png');
