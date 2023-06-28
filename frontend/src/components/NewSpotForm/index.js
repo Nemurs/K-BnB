@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { createNewSpotImageThunk, createNewSpotThunk, editSpotThunk, loadAllThunk } from '../../store/allSpots';
+import { createNewSpotImageThunk, deleteSpotImageThunk, createNewSpotThunk, editSpotThunk, loadAllThunk } from '../../store/allSpots';
 import "./NewSpotForm.css";
-import { useHistory, useParams, useLocation } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { loadOneThunk } from '../../store/singleSpot';
 
 const NewSpotForm = () => {
     const dispatch = useDispatch();
     const history = useHistory();
-    const location = useLocation();
     const { id } = useParams();
     const spot = useSelector(state => state.spots.singleSpot);
     const user = useSelector(state => state.session.user)
@@ -166,8 +165,25 @@ const NewSpotForm = () => {
             let spotRes = await dispatch(editSpotThunk({ id, ...newSpot }));
             if (spotRes.ok) {
                 let spotData = await spotRes.json();
-                // console.log(spotData);
-                history.push(`/spots/${spotData.id}`);
+                setImageLoading(true);
+                for (let id of deleteIds){
+                    await dispatch(deleteSpotImageThunk({spotId: spot.id, imgId: id}));
+                }
+                let imgResponses = []
+                for (let form of forms) {
+                    form.append("spot_id", id)
+                    imgResponses.push(await dispatch(createNewSpotImageThunk(form)));
+                }
+                if (imgResponses.every(res => res.ok)) {
+                    history.push(`/spots/${id}`);
+                    reset();
+                }
+                else {
+                    setImageLoading(false)
+                    // console.log("error with img data")
+                    // console.log(imgRes);
+                    // console.log(spotData);
+                }
             }
             else {
                 // console.log("error with spot data")
@@ -177,12 +193,8 @@ const NewSpotForm = () => {
             let spotRes = await dispatch(createNewSpotThunk(newSpot));
             if (spotRes.ok) {
                 let spotData = await spotRes.json();
-                // console.log(spotData);
-                // let imgPayload = { id: spotData.id, body: { url: previewImageURL, preview: true } }
-                // let imgRes = await dispatch(createNewSpotImageThunk(imgPayload));
                 setImageLoading(true);
                 const id = spotData.id
-
                 let imgResponses = []
                 for (let form of forms) {
                     form.append("spot_id", id)

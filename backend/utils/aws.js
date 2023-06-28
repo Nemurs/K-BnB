@@ -42,7 +42,7 @@ const singlePublicFileDelete = async (s3URL) => {
 
     const result = await s3.deleteObject(params).promise();
     // return results of deletion from aws
-    return result.Errors;
+    return result;
   };
 
   const multiplePublicFileDelete = async (urlArr) => {
