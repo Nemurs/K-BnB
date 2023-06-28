@@ -166,8 +166,34 @@ const NewSpotForm = () => {
         setPrice('');
         setPreviewImg(null);
         setImages([]);
-        // setPreviewImageURL('');
     };
+
+    const removeImg = (e, isPreviewImg = false, idx) => {
+        e.preventDefault()
+
+        if (isPreviewImg){
+            setPreviewImg(null);
+            let previewImgInput = document.getElementById('spotPreviewImgFileInput')
+            previewImgInput.value=""
+        } else{
+            let list = new DataTransfer();
+            // list.items.clear()
+            // console.log(list)
+            let newImgList = [...images]
+            newImgList.splice(idx, 1)
+            setImages(newImgList)
+            for(let file of newImgList){
+                list.items.add(file)
+            }
+            // console.log(list)
+            let myFileList = list.files;
+            // console.log(myFileList)
+            let previewImgInput = document.getElementById('spotImgFileInput')
+            // console.log(previewImgInput.files)
+            previewImgInput.files = myFileList;
+            // console.log(previewImgInput.files)
+        }
+    }
 
     useEffect(() => {
         let newErrors = {}
@@ -181,11 +207,6 @@ const NewSpotForm = () => {
         if (isNaN(Number(longitude)) || Number(longitude) < -180 || Number(longitude) > 180) newErrors.longitude = "Longitude must be a number between -180 and 180";
 
         if (description.length < 30 || description.length > 255) newErrors.description = "Description must be between 30 and 255 characters"
-
-        // if (!editBool && !(previewImageURL.endsWith(".png") || previewImageURL.endsWith(".jpg") || previewImageURL.endsWith(".jpeg") || previewImageURL.length)) {
-        //     //TODO: remove !editBool when implementing edit image feature
-        //     newErrors.previewImageURL = "Image URL must end in .png, .jpg, or .jpeg"
-        // }
 
         //Missing Required Field Errors
         if (!country.length) newErrors.country = "Country is Required";
@@ -322,21 +343,24 @@ const NewSpotForm = () => {
                         <input
                             type="file"
                             accept="image/*"
-                            name='image'
+                            id='spotPreviewImgFileInput'
                             onChange={(e) => setPreviewImg(e.target.files[0])}
                         />
-                        {previewImg ? <img src={previewImgURL} className='preview-image' /> : <></>}
+                        {previewImg ? <div className='preview-image-wrapper' onClick={e=>(removeImg(e, true))}><img src={previewImgURL} className='preview-image' /></div> : <></>}
                         <h3>Add up to 4 more images</h3>
                         <input
                             type="file"
                             accept="image/*"
+                            id='spotImgFileInput'
                             multiple
-                            onChange={(e) => setImages(e.target.files)}
+                            onChange={(e) => setImages(Array.from(e.target.files))}
                         />
                         {images.length ?
-                            <div>
-                                {imageURLs.map(url => (
-                                    <img src={url} className='preview-image' />
+                            <div className='preview-image-gallery'>
+                                {imageURLs.map((url, idx) => (
+                                    <div className='preview-image-wrapper' onClick={e=>(removeImg(e, false, idx))}>
+                                        <img src={url} className='preview-image' />
+                                    </div>
                                 ))}
                             </div>
                         : <></>}

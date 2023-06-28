@@ -4,11 +4,32 @@
 }
 
 /*Images*/
+.preview-image-gallery{
+    display: flex;
+    align-items: center;
+}
+.preview-image-wrapper{
+    width: 50px;
+    height: 50px;
+    box-sizing: border-box;
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
+}
+.preview-image-wrapper:hover{
+    background-image: url('../../../public/red-x-clear-background.png');
+    background-size: contain;
+    cursor: pointer;
+}
+
 .preview-image{
     width: 50px;
     height: 50px;
     object-fit: scale-down;
-    padding: 10px;
+}
+
+.preview-image:hover{
+    opacity: 0.6;
 }
 
 /*Colors*/
