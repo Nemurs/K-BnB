@@ -20,6 +20,11 @@
     align-self: center;
 }
 
+.inner-menu-button{
+    background-color: white;
+    border: none;
+}
+
 .nav-list{
     list-style-type: none;
     display:flex;
@@ -66,7 +71,23 @@
     align-items: center;
     background-color: white;
 }
-ul.hidden{
+
+.profile-dropdown-outer{
+    position: fixed;
+    z-index: 2;
+    margin-top: 155px;
+    margin-left: -35px;
+    padding-left: 0px;
+    padding: 10px;
+    border: black solid 2px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+}
+
+ul.hidden, i.hidden{
     display: none;
 }
 
@@ -82,5 +103,7 @@ ul.hidden{
 
 li.session-butons-li{
     display: flex;
-    column-gap: 5px;
+    flex-direction: column;
+    justify-content: center;
+    row-gap: 5px;
 }
