@@ -3,6 +3,37 @@
     font-size: 32px;
 }
 
+/*Images*/
+.edit-spot-preview-images-wrapper{
+    display: flex;
+    align-items: center;
+    column-gap:20px;
+}
+.preview-image-gallery{
+    display: flex;
+    align-items: center;
+}
+.preview-image-wrapper{
+    width: 50px;
+    height: 50px;
+    box-sizing: border-box;
+}
+.preview-image-wrapper:hover{
+    background-image: url('../../../public/red-x-clear-background.png');
+    background-size: contain;
+    cursor: pointer;
+}
+
+.preview-image{
+    width: 50px;
+    height: 50px;
+    object-fit: scale-down;
+}
+
+.preview-image:hover{
+    opacity: 0.6;
+}
+
 /*Colors*/
 .form-error{
     color: palevioletred;

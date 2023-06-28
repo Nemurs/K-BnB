@@ -6,6 +6,7 @@ const LOAD_USER_OWNED =  "allSpots/loadUserOwned";
 const CREATE_NEW_SPOT = "allSpots/createNewSpot";
 const CREATE_NEW_SPOT_IMAGE = "allSpots/createNewSpotImage";
 const DELETE_SPOT = "allSpots/deleteSpot";
+const DELETE_SPOT_IMAGE = "allSpots/deleteSpot";
 const EDIT_SPOT = "allSpots/editSpot";
 
 const loadAllAction = (data) => {
@@ -39,6 +40,13 @@ const createNewSpotImageAction = (data) => {
 const deleteSpotAction = (data) => {
   return {
     type: DELETE_SPOT,
+    payload: data
+  };
+};
+
+const deleteSpotImageAction = (data) => {
+  return {
+    type: DELETE_SPOT_IMAGE,
     payload: data
   };
 };
@@ -79,15 +87,27 @@ export const createNewSpotThunk = (payload) => async (dispatch) => {
 };
 
 export const createNewSpotImageThunk = (payload) => async (dispatch) => {
-  const response = await csrfFetch(`/api/spots/${payload.id}/images`, {
+  const response = await csrfFetch(`/api/spots/${payload.get("spot_id")}/images`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload.body)
+    headers: { 'Content-Type': 'multipart/form-data' },
+    body: payload
   });
 
   if (response.ok) {
     const img = await response.clone().json();
-    dispatch(createNewSpotImageAction({img, spotId: payload.id}));
+    dispatch(createNewSpotImageAction({img, spotId: payload.get("spot_id")}));
+  }
+  return response;
+};
+
+export const deleteSpotImageThunk = (payload) => async (dispatch) => {
+  const response = await csrfFetch(`/api/spots/${payload.spotId}/images/${payload.imgId}`, {
+    method: 'DELETE'
+  });
+
+  if (response.ok) {
+    const img = await response.clone().json();
+    dispatch(deleteSpotImageAction({img, spotId: payload.spotId}));
   }
   return response;
 };
@@ -137,7 +157,8 @@ const allSpotsReducer = (state = initialState, action) => {
       return newState;
     case CREATE_NEW_SPOT_IMAGE:
       newState = Object.assign({}, state);
-      newState[action.payload.spotId].previewImage = action.payload.img.url;
+      newState[action.payload.spotId].previewImage = action.payload.img.preview ? action.payload.img.url : newState[action.payload.spotId].previewImage
+      return newState;
     case LOAD_USER_OWNED:
       newState = Object.assign({}, state);
       newState = {...action.payload.Spots};
@@ -145,6 +166,12 @@ const allSpotsReducer = (state = initialState, action) => {
     case DELETE_SPOT:
       newState = Object.assign({}, state);
       delete newState[action.payload.id]
+      return newState;
+    case DELETE_SPOT_IMAGE:
+      newState = Object.assign({}, state);
+      if (action.payload.img.preview){
+        delete newState[action.payload.spotId].previewImage
+      }
       return newState;
     case EDIT_SPOT:
       newState = Object.assign({}, state);

@@ -13,41 +13,45 @@ const app = express();
 
 /*Middleware*/
 
-//Standard
+// Standard
 app.use(morgan('dev'));
 app.use(cookieParser());
-app.use(express.json());
+
 
 // Security
 if (!isProduction) {
-    // enable cors only in development
-    app.use(cors());
-  }
+  // enable cors only in development
+  app.use(cors());
+}
 
-  // helmet helps set a variety of headers to better secure your app
-  app.use(
-    helmet.crossOriginResourcePolicy({
-      policy: "cross-origin"
-    })
-  );
+// helmet helps set a variety of headers to better secure your app
+app.use(
+  helmet.crossOriginResourcePolicy({
+    policy: "cross-origin"
+  })
+);
+app.use(
+  helmet.contentSecurityPolicy({
+    policy: false
+  })
+);
+// Set the _csrf token and create req.csrfToken method
+app.use(
+  csurf({
+    cookie: {
+      secure: isProduction,
+      sameSite: isProduction && "Lax",
+      httpOnly: true
+    }
+  })
+);
 
-  // Set the _csrf token and create req.csrfToken method
-  app.use(
-    csurf({
-      cookie: {
-        secure: isProduction,
-        sameSite: isProduction && "Lax",
-        httpOnly: true
-      }
-    })
-  );
-
+// FileHandling
+app.use(express.urlencoded({ extended: false, limit: 10485760}));
+app.use(express.json());
 
 /*RouteHandlers*/
 const routes = require('./routes');
-
-// ...
-
 app.use(routes); // Connect all the routes
 
 /*ErrorHandlers*/

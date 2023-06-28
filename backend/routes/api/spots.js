@@ -8,6 +8,7 @@ const router = express.Router();
 
 const { Spot, SpotImage, User, Review, ReviewImage, Booking } = require('../../db/models');
 const { Op } = require('sequelize');
+const { singleMulterUpload, singlePublicFileUpload, singlePublicFileDelete, multiplePublicFileDelete } = require("../../utils/aws")
 
 /**Gets sum, count, and average stars for a spot */
 async function getReviewAggs(spot) {
@@ -66,11 +67,11 @@ router.get('/current', requireAuth, async (req, res, next) => {
 const validateBookingBody = [
   check('startDate')
     .exists()
-    .isDate({format:'YYYY/MM/DD', strictMode:true})
+    .isDate({ format: 'YYYY/MM/DD', strictMode: true })
     .withMessage('Start date property is required and it must be a valid date in the format yyyy/mm/dd.'),
   check('endDate')
     .exists()
-    .isDate({format:'YYYY/MM/DD', strictMode:true})
+    .isDate({ format: 'YYYY/MM/DD', strictMode: true })
     .withMessage('End date property is required and it must be a valid date in the format yyyy/mm/dd.'),
   handleValidationErrors
 ];
@@ -91,23 +92,23 @@ router.post('/:spotId/bookings', requireAuth, validateBookingBody, async (req, r
     attributes: ["id", "spotId", "userId", "startDate", "endDate", "createdAt", "updatedAt"],
     where: {
       spotId: req.params.spotId,
-      }
+    }
   });
 
   //Verify that start date is before end date
-  let {startDate, endDate} = req.body;
+  let { startDate, endDate } = req.body;
   startDate = new Date(startDate);
   endDate = new Date(endDate);
 
   const startDateTime = startDate.getTime();
   const endDateTime = endDate.getTime();
 
-  if (startDateTime > endDateTime){
+  if (startDateTime > endDateTime) {
     return next(makeError('Bad Request', "endDate cannot be on or before startDate", 400));
   }
 
   //verify that start date and end date are different
-  if (startDate.getDate() === endDate.getDate()){
+  if (startDate.getDate() === endDate.getDate()) {
     return next(makeError('Bad Request', "startDate cannot be the same as endDate", 400));
   }
 
@@ -116,46 +117,48 @@ router.post('/:spotId/bookings', requireAuth, validateBookingBody, async (req, r
     let startFlag = false;
     let endFlag = false;
 
-    for(let book of books){
+    for (let book of books) {
       let start = new Date(book.startDate).getTime();
       let end = new Date(book.endDate).getTime();
       // console.log(start, startDateTime, end)
-      if(startDateTime >= start && startDateTime <= end){
+      if (startDateTime >= start && startDateTime <= end) {
         startFlag = true;
       }
       // console.log(start, endDateTime, end)
-      if(endDateTime >= start && endDateTime <= end){
+      if (endDateTime >= start && endDateTime <= end) {
         endFlag = true;
       }
       // console.log(start, end, startDateTime, endDateTime)
-      if(endDateTime > end && startDateTime < start){
+      if (endDateTime > end && startDateTime < start) {
         startFlag = true;
         endFlag = true;
       }
     }
 
-    if(startFlag && endFlag){
+    if (startFlag && endFlag) {
       return next(makeError('Duplicate Action', "Sorry, this spot is already booked for the specified dates", 403,
-      {startDate: "Start date conflicts with an existing booking",
-      endDate: "End date conflicts with an existing booking"}
+        {
+          startDate: "Start date conflicts with an existing booking",
+          endDate: "End date conflicts with an existing booking"
+        }
       ));
     }
-    else if (startFlag){
+    else if (startFlag) {
       return next(makeError('Duplicate Action', "Sorry, this spot is already booked for the specified dates", 403,
-      {startDate: "Start date conflicts with an existing booking"}
+        { startDate: "Start date conflicts with an existing booking" }
       ));
     }
-    else if (endFlag){
+    else if (endFlag) {
       return next(makeError('Duplicate Action', "Sorry, this spot is already booked for the specified dates", 403,
-      {endDate: "End date conflicts with an existing booking"}
+        { endDate: "End date conflicts with an existing booking" }
       ));
     }
 
   }
 
   //Create booking with request body parameters
-  startDate = `${startDate.getFullYear()}-${startDate.getMonth()+1}-${startDate.getDate()}`;
-  endDate = `${endDate.getFullYear()}-${endDate.getMonth()+1}-${endDate.getDate()}`;
+  startDate = `${startDate.getFullYear()}-${startDate.getMonth() + 1}-${startDate.getDate()}`;
+  endDate = `${endDate.getFullYear()}-${endDate.getMonth() + 1}-${endDate.getDate()}`;
   const userId = user.id;
   const spotId = Number(req.params.spotId);
 
@@ -247,8 +250,8 @@ router.get('/:spotId/reviews', async (req, res, next) => {
   let reviews = await Review.findAll({
     attributes: ["id", "spotId", "userId", "review", "stars", "createdAt", "updatedAt"],
     include: [
-      {model: User, attributes: ['id', 'firstName', 'lastName']},
-      {model: ReviewImage, attributes: ['id', 'url']},
+      { model: User, attributes: ['id', 'firstName', 'lastName'] },
+      { model: ReviewImage, attributes: ['id', 'url'] },
     ],
     where: {
       spotId: Number(req.params.spotId)
@@ -357,7 +360,7 @@ router.get('/:id', async (req, res, next) => {
   spot = spot.toJSON();
   spot.numReviews = count;
   spot.avgRating = avg;
-  return res.json({ ...spot, SpotImages, Bookings ,Owner })
+  return res.json({ ...spot, SpotImages, Bookings, Owner })
 });
 
 /*** Get all spots ***/
@@ -380,11 +383,11 @@ const validateSpotQuery = [
     .withMessage('If provided, maxLng must be a decimal'),
   check('minPrice')
     .optional()
-    .isFloat({min: 0.0})
+    .isFloat({ min: 0.0 })
     .withMessage('If provided, minPrice must be a decimal greater than 0.0'),
   check('maxPrice')
     .optional()
-    .isFloat({min: 0.0})
+    .isFloat({ min: 0.0 })
     .withMessage('If provided, maxPrice must be a decimal greater than 0.0'),
   handleValidationErrors
 ];
@@ -396,27 +399,27 @@ router.get('', validateSpotQuery, async (req, res, next) => {
   size = parseInt(size);
 
   if (isNaN(page) || page < 0) page = 1;
-  if( page > 10) page = 10;
+  if (page > 10) page = 10;
   if (isNaN(size) || size < 0) size = 20;
-  if(size > 20) size = 20;
+  if (size > 20) size = 20;
 
   //search filters
-  const {minLat, maxLat, minLng, maxLng, minPrice, maxPrice} = req.query;
+  const { minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query;
 
   let where = {};
 
-  function minMaxFilter(whereObj = {}, prop = '', minProp, maxProp){
-    if(minProp && maxProp){
+  function minMaxFilter(whereObj = {}, prop = '', minProp, maxProp) {
+    if (minProp && maxProp) {
       whereObj[prop] = {
-        [Op.between] : [minProp, maxProp]
+        [Op.between]: [minProp, maxProp]
       }
-    } else if(minProp) {
+    } else if (minProp) {
       whereObj[prop] = {
-        [Op.gte] : minProp
+        [Op.gte]: minProp
       }
-    } else if(maxProp) {
+    } else if (maxProp) {
       whereObj[prop] = {
-        [Op.lte] : maxProp
+        [Op.lte]: maxProp
       }
     }
   }
@@ -456,23 +459,23 @@ router.get('', validateSpotQuery, async (req, res, next) => {
     delete spot.SpotImages;
   });
 
-  return res.json({...out, ...{page, size}});
+  return res.json({ ...out, ...{ page, size } });
 });
 
 /*** Add an image to a spot based on the spot's id ***/
-const validateImageBody = [
-  check('url')
-    .exists({ checkFalsy: true })
-    .isURL()
-    .withMessage('URL is required'),
-  check('preview')
-    .optional()
-    .isBoolean()
-    .withMessage('Preview must be a boolean'),
-  handleValidationErrors
-];
+// const validateImageBody = [
+//   check('url')
+//     .exists({ checkFalsy: true })
+//     .isURL()
+//     .withMessage('URL is required'),
+//   check('preview')
+//     .optional()
+//     .isBoolean()
+//     .withMessage('Preview must be a boolean'),
+//   handleValidationErrors
+// ];
 
-router.post('/:spotId/images', requireAuth, validateImageBody, async (req, res, next) => {
+router.post('/:spotId/images', singleMulterUpload("image"), requireAuth, async (req, res, next) => {
   //Verify authorization and that the spot exists
   const { user } = req;
   let spot = await Spot.findByPk(req.params.spotId);
@@ -482,11 +485,16 @@ router.post('/:spotId/images', requireAuth, validateImageBody, async (req, res, 
   if (user.id != spot.ownerId) {
     return next(makeError('Forbidden Spot', "Spot must belong to the current user", 403));
   }
-  //set preview to false if undefined
-  let { url, preview } = req.body;
-  preview = typeof preview === 'undefined' ? false : preview;
+
+
+  //set preview to true if there are no other images
+  let { preview } = req.body;
+  console.log(req.file)
+  preview = preview ? preview : !spot.images?.length;
   const spotId = req.params.spotId;
   try {
+    // console.log(req.body)
+    const url = await singlePublicFileUpload(req.file);
     let newSpotImg = await SpotImage.create({ spotId, url, preview })
     newSpotImg = newSpotImg.toJSON();
     delete newSpotImg.spotId;
@@ -536,7 +544,7 @@ router.post('/', requireAuth, validateSpotBody, async (req, res, next) => {
   const { user } = req;
   const ownerId = user.id;
 
-  if(isNaN(Number(price)) || Number(price) < 0){
+  if (isNaN(Number(price)) || Number(price) < 0) {
     return next(makeError('Bad Request', "Price must be a number greater or equal to 0", 400));
   }
 
@@ -572,19 +580,59 @@ router.put('/:spotId', requireAuth, validateSpotBody, async (req, res, next) => 
   }
 })
 
-/*** Delete a Spot ***/
-router.delete('/:spotId', requireAuth, async (req, res, next) => {
+/*** Delete a Spot Image ***/
+router.delete('/:spotId/images/:imgId', requireAuth, async (req, res, next) => {
   //Verify authorization and that the spot exists
   const { user } = req;
-  let spot = await Spot.findByPk(req.params.spotId);
+  let spot = await Spot.findByPk(req.params.spotId, { include: { model: SpotImage } });
   if (!spot) {
     return next(makeError('Spot Not Found', "Spot couldn't be found", 404));
   }
   if (user.id != spot.ownerId) {
     return next(makeError('Forbidden Spot', "Spot must belong to the current user", 403));
   }
-
+  // console.log(spot.SpotImages)
+  let img = await SpotImage.findByPk(req.params.imgId);
+  // console.log(img)
+  if (!img) {
+    return next(makeError('Spot Image Not Found', "Spot Image couldn't be found", 404));
+  }
+  if (img.spotId != spot.id) {
+    return next(makeError('Forbidden Image', "Image must belong to the requested spot", 403));
+  }
   try {
+    let errors = await singlePublicFileDelete(img.url)
+    if (errors.length > 0) throw makeError('Error Deleting Image', "Could not delete image from AWS", 500);
+    console.log("Spot Images Deleted from AWS!")
+    img.destroy();
+    res.json({
+      message: "Successfully deleted"
+    })
+  } catch (error) {
+    return next(error);
+  }
+
+})
+
+/*** Delete a Spot ***/
+router.delete('/:spotId', requireAuth, async (req, res, next) => {
+  //Verify authorization and that the spot exists
+  const { user } = req;
+  let spot = await Spot.findByPk(req.params.spotId, { include: { model: SpotImage } });
+  if (!spot) {
+    return next(makeError('Spot Not Found', "Spot couldn't be found", 404));
+  }
+  if (user.id != spot.ownerId) {
+    return next(makeError('Forbidden Spot', "Spot must belong to the current user", 403));
+  }
+  // console.log(spot.SpotImages)
+  let urlArr = spot.SpotImages.map(img => img.url);
+  try {
+    if (urlArr.length) {
+      let errors = await multiplePublicFileDelete(urlArr)
+      if (errors.length > 0) throw makeError('Error Deleting Images', "Could not delete images from AWS", 500);
+      console.log("Spot Images Deleted from AWS!")
+    }
     spot.destroy();
     res.json({
       message: "Successfully deleted"
@@ -596,7 +644,7 @@ router.delete('/:spotId', requireAuth, async (req, res, next) => {
 })
 
 /*** Helper Functions ***/
-function makeError(title = '', msg = '', status = 500, errors={}) {
+function makeError(title = '', msg = '', status = 500, errors = {}) {
   const err = new Error(title);
   err.title = title;
   err.errors = { message: msg, ...errors };
