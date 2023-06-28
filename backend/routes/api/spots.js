@@ -603,7 +603,7 @@ router.delete('/:spotId/images/:imgId', requireAuth, async (req, res, next) => {
   try {
     let errors = await singlePublicFileDelete(img.url)
     if (errors.length > 0) throw makeError('Error Deleting Image', "Could not delete image from AWS", 500);
-    console.log("Spot Images Deleted from AWS!")
+    console.log("Spot Image Deleted from AWS!")
     img.destroy();
     res.json({
       message: "Successfully deleted"

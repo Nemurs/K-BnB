@@ -30,11 +30,11 @@ app.use(
     policy: "cross-origin"
   })
 );
-app.use(
-  helmet.contentSecurityPolicy({
-    policy: false
-  })
-);
+// app.use(
+//   helmet.contentSecurityPolicy({
+//     policy: false
+//   })
+// );
 // Set the _csrf token and create req.csrfToken method
 app.use(
   csurf({

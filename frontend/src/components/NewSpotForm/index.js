@@ -275,6 +275,8 @@ const NewSpotForm = () => {
 
         if (description.length < 30 || description.length > 255) newErrors.description = "Description must be between 30 and 255 characters"
 
+        if((images.length + oldImgs.filter(img => !deleteIds.includes(img.id)).length) > 4) newErrors.additionalImgs = "Only 4 non-preview images are allows";
+
         //Missing Required Field Errors
         if (!country.length) newErrors.country = "Country is Required";
         if (!address.length) newErrors.address = "Address is Required";
@@ -287,7 +289,7 @@ const NewSpotForm = () => {
         return () => setError({});
 
 
-    }, [country, address, city, state, latitude, longitude, description, name, price, previewImg, deleteIds]);
+    }, [country, address, city, state, latitude, longitude, description, name, price, previewImg, deleteIds, oldImgs]);
 
     return (
         <div className='create-new-spot-page'>
