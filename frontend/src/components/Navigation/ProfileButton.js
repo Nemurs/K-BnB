@@ -7,7 +7,7 @@ import "./Navigation.css";
 import { useHistory } from "react-router-dom";
 import { clearSingleBookingAction } from "../../store/singleBooking";
 
-function ProfileButton({ user }) {
+function ProfileButton({ user, closeMenuOuter }) {
   const dispatch = useDispatch();
   const history = useHistory();
   const [showMenu, setShowMenu] = useState(false);
@@ -16,6 +16,11 @@ function ProfileButton({ user }) {
   const openMenu = () => {
     if (showMenu) return;
     setShowMenu(true);
+  };
+
+  const closeMenuInner = () => {
+    if (!showMenu) return;
+    setShowMenu(false);
   };
 
   useEffect(() => {
@@ -34,8 +39,9 @@ function ProfileButton({ user }) {
 
   const logout = (e) => {
     e.preventDefault();
+    closeMenuOuter();
     dispatch(sessionActions.logoutThunk());
-    dispatch(clearSingleBookingAction())
+    dispatch(clearSingleBookingAction());
     history.push("/");
   };
 
@@ -43,20 +49,20 @@ function ProfileButton({ user }) {
 
   return (
     <>
-      <button onClick={openMenu}>
-        <i className="fas fa-user-circle" />
+      <button className="inner-menu-button" onClick={openMenu}>
+      <i className="fas fa-bars" style={{ color: "black" }}/>
       </button>
       <ul className={ulClassName} ref={ulRef}>
         <li>{`Hello, ${user.firstName}`}</li>
         <li>{user.email}</li>
         <li>
-          <Link to={'/spots/current'} className='spot-management-link'>
+          <Link to={'/spots/current'} className='spot-management-link' onClick={closeMenuInner}>
             Manage Spots
           </Link>
         </li>
         <li>
-          <Link to={'/bookings/current'} className='spot-management-link'>
-            Manage Bookings
+          <Link to={'/bookings/current'} className='spot-management-link' onClick={closeMenuInner}>
+            My Bookings
           </Link>
         </li>
         <li>
