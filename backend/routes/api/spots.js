@@ -489,7 +489,7 @@ router.post('/:spotId/images', singleMulterUpload("image"), requireAuth, async (
 
   //set preview to true if there are no other images
   let { preview } = req.body;
-  console.log(preview)
+  console.log(req.file)
   preview = preview ? preview : !spot.images?.length;
   const spotId = req.params.spotId;
   try {

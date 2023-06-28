@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { createNewSpotImageThunk, deleteSpotImageThunk, createNewSpotThunk, editSpotThunk, loadAllThunk } from '../../store/allSpots';
-import "./NewSpotForm.css";
 import { useHistory, useParams } from 'react-router-dom';
+import { createNewSpotImageThunk, deleteSpotImageThunk, createNewSpotThunk, editSpotThunk, loadAllThunk } from '../../store/allSpots';
 import { loadOneThunk } from '../../store/singleSpot';
+import Loader from '../Loader';
+import "./NewSpotForm.css";
 
 const NewSpotForm = () => {
     const dispatch = useDispatch();
@@ -128,18 +129,24 @@ const NewSpotForm = () => {
         e.preventDefault();
         setSubmitState(true); //Display errors ony after submission
 
-        const previewImgformData = new FormData();
-        previewImgformData.append("image", previewImg);
-        previewImgformData.append("preview", true);
 
         let forms = []
-        for (let idx = 0; idx < images.length; idx++) {
-            let img = images[idx]
-            forms.push(new FormData())
-            forms[idx].append("image", img)
-            forms[idx].append("preview", false);
+        if (images.length){
+            for (let idx = 0; idx < images.length; idx++) {
+                let img = images[idx]
+                if (img){
+                    forms.push(new FormData())
+                    forms[idx].append("image", img)
+                    forms[idx].append("preview", false);
+                }
+            }
         }
-        forms.push(previewImgformData)
+        if(previewImg){
+            const previewImgformData = new FormData();
+            previewImgformData.append("image", previewImg);
+            previewImgformData.append("preview", true);
+            forms.push(previewImgformData)
+        }
 
         const newSpot = {
             country,
@@ -420,7 +427,7 @@ const NewSpotForm = () => {
                             onChange={(e) => setPreviewImg(e.target.files[0])}
                             style={{ marginTop: "5px" }}
                         />
-                        {!editBool && previewImg ? <div className='preview-image-wrapper' onClick={e => (removeImg(e, true))}><img src={previewImgURL} className='preview-image' /></div> : <></>}
+                        {!editBool && previewImg ? <div className='preview-image-wrapper' onClick={e => (removeImg(e, true))} style={{marginTop:"5px"}}><img src={previewImgURL} className='preview-image' /></div> : <></>}
 
                         {!editBool ?
                             (<h3>Add up to {images.length ? `${4 - images.length}` : 4} more image{images.length === 3 ? "" : "s"}</h3>)
@@ -462,6 +469,7 @@ const NewSpotForm = () => {
                             id='spotImgFileInput'
                             multiple
                             onChange={(e) => setImages(Array.from(e.target.files))}
+                            style={{ marginTop: "5px" }}
                         />
                         {!editBool && images.length ?
                             <div className='preview-image-gallery'>
@@ -472,7 +480,7 @@ const NewSpotForm = () => {
                                 ))}
                             </div>
                             : <></>}
-                        {(imageLoading) && <p>Loading...</p>}
+                        {(imageLoading) && <Loader size={50}/>}
                     </div>
                     <button className="create-new-spot-button" type='submit'>{editBool ? "Update Spot" : "Create Spot"}</button>
                 </form>

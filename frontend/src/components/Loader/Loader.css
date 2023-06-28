@@ -1,0 +1,7 @@
+.loader-wrapper{
+    width: fit-content;
+    height: fit-content;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+}
