@@ -1,8 +1,27 @@
-# `Kevin's AirBnB Clone`
+# K-BnB
+
+Please visit my website at:
+
+[k-bnb.onrender.com]
+
+<img width="1039" alt="Screen Shot 2023-06-28 at 8 38 48 AM" src="https://github.com/Nemurs/K-BnB/assets/118857412/73108cd4-6ee9-4d9e-aa89-3a3582999045">
+
+
+## \~Spots~
+<img width="1069" alt="Screen Shot 2023-06-28 at 8 40 47 AM" src="https://github.com/Nemurs/K-BnB/assets/118857412/13a022d7-0c5d-4f24-aca3-aaf76bf30564">
+
+## \~Bookings~
+<img width="713" alt="Screen Shot 2023-06-28 at 8 42 05 AM" src="https://github.com/Nemurs/K-BnB/assets/118857412/9bc93044-fa76-4831-92b5-23f09c61bbb1">
+
+
+For more info about this project please check out my [wiki]!
+_________________________
+
 
 ## Database Schema Design
 
 ![Kevin's AirBnB Database Schema](./airbnb_dbdiagram.png "Schema")
+_________________________
 
 ## API Documentation
 
@@ -1438,3 +1457,6 @@ Return spots filtered by query parameters.
       }
     }
     ```
+
+[wiki]: https://github.com/Nemurs/K-BnB/wiki
+[k-bnb.onrender.com]: https://k-bnb.onrender.com/

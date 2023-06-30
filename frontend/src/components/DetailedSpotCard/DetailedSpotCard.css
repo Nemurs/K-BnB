@@ -79,3 +79,9 @@ h4{
     list-style-type: none;
     margin-left: -35px;
 }
+
+.review-modal-button-wrapper{
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
+}

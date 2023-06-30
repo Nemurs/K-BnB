@@ -17,7 +17,7 @@ const DetailedSpotCard = () => {
     const spot = useSelector(state => state.spots.singleSpot);
     const user = useSelector(state => state.session.user);
     const reviews = useSelector(state => Object.values(state.reviews.spot));
-    reviews.sort((a,b) => Date.parse(b["createdAt"]) - Date.parse(a["createdAt"]));
+    reviews.sort((a, b) => Date.parse(b["createdAt"]) - Date.parse(a["createdAt"]));
 
     function processDate(dateString) {
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'Augus', 'September', 'October', 'November', 'December']
@@ -60,7 +60,7 @@ const DetailedSpotCard = () => {
                         <p className='detailed-spot-card-host-text'>{isSpotOwnedByLoggedInUser ? `Hosted by You` : `Hosted by ${spot?.Owner?.firstName} ${spot?.Owner?.lastName}`}</p>
                         <p className='detailed-spot-card-description-text'>{spot.description}</p>
                     </div>
-                    <ReserveSpot spot={spot} {...{user, isSpotOwnedByLoggedInUser}}/>
+                    <ReserveSpot spot={spot} {...{ user, isSpotOwnedByLoggedInUser }} />
                 </div>
             </div>
             <div className="detailed-spot-reviews">
@@ -73,16 +73,25 @@ const DetailedSpotCard = () => {
                 />}
                 {!reviews.length && user && !(isSpotOwnedByLoggedInUser || isReviewedByLoggedInUser) && <p>Be the first to post a review!</p>}
                 <ul className="review-list">
-                    {reviews.length? reviews.map((rev) => (
+                    {reviews.length ? reviews.map((rev) => (
                         <li key={rev["id"]} className='review-list-item'>
                             <h3>{rev.User.firstName}</h3>
                             <h4>{processDate(rev.updatedAt)}</h4>
                             <p className="review-text">{rev.review}</p>
-                            {user && user.id === rev.User.id ? <OpenModalButton
-                                buttonText="Delete"
-                                cssClass={"detailed-spot-post-delete-button"}
-                                modalComponent={<DeleteReviewModal revId={rev.id} spotId={spot.id} />}
-                            /> : <></>}
+                            {user && user.id === rev.User.id ?
+                                <div className="review-modal-button-wrapper">
+                                    <OpenModalButton
+                                        buttonText="Edit"
+                                        cssClass="detailed-spot-post-review-button"
+                                        modalComponent={<SubmitReviewModal spotId={spot.id} user={user} isEdit={true} oldReview={rev}/>}
+                                    />
+                                    <OpenModalButton
+                                        buttonText="Delete"
+                                        cssClass={"detailed-spot-post-delete-button"}
+                                        modalComponent={<DeleteReviewModal revId={rev.id} spotId={spot.id} />}
+                                    />
+                                </div>
+                                : <></>}
                         </li>
                     )) : <></>}
                 </ul>

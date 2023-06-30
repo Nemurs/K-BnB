@@ -35,33 +35,36 @@ const UserBookingBrowser = () => {
 
     return (
         <div>
-            <h1>Manage Your Bookings</h1>
+            {!bookings.length ? (<h1 style={{color:"#47bbff"}}>Looks like you have no bookings yet {":("}</h1>):(<h1>Manage Your Bookings</h1>)}
             <Link to="../">
                 <button className="user-spot-create-button" onClick={(e) => e.preventDefault}>Create a New Booking</button>
             </Link>
-            <ul className='spot-list'>
-                {bookings.map((book) => {
-                const spot = book.Spot
-                if(!spot || book.expired) return (<></>)
-                return (
-                    <li key={spot["id"]} className='spot-card-list-item'>
-                        <Link to={`../spots/${spot["id"]}`} className='spot-card-link'>
-                            <span>{`${format(new Date(book.startDate),"yyyy/MM/dd")} - ${format(new Date(book.endDate),"yyyy/MM/dd")}`}</span>
-                            <SpotCard spot={spot} tooltip={spot["name"]} />
-                        </Link>
-                        <div className='user-spot-buttons'>
-                            <Link to={`../reserve/${spot["id"]}`}>
-                                <button className="user-spot-update-button" onClick={e => handleClick(e, spot["id"])}>Update</button>
+            {bookings.length ? (
+                <ul className='spot-list'>
+                    {bookings.map((book) => {
+                    const spot = book.Spot
+                    if(!spot || book.expired) return (<></>)
+                    let startsToday = (new Date(book.startDate)).getDate() === (new Date()).getDate()
+                    return (
+                        <li key={spot["id"]} className='spot-card-list-item' style={startsToday ? {border:"2.5px solid #f9385d", borderRadius:"20px"}:{}}>
+                            <Link to={`../spots/${spot["id"]}`} className='spot-card-link'>
+                                <span>{`${format(new Date(book.startDate),"yyyy/MM/dd")} - ${format(new Date(book.endDate),"yyyy/MM/dd")}`}</span>
+                                <SpotCard spot={spot} tooltip={spot["name"]} />
                             </Link>
-                            <OpenModalButton
-                                buttonText="Cancel Booking"
-                                cssClass={"user-spot-delete-button"}
-                                modalComponent={<DeleteBookingModal bookingId={book.id} />}
-                            />
-                        </div>
-                    </li>
-                )})}
-            </ul>
+                            <div className='user-spot-buttons'>
+                                <Link to={`../reserve/${spot["id"]}`}>
+                                    <button className="user-spot-update-button" onClick={e => handleClick(e, spot["id"])}>Update</button>
+                                </Link>
+                                <OpenModalButton
+                                    buttonText="Cancel Booking"
+                                    cssClass={"user-spot-delete-button"}
+                                    modalComponent={<DeleteBookingModal bookingId={book.id} />}
+                                />
+                            </div>
+                        </li>
+                    )})}
+                </ul>
+            ):(<></>)}
         </div>
     );
 };

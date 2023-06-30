@@ -49,6 +49,20 @@ export const createNewReviewThunk = (payload) => async (dispatch) => {
   return response;
 };
 
+export const editReviewThunk = (payload) => async (dispatch) => {
+  const response = await csrfFetch(`/api/reviews/${payload.revId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload.body)
+  });
+  if (response.ok) {
+    const spot = await response.clone().json();
+    spot.spotId = Number(spot.spotId);
+    dispatch(createNewReviewAction({spot, user:payload.user}));
+  }
+  return response;
+};
+
 export const deleteReviewThunk = (id) => async (dispatch) => {
   const response = await csrfFetch(`/api/reviews/${id}`, {
     method: 'DELETE',
@@ -78,8 +92,6 @@ const singleSpotReviews = (state = initialState, action) => {
     case CREATE_NEW_REVIEW:
       newState = Object.assign({}, state);
       newState[action.payload.spot.id] = action.payload.spot;
-      // delete action.payload.user.email;
-      // delete action.payload.user.username;
       newState[action.payload.spot.id].User = action.payload.user
       return newState;
     case DELETE_REVIEW:

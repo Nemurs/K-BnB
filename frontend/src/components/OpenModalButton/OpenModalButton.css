@@ -1,4 +1,4 @@
-.detailed-spot-post-review-button, .detailed-spot-post-delete-button, .user-login-button{
+.detailed-spot-post-review-button, .user-login-button{
     background-color: #f9385d;
     color: white;
     border: none;
@@ -11,7 +11,7 @@
     border-radius: 5px;
 }
 
-.user-spot-delete-button, .user-signup-button{
+.user-spot-delete-button, .detailed-spot-post-delete-button, .user-signup-button{
     border: none;
     padding: 5px;
     border-radius: 10px;

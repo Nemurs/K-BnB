@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useModal } from "../../context/Modal.js";
 import StarRatingInput from "../StarRatingInput";
-import "./SubmitReviewModal.css";
-import { createNewReviewThunk, loadAllReviewsThunk } from "../../store/singleSpotReviews.js";
+import { createNewReviewThunk, editReviewThunk, loadAllReviewsThunk } from "../../store/singleSpotReviews.js";
 import { loadOneThunk } from "../../store/singleSpot.js";
+import "./SubmitReviewModal.css";
 
-function SubmitReviewModal({ spotId, user }) {
+function SubmitReviewModal({ spotId, user, isEdit, oldReview }) {
     const dispatch = useDispatch();
-    const [reviewText, setReviewText] = useState("");
-    const [rating, setRating] = useState(0);
+    const [reviewText, setReviewText] = useState(isEdit && oldReview ? oldReview.review : "");
+    const [rating, setRating] = useState(isEdit && oldReview ? oldReview.stars : 0);
     const [error, setError] = useState({});
     const [disabled, setDisabled] = useState(true);
     const [touched, setTouched] = useState({});
@@ -19,11 +19,23 @@ function SubmitReviewModal({ spotId, user }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitState(true);
+        let res;
 
-        let res = await dispatch(createNewReviewThunk({ spotId: Number(spotId), body: { review: reviewText, stars: rating }, user }));
+        if (isEdit){
+            //prevent api call if no change
+            if (!(oldReview.review === reviewText && oldReview.stars === rating)){
+                res = await dispatch(editReviewThunk({ revId: Number(oldReview.id), body: { review: reviewText, stars: rating }, user }));
+            } else{
+                closeModal();
+                return;
+            }
+        } else {
+            res = await dispatch(createNewReviewThunk({ spotId: Number(spotId), body: { review: reviewText, stars: rating }, user }));
+        }
+
 
         if (!res.ok) {
-            console.log(await res.json());
+            // console.log(await res.json());
             // console.log(spots);
         } else {
             await dispatch(loadAllReviewsThunk(spotId));
@@ -62,7 +74,7 @@ function SubmitReviewModal({ spotId, user }) {
 
     return (
         <div className="submit-review-modal">
-            <h1>How was your Stay?</h1>
+            <h1>{isEdit ? "Changed your mind?" : "How was your Stay?"}</h1>
             <form onSubmit={handleSubmit}>
                 <textarea
                     value={reviewText}
@@ -89,7 +101,7 @@ function SubmitReviewModal({ spotId, user }) {
                     {((touched.rating || submitState) && error.rating) && <p className="form-error">{error.rating}</p>}
                 </div>
 
-                <button disabled={disabled} type="submit" className={disabled ? "submit-review-inactive": "submit-review-active" }>Submit Your Review</button>
+                <button disabled={disabled} type="submit" className={disabled ? "submit-review-inactive": "submit-review-active" }>{isEdit ? "Submit Your Change" : "Submit Your Review"}</button>
             </form>
         </div>
     );

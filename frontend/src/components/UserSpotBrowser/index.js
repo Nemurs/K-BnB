@@ -32,29 +32,31 @@ const UserSpotBrowser = () => {
 
     return (
         <div>
-            <h1>Manage Your Spots</h1>
+            {!spots.length ? (<h1 style={{color:"#47bbff"}}>Looks like you have no spots yet {":("}</h1>):(<h1>Manage Your Spots</h1>)}
             <Link to="/spots/new">
-                <button className="user-spot-create-button" onClick={(e) => e.preventDefault}>Create a New Spot</button>
+                <button className="user-spot-create-button" onClick={(e) => e.preventDefault} >Create a New Spot</button>
             </Link>
-            <ul className='spot-list'>
-                {spots.map((spot) => (
-                    <li key={spot["id"]} className='spot-card-list-item'>
-                        <Link to={`/spots/${spot["id"]}`} className='spot-card-link'>
-                            <SpotCard spot={spot} tooltip={spot["name"]} />
-                        </Link>
-                        <div className='user-spot-buttons'>
-                            <Link to={`/spots/${spot["id"]}/edit`}>
-                                <button className="user-spot-update-button" onClick={e => handleClick(e, spot["id"])}>Update</button>
+            {spots.length ? (
+                <ul className='spot-list'>
+                    {spots.map((spot) => (
+                        <li key={spot["id"]} className='spot-card-list-item'>
+                            <Link to={`/spots/${spot["id"]}`} className='spot-card-link'>
+                                <SpotCard spot={spot} tooltip={spot["name"]} />
                             </Link>
-                            <OpenModalButton
-                                buttonText="Delete"
-                                cssClass={"user-spot-delete-button"}
-                                modalComponent={<DeleteSpotModal spotId={spot["id"]} />}
-                            />
-                        </div>
-                    </li>
-                ))}
-            </ul>
+                            <div className='user-spot-buttons'>
+                                <Link to={`/spots/${spot["id"]}/edit`}>
+                                    <button className="user-spot-update-button" onClick={e => handleClick(e, spot["id"])}>Update</button>
+                                </Link>
+                                <OpenModalButton
+                                    buttonText="Delete"
+                                    cssClass={"user-spot-delete-button"}
+                                    modalComponent={<DeleteSpotModal spotId={spot["id"]} />}
+                                />
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            ):(<></>)}
         </div>
     );
 };
