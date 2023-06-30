@@ -4,8 +4,7 @@ Please visit my website at:
 
 [k-bnb.onrender.com]
 
-<img width="1039" alt="Screen Shot 2023-06-28 at 8 38 48 AM" src="https://github.com/Nemurs/K-BnB/assets/118857412/73108cd4-6ee9-4d9e-aa89-3a3582999045">
-
+<img width="1678" alt="Screen Shot 2023-06-30 at 10 03 48 AM" src="https://github.com/Nemurs/K-BnB/assets/118857412/20b73079-32aa-4b4d-8d92-9a8d9c3d8859">
 
 ## \~Spots~
 <img width="1069" alt="Screen Shot 2023-06-28 at 8 40 47 AM" src="https://github.com/Nemurs/K-BnB/assets/118857412/13a022d7-0c5d-4f24-aca3-aaf76bf30564">
