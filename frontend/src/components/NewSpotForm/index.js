@@ -184,17 +184,9 @@ const NewSpotForm = () => {
                 if (imgResponses.every(res => res.ok)) {
                     history.push(`/spots/${id}`);
                     reset();
-                }
-                else {
+                } else {
                     setImageLoading(false)
-                    // console.log("error with img data")
-                    // console.log(imgRes);
-                    // console.log(spotData);
                 }
-            }
-            else {
-                // console.log("error with spot data")
-                // console.log(await spotRes.json());
             }
         } else {
             let spotRes = await dispatch(createNewSpotThunk(newSpot));
@@ -210,17 +202,9 @@ const NewSpotForm = () => {
                 if (imgResponses.every(res => res.ok)) {
                     history.push(`/spots/${id}`);
                     reset();
-                }
-                else {
+                } else {
                     setImageLoading(false)
-                    // console.log("error with img data")
-                    // console.log(imgRes);
-                    // console.log(spotData);
                 }
-            }
-            else {
-                // console.log("error with spot data")
-                // console.log(spotRes);
             }
         }
 
@@ -237,28 +221,21 @@ const NewSpotForm = () => {
             previewImgInput.value = ""
         } else {
             let list = new DataTransfer();
-            // list.items.clear()
-            // console.log(list)
             let newImgList = [...images]
             newImgList.splice(idx, 1)
             setImages(newImgList)
             for (let file of newImgList) {
                 list.items.add(file)
             }
-            // console.log(list)
             let myFileList = list.files;
-            // console.log(myFileList)
             let previewImgInput = document.getElementById('spotImgFileInput')
-            // console.log(previewImgInput.files)
             previewImgInput.files = myFileList;
-            // console.log(previewImgInput.files)
         }
     }
 
     const removeOldImg = (e, imageId) => {
         e.preventDefault()
         setDeleteIds(prev => [...prev, imageId])
-        console.log(deleteIds)
         return;
     }
 

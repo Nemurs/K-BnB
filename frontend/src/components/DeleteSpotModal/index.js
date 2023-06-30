@@ -11,10 +11,7 @@ const DeleteSpotModal = ({spotId}) => {
     async function onClickYes(e){
         e.preventDefault();
         let res = await dispatch(deleteSpotThunk({id: spotId}))
-        if(!res.ok){
-            // console.log(res);
-            // console.log(spots);
-        } else {
+        if(res.ok){
             await dispatch(loadUserOwnedThunk());
             closeModal();
         }

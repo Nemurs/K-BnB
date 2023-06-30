@@ -27,7 +27,6 @@ const UserBookingBrowser = () => {
 
     async function handleClick(e, spotId) {
         e.preventDefault();
-        // console.log(id);
         await dispatch(loadOneThunk(spotId));
         await dispatch(loadOneBookingThunk(spotId));
         history.push(`../../reserve/${spotId}`);

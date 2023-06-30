@@ -93,23 +93,13 @@ const BookingForm = () => {
             let bookRes = await dispatch(editBookingThunk({ bookingId: booking.id, book }));
             if (bookRes.ok) {
                 let bookData = await bookRes.json();
-                console.log(bookData);
                 history.push(`../bookings/current`);
-            }
-            else {
-                // console.log("error with spot data")
-                // console.log(await spotRes.json());
             }
         } else {
             let bookRes = await dispatch(createNewBookingThunk({ spotId: id, book }));
             if (bookRes.ok) {
                 let bookData = await bookRes.json();
-                console.log(bookData);
                 history.push(`../bookings/current`)
-            }
-            else {
-                // console.log("error with spot data")
-                // console.log(spotRes);
             }
         }
 

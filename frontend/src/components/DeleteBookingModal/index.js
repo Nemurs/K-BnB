@@ -15,10 +15,7 @@ const DeleteBookingModal = ({bookingId}) => {
     async function onClickYes(e){
         e.preventDefault();
         let res = await dispatch(deleteBookingThunk({id: bookingId}))
-        if(!res.ok){
-            // console.log(res);
-            // console.log(bookings);
-        } else {
+        if(res.ok){
             await dispatch(clearSingleBookingAction());
             await dispatch(loadUserOwnedThunk())
             if (location.pathname.startsWith("reserve")) history.push("../");

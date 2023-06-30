@@ -5,21 +5,17 @@ import { loadOneThunk } from "../../store/singleSpot";
 import "./DeleteReviewModal.css";
 
 const DeleteReviewModal = ({revId, spotId}) => {
-    console.log(revId, spotId)
+
     const dispatch = useDispatch();
     const { closeModal } = useModal();
 
     async function onClickYes(e){
         e.preventDefault();
         let res = await dispatch(deleteReviewThunk(revId))
-        if(!res.ok){
-            console.log(await res.json());
-            // console.log(spots);
-        } else {
+        if(res.ok){
             closeModal();
             await dispatch(loadAllReviewsThunk(spotId));
             await dispatch(loadOneThunk(spotId));
-
         }
     }
 
