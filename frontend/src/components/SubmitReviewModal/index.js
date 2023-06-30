@@ -33,11 +33,7 @@ function SubmitReviewModal({ spotId, user, isEdit, oldReview }) {
             res = await dispatch(createNewReviewThunk({ spotId: Number(spotId), body: { review: reviewText, stars: rating }, user }));
         }
 
-
-        if (!res.ok) {
-            // console.log(await res.json());
-            // console.log(spots);
-        } else {
+        if (res.ok) {
             await dispatch(loadAllReviewsThunk(spotId));
             await dispatch(loadOneThunk(spotId));
             closeModal();

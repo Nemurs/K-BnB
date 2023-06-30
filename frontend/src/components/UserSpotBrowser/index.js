@@ -25,7 +25,6 @@ const UserSpotBrowser = () => {
 
     async function handleClick(e, id){
         e.preventDefault();
-        // console.log(id);
         await dispatch(loadOneThunk(id));
         history.push(`/spots/${id}/edit`);
     }

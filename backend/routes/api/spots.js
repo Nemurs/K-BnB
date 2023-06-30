@@ -120,15 +120,15 @@ router.post('/:spotId/bookings', requireAuth, validateBookingBody, async (req, r
     for (let book of books) {
       let start = new Date(book.startDate).getTime();
       let end = new Date(book.endDate).getTime();
-      // console.log(start, startDateTime, end)
+
       if (startDateTime >= start && startDateTime <= end) {
         startFlag = true;
       }
-      // console.log(start, endDateTime, end)
+
       if (endDateTime >= start && endDateTime <= end) {
         endFlag = true;
       }
-      // console.log(start, end, startDateTime, endDateTime)
+
       if (endDateTime > end && startDateTime < start) {
         startFlag = true;
         endFlag = true;
@@ -489,11 +489,11 @@ router.post('/:spotId/images', singleMulterUpload("image"), requireAuth, async (
 
   //set preview to true if there are no other images
   let { preview } = req.body;
-  console.log(req.file)
+
   preview = preview ? preview : !spot.images?.length;
   const spotId = req.params.spotId;
   try {
-    // console.log(req.body)
+
     const url = await singlePublicFileUpload(req.file);
     let newSpotImg = await SpotImage.create({ spotId, url, preview })
     newSpotImg = newSpotImg.toJSON();
@@ -591,9 +591,9 @@ router.delete('/:spotId/images/:imgId', requireAuth, async (req, res, next) => {
   if (user.id != spot.ownerId) {
     return next(makeError('Forbidden Spot', "Spot must belong to the current user", 403));
   }
-  // console.log(spot.SpotImages)
+
   let img = await SpotImage.findByPk(req.params.imgId);
-  // console.log(img)
+
   if (!img) {
     return next(makeError('Spot Image Not Found', "Spot Image couldn't be found", 404));
   }
@@ -603,7 +603,7 @@ router.delete('/:spotId/images/:imgId', requireAuth, async (req, res, next) => {
   try {
     let errors = await singlePublicFileDelete(img.url)
     if (errors.length > 0) throw makeError('Error Deleting Image', "Could not delete image from AWS", 500);
-    console.log("Spot Image Deleted from AWS!")
+
     img.destroy();
     res.json({
       message: "Successfully deleted"
@@ -625,13 +625,13 @@ router.delete('/:spotId', requireAuth, async (req, res, next) => {
   if (user.id != spot.ownerId) {
     return next(makeError('Forbidden Spot', "Spot must belong to the current user", 403));
   }
-  // console.log(spot.SpotImages)
+
   let urlArr = spot.SpotImages.map(img => img.url);
   try {
     if (urlArr.length) {
       let errors = await multiplePublicFileDelete(urlArr)
       if (errors.length > 0) throw makeError('Error Deleting Images', "Could not delete images from AWS", 500);
-      console.log("Spot Images Deleted from AWS!")
+
     }
     spot.destroy();
     res.json({

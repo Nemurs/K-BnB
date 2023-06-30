@@ -18,8 +18,6 @@ function LoginFormModal() {
   const [submitState, setSubmitState] = useState(false);
   const { closeModal } = useModal();
 
-  console.log(history);
-
   const handleSubmit = (e, demoUser = false) => {
     e.preventDefault();
     setErrors({});
