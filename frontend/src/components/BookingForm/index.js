@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, useParams, Link } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip'
 import { loadOneThunk } from '../../store/singleSpot';
-import { addDays, differenceInDays, format, eachDayOfInterval } from 'date-fns';
+import { addDays, differenceInDays, format, eachDayOfInterval, isPast } from 'date-fns';
 import { DateRange } from 'react-date-range';
 import placeHolderImage from "../../Assets/Images/No-Image-Placeholder.png";
 import 'react-date-range/dist/styles.css'; // react-date-range main css file
@@ -28,6 +28,7 @@ const BookingForm = () => {
     const isBooked = Object.values(booking).length > 0;
 
     const [nightCount, setNightCount] = useState(2);
+    const [forbiddenDates, setForbiddenDates] = useState([]);
     const [state, setState] = useState([{
         startDate: TOMORROW,
         endDate: addDays(TOMORROW, +2),
@@ -56,16 +57,25 @@ const BookingForm = () => {
         }
     }, [booking])
 
+    useEffect(()=> {
+        if(spot.Bookings){
+            setForbiddenDates(prev => {
+                let out = [];
+                spot.Bookings.forEach(book => {
+                    const start = new Date(book.startDate);
+                    const end =  new Date(book.endDate)
+                    if (!isPast(end) && book.id !== booking.id) {
+                        out.push(...eachDayOfInterval({ start, end}))
+                    }
+                });
+                return out;
+            })
+        }
+    }, [spot])
+
     if (!spot || !spot.SpotImages || !user) return (<></>)
 
     let prevImg = spot.SpotImages.find(img => img.preview === true);
-
-    let forbiddenDates = [];
-    spot.Bookings.forEach(book => {
-        if (book.id !== booking.id) {
-            forbiddenDates.push(...eachDayOfInterval({ start: new Date(book.startDate), end: new Date(book.endDate) }))
-        }
-    });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -125,6 +135,7 @@ const BookingForm = () => {
                     ranges={state}
                     months={2}
                     direction='horizontal'
+                    showDateDisplay={false}
                 />
                 <h3>Total: <span>${(nightCount * spot.price).toFixed(2)}</span></h3>
                 <h4>{nightCount} night{nightCount === 1 ? "" : "s"} at ${spot.price} / night</h4>
