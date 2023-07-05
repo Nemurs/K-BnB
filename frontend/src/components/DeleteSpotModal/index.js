@@ -19,7 +19,7 @@ const DeleteSpotModal = ({spotId}) => {
 
     return (
         <div className="delete-spot-modal">
-            <h2>Confirm Delete</h2>
+            <h2>Are you sure?</h2>
             <button className="delete-spot-modal-button-yes" onClick={onClickYes}>{"YES (Delete Spot)"}</button>
             <button className="delete-spot-modal-button-no" onClick={closeModal}>{"NO (Keep Spot)"}</button>
         </div>

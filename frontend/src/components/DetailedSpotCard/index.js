@@ -2,14 +2,15 @@ import { useParams } from "react-router-dom";
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loadOneThunk } from "../../store/singleSpot";
+import { loadOneBookingThunk } from '../../store/singleBooking';
 import { loadAllReviewsThunk } from "../../store/singleSpotReviews";
 import placeHolderImage from "../../Assets/Images/No-Image-Placeholder.png";
-import "./DetailedSpotCard.css";
 import ReserveSpot from "../ReserveSpot";
 import ReviewAggText from "../ReviewAggText";
 import OpenModalButton from "../OpenModalButton";
 import DeleteReviewModal from "../DeleteReviewModal";
 import SubmitReviewModal from "../SubmitReviewModal";
+import "./DetailedSpotCard.css";
 
 const DetailedSpotCard = () => {
     const dispatch = useDispatch();
@@ -18,6 +19,8 @@ const DetailedSpotCard = () => {
     const user = useSelector(state => state.session.user);
     const reviews = useSelector(state => Object.values(state.reviews.spot));
     reviews.sort((a, b) => Date.parse(b["createdAt"]) - Date.parse(a["createdAt"]));
+    const booking = useSelector(state => state.bookings.singleBooking)
+    const isBooked = Object.values(booking).length > 0;
 
     function processDate(dateString) {
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'Augus', 'September', 'October', 'November', 'December']
@@ -28,6 +31,7 @@ const DetailedSpotCard = () => {
     useEffect(() => {
         dispatch(loadOneThunk(id));
         dispatch(loadAllReviewsThunk(id));
+        dispatch(loadOneBookingThunk(id));
     }, [dispatch]);
 
     if (!spot || !spot.Owner) return (<h1>Spot: {id} Loading...</h1>)
@@ -60,7 +64,7 @@ const DetailedSpotCard = () => {
                         <p className='detailed-spot-card-host-text'>{isSpotOwnedByLoggedInUser ? `Hosted by You` : `Hosted by ${spot?.Owner?.firstName} ${spot?.Owner?.lastName}`}</p>
                         <p className='detailed-spot-card-description-text'>{spot.description}</p>
                     </div>
-                    <ReserveSpot spot={spot} {...{ user, isSpotOwnedByLoggedInUser }} />
+                    <ReserveSpot spot={spot} {...{ user, isSpotOwnedByLoggedInUser, isBooked }} />
                 </div>
             </div>
             <div className="detailed-spot-reviews">

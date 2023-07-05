@@ -3,16 +3,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip'
 import { loadOneThunk } from '../../store/singleSpot';
-import { addDays, differenceInDays, format, eachDayOfInterval, isPast } from 'date-fns';
+import { addDays, differenceInDays, format, eachDayOfInterval, isPast, isSameDay } from 'date-fns';
 import { DateRange } from 'react-date-range';
-import placeHolderImage from "../../Assets/Images/No-Image-Placeholder.png";
-import 'react-date-range/dist/styles.css'; // react-date-range main css file
-import 'react-date-range/dist/theme/default.css'; // react-date-range theme css file
-import "./BookingForm.css";
 import { loadOneBookingThunk } from '../../store/singleBooking';
 import { createNewBookingThunk, editBookingThunk } from '../../store/allBookings';
 import OpenModalButton from '../OpenModalButton';
 import DeleteBookingModal from '../DeleteBookingModal';
+import placeHolderImage from "../../Assets/Images/No-Image-Placeholder.png";
+import 'react-date-range/dist/styles.css'; // react-date-range main css file
+import 'react-date-range/dist/theme/default.css'; // react-date-range theme css file
+import "./BookingForm.css";
 
 const TODAY = new Date();
 const TOMORROW = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate() + 1);
@@ -83,36 +83,30 @@ const BookingForm = () => {
         let start = state[0].startDate;
         let end = state[0].endDate;
 
-        let isForbidden = false;
-        for (let date of forbiddenDates) {
-            if ((date.getFullYear() === start.getFullYear() && date.getMonth() === start.getMonth() && date.getDate() === start.getDate()) || (date.getFullYear() === end.getFullYear() && date.getMonth() === end.getMonth() && date.getDate() === end.getDate())) {
-                alert("Sorry, this spot is already booked for those days!");
-                isForbidden = true
-                break;
+        for (let forbiddenDate of forbiddenDates) {
+            if (isSameDay(forbiddenDate, start) || isSameDay(forbiddenDate, end)) {
+                alert("Sorry, this spot is already booked for those days.");
+                return;
             }
         }
 
-        if (isForbidden || nightCount < 1) return;
+        if (nightCount < 1){
+            alert("You must select at least 1 night.");
+            return;
+        }
 
         const book = {
             startDate: format(state[0].startDate, "yyyy/MM/dd"),
             endDate: format(state[0].endDate, "yyyy/MM/dd"),
         }
 
-        if (isBooked) {
-            let bookRes = await dispatch(editBookingThunk({ bookingId: booking.id, book }));
-            if (bookRes.ok) {
-                let bookData = await bookRes.json();
-                history.push(`../bookings/current`);
-            }
+        let bookRes = isBooked ? await dispatch(editBookingThunk({ bookingId: booking.id, book })) : await dispatch(createNewBookingThunk({ spotId: id, book }));
+        if (bookRes.ok) {
+            history.push(`../bookings/current`);
         } else {
-            let bookRes = await dispatch(createNewBookingThunk({ spotId: id, book }));
-            if (bookRes.ok) {
-                let bookData = await bookRes.json();
-                history.push(`../bookings/current`)
-            }
+            alert("Sorry, there was an error trying to book this spot.");
+                return;
         }
-
     };
 
     return (

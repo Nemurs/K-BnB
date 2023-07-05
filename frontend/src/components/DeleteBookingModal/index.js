@@ -25,7 +25,7 @@ const DeleteBookingModal = ({bookingId}) => {
 
     return (
         <div className="delete-booking-modal">
-            <h2>Confirm Delete</h2>
+            <h2>Are you sure?</h2>
             <button className="delete-booking-modal-button-yes" onClick={onClickYes}>{"YES (Delete Booking)"}</button>
             <button className="delete-booking-modal-button-no" onClick={closeModal}>{"NO (Keep Booking)"}</button>
         </div>

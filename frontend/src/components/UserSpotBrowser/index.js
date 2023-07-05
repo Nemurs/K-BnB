@@ -31,7 +31,7 @@ const UserSpotBrowser = () => {
 
     return (
         <div>
-            {!spots.length ? (<h1 style={{color:"#47bbff"}}>Looks like you have no spots yet {":("}</h1>):(<h1>Manage Your Spots</h1>)}
+            {!spots.length ? (<h1 style={{color:"#47bbff"}}>Looks like you have no spots {":("}</h1>):(<h1>Manage Your Spots</h1>)}
             <Link to="/spots/new">
                 <button className="user-spot-create-button" onClick={(e) => e.preventDefault} >Create a New Spot</button>
             </Link>

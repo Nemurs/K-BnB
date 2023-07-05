@@ -1,7 +1,7 @@
 import { useHistory } from 'react-router-dom';
 import "./ReserveButton.css";
 
-const ReserveButton = ({spotId, isDisabled}) => {
+const ReserveButton = ({spotId, isDisabled, isBooked}) => {
     const history = useHistory();
 
     function onClick(){
@@ -13,7 +13,7 @@ const ReserveButton = ({spotId, isDisabled}) => {
             onClick={onClick}
             disabled={isDisabled}
         >
-            Reserve
+            {isBooked ? "Update Reservation": "Reserve"}
         </button>
     )
 }
