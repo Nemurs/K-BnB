@@ -34,7 +34,7 @@ const UserBookingBrowser = () => {
 
     return (
         <div>
-            {!bookings.length ? (<h1 style={{color:"#47bbff"}}>Looks like you have no bookings yet {":("}</h1>):(<h1>Manage Your Bookings</h1>)}
+            {!bookings.length || bookings.every(book => book.expired) ? (<h1 style={{color:"#47bbff"}}>Looks like you have no bookings {":("}</h1>):(<h1>Manage Your Bookings</h1>)}
             <Link to="../">
                 <button className="user-spot-create-button" onClick={(e) => e.preventDefault}>Create a New Booking</button>
             </Link>
