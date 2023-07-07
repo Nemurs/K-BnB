@@ -56,11 +56,13 @@ const UserBookingBrowser = () => {
                                     <Link to={`../reserve/${spot["id"]}`}>
                                         <button className="user-spot-update-button" onClick={e => handleClick(e, spot["id"])}>Update</button>
                                     </Link>
-                                    <OpenModalButton
-                                        buttonText="Cancel Booking"
-                                        cssClass={"user-spot-delete-button"}
-                                        modalComponent={<DeleteBookingModal bookingId={book.id} />}
-                                    />
+                                    {isInProgress ? (<></>) :
+                                        <OpenModalButton
+                                            buttonText="Cancel Booking"
+                                            cssClass={"user-spot-delete-button"}
+                                            modalComponent={<DeleteBookingModal bookingId={book.id} />}
+                                        />
+                                    }
                                 </div>
                             </li>
                         )
