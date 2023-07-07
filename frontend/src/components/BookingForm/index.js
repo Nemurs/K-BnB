@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip'
 import { loadOneThunk } from '../../store/singleSpot';
-import { addDays, differenceInDays, format, eachDayOfInterval, isPast, isSameDay } from 'date-fns';
+import { addDays, differenceInDays, format, eachDayOfInterval, isPast, isAfter, isSameDay, isWithinInterval, min, subDays, formatISO } from 'date-fns';
 import { DateRange } from 'react-date-range';
 import { loadOneBookingThunk } from '../../store/singleBooking';
 import { createNewBookingThunk, editBookingThunk } from '../../store/allBookings';
@@ -30,8 +30,8 @@ const BookingForm = () => {
     const [nightCount, setNightCount] = useState(2);
     const [forbiddenDates, setForbiddenDates] = useState([]);
     const [state, setState] = useState([{
-        startDate: TOMORROW,
-        endDate: addDays(TOMORROW, +2),
+        startDate: TODAY,
+        endDate: addDays(TODAY, +2),
         key: 'selection'
     }
     ]);
@@ -81,7 +81,11 @@ const BookingForm = () => {
         e.preventDefault();
 
         let start = state[0].startDate;
+        // let start = formatISO(state[0].startDate, { representation: 'date' })
+
         let end = state[0].endDate;
+        // let end = formatISO(state[0].endDate, { representation: 'date' })
+        // end = new Date(end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate())
 
         for (let forbiddenDate of forbiddenDates) {
             if (isSameDay(forbiddenDate, start) || isSameDay(forbiddenDate, end)) {
@@ -96,9 +100,12 @@ const BookingForm = () => {
         }
 
         const book = {
-            startDate: format(state[0].startDate, "yyyy/MM/dd"),
-            endDate: format(state[0].endDate, "yyyy/MM/dd"),
+            startDate: formatISO(state[0].startDate, { representation: 'date' }),
+            endDate: formatISO(state[0].endDate, { representation: 'date' }),
         }
+
+        console.log(book);
+        // console.log(book.startDate);
 
         let bookRes = isBooked ? await dispatch(editBookingThunk({ bookingId: booking.id, book })) : await dispatch(createNewBookingThunk({ spotId: id, book }));
         if (bookRes.ok) {
@@ -108,6 +115,8 @@ const BookingForm = () => {
                 return;
         }
     };
+
+    const isInProgress = isWithinInterval(new Date(), {start:new Date(booking.startDate), end:new Date(booking.endDate)})
 
     return (
         <div className='create-new-booking-page'>
@@ -122,9 +131,25 @@ const BookingForm = () => {
             <form className='create-new-booking-form' onSubmit={handleSubmit}>
                 <DateRange
                     editableDateInputs={true}
-                    onChange={item => setState([item.selection])}
+                    onChange={item => {
+                        if(isBooked && isInProgress){
+                            if(!forbiddenDates.every(date=>isAfter(item.selection.endDate, date))){
+                                setState([{
+                                    startDate: new Date(booking.startDate),
+                                    endDate: item.selection.endDate,
+                                    key: 'selection'
+                                }])
+                            } else {
+                                setState([{
+                                    startDate: new Date(booking.startDate),
+                                    endDate: subDays(min(forbiddenDates),1),
+                                    key: 'selection'
+                                }])
+                            }
+                        } else setState([item.selection])
+                    }}
                     moveRangeOnFirstSelection={false}
-                    minDate={TOMORROW}
+                    minDate={TODAY}
                     disabledDates={forbiddenDates}
                     ranges={state}
                     months={2}
@@ -135,7 +160,7 @@ const BookingForm = () => {
                 <h4>{nightCount} night{nightCount === 1 ? "" : "s"} at ${spot.price} / night</h4>
                 <button className="reserve-button" type='submit'>{isBooked ? "Update Booking" : "Create Booking"}</button>
             </form>
-            {isBooked ?
+            {isBooked  && !isInProgress?
             <OpenModalButton
                 buttonText="Cancel Booking"
                 cssClass={"user-spot-delete-button"}

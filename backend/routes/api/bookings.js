@@ -148,11 +148,11 @@ router.get('/current/:spotId', requireAuth, async (req, res, next) => {
 const validateBookingBody = [
     check('startDate')
         .exists()
-        .isDate({ format: 'YYYY/MM/DD', strictMode: true })
+        .isDate({ format: 'YYYY-MM-DD', strictMode: true })
         .withMessage('Start date property is required and it must be a valid date in the format yyyy/mm/dd.'),
     check('endDate')
         .exists()
-        .isDate({ format: 'YYYY/MM/DD', strictMode: true })
+        .isDate({ format: 'YYYY-MM-DD', strictMode: true })
         .withMessage('End date property is required and it must be a valid date in the format yyyy/mm/dd.'),
     handleValidationErrors
 ];
@@ -245,8 +245,9 @@ router.put('/:bookingId', requireAuth, validateBookingBody, async (req, res, nex
     }
 
     //Update booking with request body parameters
-    startDate = `${startDate.getFullYear()}-${startDate.getMonth() + 1}-${startDate.getDate()}`;
-    endDate = `${endDate.getFullYear()}-${endDate.getMonth() + 1}-${endDate.getDate()}`;
+    startDate = `${startDate.getUTCFullYear()}-${startDate.getUTCMonth() + 1}-${startDate.getUTCDate()}`;
+    endDate = `${endDate.getUTCFullYear()}-${endDate.getUTCMonth() + 1}-${endDate.getUTCDate()}`;
+
     const userId = user.id;
     const spotId = Number(req.params.spotId);
 
