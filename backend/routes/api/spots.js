@@ -24,6 +24,10 @@ async function getReviewAggs(spot) {
   return [sum, count, avg]
 }
 
+function convertDateToUTC(date) {
+  return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+}
+
 /*** Get spots owned by the current user ***/
 router.get('/current', requireAuth, async (req, res, next) => {
   const { user } = req;
@@ -98,7 +102,9 @@ router.post('/:spotId/bookings', requireAuth, validateBookingBody, async (req, r
   //Verify that start date is before end date
   let { startDate, endDate } = req.body;
   startDate = new Date(startDate);
+  startDate = convertDateToUTC(startDate);
   endDate = new Date(endDate);
+  endDate = convertDateToUTC(endDate);
 
   const startDateTime = startDate.getTime();
   const endDateTime = endDate.getTime();

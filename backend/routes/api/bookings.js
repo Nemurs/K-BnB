@@ -4,9 +4,13 @@ const { requireAuth } = require('../../utils/auth');
 const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 
-const { Booking, Spot, SpotImage, User } = require('../../db/models');
+const { Booking, Spot, SpotImage } = require('../../db/models');
 
 const router = express.Router();
+
+function convertDateToUTC(date) {
+    return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+  }
 
 /*** Get ALL bookings of the current user***/
 router.get('/current', requireAuth, async (req, res, next) => {
@@ -173,7 +177,9 @@ router.put('/:bookingId', requireAuth, validateBookingBody, async (req, res, nex
     //verify that start date is before end date
     let { startDate, endDate } = req.body;
     startDate = new Date(startDate);
+    startDate = convertDateToUTC(startDate);
     endDate = new Date(endDate);
+    endDate = convertDateToUTC(endDate);
 
     const startDateTime = startDate.getTime();
     const endDateTime = endDate.getTime();
