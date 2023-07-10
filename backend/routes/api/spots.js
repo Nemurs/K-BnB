@@ -101,8 +101,11 @@ router.post('/:spotId/bookings', requireAuth, validateBookingBody, async (req, r
 
   //Verify that start date is before end date
   let { startDate, endDate } = req.body;
+  console.log("this is the requested startDate", startDate);
   startDate = new Date(startDate);
+  console.log("this is the startDate", startDate);
   startDate = convertDateToUTC(startDate);
+  console.log("this is the utc startDate", startDate);
   endDate = new Date(endDate);
   endDate = convertDateToUTC(endDate);
 
@@ -164,6 +167,7 @@ router.post('/:spotId/bookings', requireAuth, validateBookingBody, async (req, r
 
   //Create booking with request body parameters
   startDate = `${startDate.getUTCFullYear()}-${startDate.getUTCMonth() + 1}-${startDate.getUTCDate()}`;
+  console.log("this is the db startDate", startDate);
   endDate = `${endDate.getUTCFullYear()}-${endDate.getUTCMonth() + 1}-${endDate.getUTCDate()}`;
   const userId = user.id;
   const spotId = Number(req.params.spotId);
