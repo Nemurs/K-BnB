@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip'
 import { loadOneThunk } from '../../store/singleSpot';
-import { addDays, differenceInDays, format, eachDayOfInterval, isPast, isAfter, isSameDay, isWithinInterval, min, subDays, formatISO } from 'date-fns';
+import { addDays, addMonths, differenceInDays, eachDayOfInterval, isPast, isAfter, isSameDay, isWithinInterval, min, max, subDays, formatISO, eachWeekendOfMonth } from 'date-fns';
 import { DateRange } from 'react-date-range';
 import { loadOneBookingThunk } from '../../store/singleBooking';
 import { createNewBookingThunk, editBookingThunk } from '../../store/allBookings';
@@ -31,7 +31,7 @@ const BookingForm = () => {
     const [forbiddenDates, setForbiddenDates] = useState([]);
     const [state, setState] = useState([{
         startDate: TODAY,
-        endDate: addDays(TODAY, +2),
+        endDate: addDays(TODAY, 1),
         key: 'selection'
     }
     ]);
@@ -72,6 +72,32 @@ const BookingForm = () => {
             })
         }
     }, [spot])
+
+    useEffect(()=> {
+        if (forbiddenDates.length){
+            let start = TODAY;
+            let minDate;
+            minDate = !isWithinInterval(TOMORROW, {start: min(forbiddenDates), end: max(forbiddenDates)}) ? TODAY : minDate;
+            while (!minDate){
+                const weekendDates = eachWeekendOfMonth(start)
+                console.log(weekendDates)
+                console.log(forbiddenDates)
+                for (let date of weekendDates){
+                    if(!isPast(date) && !forbiddenDates.some(fbd => fbd.toUTCString() === date.toUTCString())){
+                        minDate = date;
+                        break;
+                    }
+                }
+                start = addMonths(start, 1)
+            }
+            console.log(minDate)
+            setState([{
+                startDate: minDate,
+                endDate: addDays(minDate, 1),
+                key: 'selection'
+            }])
+        }
+    }, [forbiddenDates])
 
     if (!spot || !spot.SpotImages || !user) return (<></>)
 
