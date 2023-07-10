@@ -18,7 +18,7 @@ const DeleteBookingModal = ({bookingId}) => {
         if(res.ok){
             await dispatch(clearSingleBookingAction());
             await dispatch(loadUserOwnedThunk())
-            if (location.pathname.startsWith("reserve")) history.push("../");
+            if (location.pathname.startsWith("/reserve")) history.push("../bookings/current");
             closeModal();
         }
     }
