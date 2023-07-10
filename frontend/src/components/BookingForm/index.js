@@ -116,7 +116,7 @@ const BookingForm = () => {
         }
     };
 
-    const isInProgress = isWithinInterval(new Date(), {start:new Date(booking.startDate), end:new Date(booking.endDate)})
+    const isInProgress = isBooked && isWithinInterval(new Date(), {start:new Date(booking.startDate), end:new Date(booking.endDate)})
 
     return (
         <div className='create-new-booking-page'>
@@ -132,7 +132,7 @@ const BookingForm = () => {
                 <DateRange
                     editableDateInputs={true}
                     onChange={item => {
-                        if(isBooked && isInProgress){
+                        if(isInProgress){
                             if(!forbiddenDates.every(date=>isAfter(item.selection.endDate, date))){
                                 setState([{
                                     startDate: new Date(booking.startDate),
@@ -160,7 +160,7 @@ const BookingForm = () => {
                 <h4>{nightCount} night{nightCount === 1 ? "" : "s"} at ${spot.price} / night</h4>
                 <button className="reserve-button" type='submit'>{isBooked ? "Update Booking" : "Create Booking"}</button>
             </form>
-            {isBooked  && !isInProgress?
+            {!isInProgress?
             <OpenModalButton
                 buttonText="Cancel Booking"
                 cssClass={"user-spot-delete-button"}
