@@ -74,7 +74,7 @@ const BookingForm = () => {
     }, [spot])
 
     useEffect(()=> {
-        if (forbiddenDates.length){
+        if (!isBooked && forbiddenDates.length){
             let start = TODAY;
             let minDate;
             minDate = !isWithinInterval(TOMORROW, {start: min(forbiddenDates), end: max(forbiddenDates)}) ? TODAY : minDate;
