@@ -43,7 +43,9 @@ const UserBookingBrowser = () => {
                     {bookings.map((book) => {
                         const spot = book.Spot
                         if(!spot || book.expired) return (<></>)
+                        console.log("frontend startDate", book.startDate)
                         const start = new Date(book.startDate)
+                        console.log("frontend startDate after conversion", start)
                         const end = new Date(book.endDate)
                         const isInProgress = isWithinInterval(new Date(), {start, end})
                         return (
