@@ -175,13 +175,14 @@ router.post('/:spotId/bookings', requireAuth, validateBookingBody, async (req, r
   try {
     let newBooking = await Booking.create({ userId, spotId, startDate, endDate }, { returning: false })
     newBooking = newBooking.toJSON();
-    newBooking.id = (await Booking.findOne({
-      attributes: ["id", "spotId", "userId", "startDate", "endDate", "createdAt", "updatedAt"],
-      where: {
-        userId: user.id,
-        spotId: req.params.spotId
-      }
-    })).id
+    console.log("this is the db booking", newBooking);
+    // newBooking.id = (await Booking.findOne({
+    //   attributes: ["id", "spotId", "userId", "startDate", "endDate", "createdAt", "updatedAt"],
+    //   where: {
+    //     userId: user.id,
+    //     spotId: req.params.spotId
+    //   }
+    // })).id
     res.statusCode = 200;
     res.json(newBooking);
   } catch (error) {

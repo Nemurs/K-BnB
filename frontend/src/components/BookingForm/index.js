@@ -80,8 +80,6 @@ const BookingForm = () => {
             minDate = !isWithinInterval(TOMORROW, {start: min(forbiddenDates), end: max(forbiddenDates)}) ? TODAY : minDate;
             while (!minDate){
                 const weekendDates = eachWeekendOfMonth(start)
-                console.log(weekendDates)
-                console.log(forbiddenDates)
                 for (let date of weekendDates){
                     if(!isPast(date) && !forbiddenDates.some(fbd => fbd.toUTCString() === date.toUTCString())){
                         minDate = date;
@@ -90,7 +88,6 @@ const BookingForm = () => {
                 }
                 start = addMonths(start, 1)
             }
-            console.log(minDate)
             setState([{
                 startDate: minDate,
                 endDate: addDays(minDate, 1),
