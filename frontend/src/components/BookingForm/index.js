@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip'
 import { loadOneThunk } from '../../store/singleSpot';
-import { addDays, addMonths, differenceInDays, eachDayOfInterval, isPast, isAfter, isSameDay, isWithinInterval, min, max, subDays, formatISO, eachWeekendOfMonth } from 'date-fns';
+import { addDays, addMonths, differenceInDays, eachDayOfInterval, isPast, isBefore, isSameDay, isWithinInterval, min, max, subDays, formatISO, eachWeekendOfMonth, isSunday } from 'date-fns';
 import { DateRange } from 'react-date-range';
 import { loadOneBookingThunk } from '../../store/singleBooking';
 import { createNewBookingThunk, editBookingThunk } from '../../store/allBookings';
@@ -15,7 +15,8 @@ import 'react-date-range/dist/theme/default.css'; // react-date-range theme css 
 import "./BookingForm.css";
 
 const TODAY = new Date();
-const TOMORROW = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate() + 1);
+const FORMATTEDTODAY = new Date(TODAY.getTime() - TODAY.getTimezoneOffset() * -60000 );
+const TOMORROW = addDays(FORMATTEDTODAY, 1);
 
 const BookingForm = () => {
     const dispatch = useDispatch();
@@ -29,6 +30,7 @@ const BookingForm = () => {
 
     const [nightCount, setNightCount] = useState(1);
     const [forbiddenDates, setForbiddenDates] = useState([]);
+    const [formattedBookingState, setFormattedBookingState]= useState({});
     const [state, setState] = useState([{
         startDate: TODAY,
         endDate: addDays(TODAY, 1),
@@ -49,13 +51,17 @@ const BookingForm = () => {
 
     useEffect(() => {
         if (isBooked) {
-            const unAdjustedStart = new Date(booking.startDate)
-            const startDate = new Date(unAdjustedStart.getTime() - unAdjustedStart.getTimezoneOffset() * -60000);
-            const unAdjustedEnd = new Date(booking.endDate)
-            const endDate = new Date(unAdjustedEnd.getTime() - unAdjustedEnd.getTimezoneOffset() * -60000);
+            const unformattedBookingStartDate = new Date(booking.startDate)
+            const formattedBookingStartDate = new Date(unformattedBookingStartDate.getTime() - unformattedBookingStartDate.getTimezoneOffset() * -60000);
+            const unformattedBookingEndDate = new Date(booking.endDate)
+            const formattedBookingEndDate = new Date(unformattedBookingEndDate.getTime() - unformattedBookingEndDate.getTimezoneOffset() * -60000);
+            setFormattedBookingState({
+                startDate:formattedBookingStartDate,
+                endDate:formattedBookingEndDate
+            })
             setState([{
-                startDate,
-                endDate,
+                startDate:formattedBookingStartDate,
+                endDate:formattedBookingEndDate,
                 key: 'selection'
             }])
         }
@@ -83,11 +89,11 @@ const BookingForm = () => {
         if (!isBooked && forbiddenDates.length) {
             let start = TODAY;
             let minDate;
-            minDate = !isWithinInterval(TOMORROW, { start: min(forbiddenDates), end: max(forbiddenDates) }) ? TODAY : minDate;
+            minDate = isWithinInterval(FORMATTEDTODAY, { start: min(forbiddenDates), end: max(forbiddenDates)}) || isWithinInterval(TOMORROW, { start: min(forbiddenDates), end: max(forbiddenDates)}) ? minDate : TODAY;
             while (!minDate) {
                 const weekendDates = eachWeekendOfMonth(start)
                 for (let date of weekendDates) {
-                    if (!isPast(date) && !forbiddenDates.some(fbd => fbd.toUTCString() === date.toUTCString())) {
+                    if (!isPast(date) && !isSunday(date) && !forbiddenDates.some(fbd => fbd.toUTCString() === date.toUTCString())) {
                         minDate = date;
                         break;
                     }
@@ -112,16 +118,22 @@ const BookingForm = () => {
         let start = state[0].startDate;
         let end = state[0].endDate;
 
+        if (nightCount < 1) {
+            alert("You must select at least 1 night.");
+            return;
+        }
+
+        if (isBooked && isSameDay(start, formattedBookingState.startDate) && isSameDay(end, formattedBookingState.endDate)){
+            //prevent api call if there is no change
+            history.push(`../bookings/current`);
+            return;
+        }
+
         for (let forbiddenDate of forbiddenDates) {
             if (isSameDay(forbiddenDate, start) || isSameDay(forbiddenDate, end)) {
                 alert("Sorry, this spot is already booked for those days.");
                 return;
             }
-        }
-
-        if (nightCount < 1) {
-            alert("You must select at least 1 night.");
-            return;
         }
 
         const book = {
@@ -138,7 +150,7 @@ const BookingForm = () => {
         }
     };
 
-    const isInProgress = isBooked && isWithinInterval(new Date(), { start: new Date(booking.startDate), end: new Date(booking.endDate) })
+    const isInProgress = isBooked && Object.values(formattedBookingState).length && isWithinInterval(FORMATTEDTODAY, { start: formattedBookingState.startDate, end: formattedBookingState.endDate })
 
     return (
         <div className='create-new-booking-page'>
@@ -155,18 +167,17 @@ const BookingForm = () => {
                     editableDateInputs={true}
                     onChange={item => {
                         if (isInProgress) {
-                            const unAdjustedStart = new Date(booking.startDate)
-                            const startDate = new Date(unAdjustedStart.getTime() - unAdjustedStart.getTimezoneOffset() * -60000 );
-                            if (!forbiddenDates.every(date => isAfter(item.selection.endDate, date))) {
-
+                            const unAdjustedEnd = new Date(item.selection.endDate)
+                            const endDate = new Date(unAdjustedEnd.getTime() - unAdjustedEnd.getTimezoneOffset() * -60000 );
+                            if (forbiddenDates.every(date => isBefore(endDate, date))) {
                                 setState([{
-                                    startDate,
-                                    endDate: item.selection.endDate,
+                                    startDate: formattedBookingState.startDate,
+                                    endDate: endDate,
                                     key: 'selection'
                                 }])
-                            } else {
+                            } else if (forbiddenDates.length){
                                 setState([{
-                                    startDate,
+                                    startDate: formattedBookingState.startDate,
                                     endDate: subDays(min(forbiddenDates), 1),
                                     key: 'selection'
                                 }])
