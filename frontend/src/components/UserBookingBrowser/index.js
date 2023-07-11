@@ -10,6 +10,9 @@ import OpenModalButton from '../OpenModalButton';
 import DeleteBookingModal from '../DeleteBookingModal';
 import "./UserBookingBrowser.css";
 
+const TODAY = new Date();
+const FORMATTEDTODAY = new Date(TODAY.getTime() - TODAY.getTimezoneOffset() * -60000 );
+
 const UserBookingBrowser = () => {
     const dispatch = useDispatch();
     const bookings = useSelector(state => Object.values(state.bookings.allBookings));
@@ -47,7 +50,7 @@ const UserBookingBrowser = () => {
                         const start = new Date(unAdjustedStart.getTime() - unAdjustedStart.getTimezoneOffset() * -60000 );
                         const unAdjustedEnd = new Date(book.endDate)
                         const end = new Date(unAdjustedEnd.getTime() - unAdjustedEnd.getTimezoneOffset() * -60000 );
-                        const isInProgress = isWithinInterval(new Date(), {start, end})
+                        const isInProgress = isWithinInterval(FORMATTEDTODAY, {start, end})
                         return (
                             <li key={spot["id"]} className='spot-card-list-item' style={isInProgress ? {border:"2.5px solid #f9385d", borderRadius:"20px"}:{}}>
                                 <Link to={`../spots/${spot["id"]}`} className='spot-card-link'>
