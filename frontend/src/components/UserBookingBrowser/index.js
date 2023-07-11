@@ -44,9 +44,13 @@ const UserBookingBrowser = () => {
                         const spot = book.Spot
                         if(!spot || book.expired) return (<></>)
                         console.log("frontend startDate", book.startDate)
-                        const start = new Date(book.startDate)
+                        console.log("frontend endDate", book.endDate)
+                        const unAdjustedStart = new Date(book.startDate)
+                        const start = new Date(unAdjustedStart.getTime() - unAdjustedStart.getTimezoneOffset() * -60000 );
+                        const unAdjustedEnd = new Date(book.endDate)
+                        const end = new Date(unAdjustedEnd.getTime() - unAdjustedEnd.getTimezoneOffset() * -60000 );
                         console.log("frontend startDate after conversion", start)
-                        const end = new Date(book.endDate)
+                        console.log("frontend endDate after conversion", end)
                         const isInProgress = isWithinInterval(new Date(), {start, end})
                         return (
                             <li key={spot["id"]} className='spot-card-list-item' style={isInProgress ? {border:"2.5px solid #f9385d", borderRadius:"20px"}:{}}>
