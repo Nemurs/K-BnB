@@ -5,7 +5,7 @@ import { Tooltip } from 'react-tooltip'
 import { loadOneThunk } from '../../store/singleSpot';
 import { addDays, addMonths, differenceInDays, eachDayOfInterval, isPast, isBefore, isSameDay, isWithinInterval, min, max, subDays, formatISO, eachWeekendOfMonth, isSunday } from 'date-fns';
 import { DateRange } from 'react-date-range';
-import { loadOneBookingThunk } from '../../store/singleBooking';
+import { loadOneBookingThunk, clearSingleBookingAction } from '../../store/singleBooking';
 import { createNewBookingThunk, editBookingThunk } from '../../store/allBookings';
 import OpenModalButton from '../OpenModalButton';
 import DeleteBookingModal from '../DeleteBookingModal';
@@ -42,6 +42,7 @@ const BookingForm = () => {
         if (!spot || spot.id !== id) {
             dispatch(loadOneThunk(id));
         }
+        clearSingleBookingAction();
         dispatch(loadOneBookingThunk(id));
     }, [dispatch]);
 
