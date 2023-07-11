@@ -101,11 +101,8 @@ router.post('/:spotId/bookings', requireAuth, validateBookingBody, async (req, r
 
   //Verify that start date is before end date
   let { startDate, endDate } = req.body;
-  console.log("this is the requested startDate", startDate);
   startDate = new Date(startDate);
-  console.log("this is the startDate", startDate);
   startDate = convertDateToUTC(startDate);
-  console.log("this is the utc startDate", startDate);
   endDate = new Date(endDate);
   endDate = convertDateToUTC(endDate);
 
@@ -167,24 +164,14 @@ router.post('/:spotId/bookings', requireAuth, validateBookingBody, async (req, r
 
   //Create booking with request body parameters
   startDate = `${startDate.getUTCFullYear()}-${startDate.getUTCMonth() + 1}-${startDate.getUTCDate()}`;
-  console.log("this is the db startDate", startDate);
   endDate = `${endDate.getUTCFullYear()}-${endDate.getUTCMonth() + 1}-${endDate.getUTCDate()}`;
   const userId = user.id;
   const spotId = Number(req.params.spotId);
 
   try {
-    let newBooking = await Booking.create({ userId, spotId, startDate, endDate }, { returning: false })
-    newBooking = newBooking.toJSON();
-    console.log("this is the db booking", newBooking);
-    // newBooking.id = (await Booking.findOne({
-    //   attributes: ["id", "spotId", "userId", "startDate", "endDate", "createdAt", "updatedAt"],
-    //   where: {
-    //     userId: user.id,
-    //     spotId: req.params.spotId
-    //   }
-    // })).id
+    let newBooking = await Booking.create({ userId, spotId, startDate, endDate }, { returning: false });
     res.statusCode = 200;
-    res.json(newBooking);
+    res.json(newBooking.toJSON());
   } catch (error) {
     return next(error)
   }

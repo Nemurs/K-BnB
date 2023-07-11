@@ -110,11 +110,7 @@ const BookingForm = () => {
         e.preventDefault();
 
         let start = state[0].startDate;
-        // let start = formatISO(state[0].startDate, { representation: 'date' })
-
         let end = state[0].endDate;
-        // let end = formatISO(state[0].endDate, { representation: 'date' })
-        // end = new Date(end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate())
 
         for (let forbiddenDate of forbiddenDates) {
             if (isSameDay(forbiddenDate, start) || isSameDay(forbiddenDate, end)) {
@@ -132,9 +128,6 @@ const BookingForm = () => {
             startDate: formatISO(state[0].startDate, { representation: 'date' }),
             endDate: formatISO(state[0].endDate, { representation: 'date' }),
         }
-
-        console.log(book);
-        // console.log(book.startDate);
 
         let bookRes = isBooked ? await dispatch(editBookingThunk({ bookingId: booking.id, book })) : await dispatch(createNewBookingThunk({ spotId: id, book }));
         if (bookRes.ok) {
