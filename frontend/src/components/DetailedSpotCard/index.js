@@ -20,7 +20,7 @@ const DetailedSpotCard = () => {
     const reviews = useSelector(state => Object.values(state.reviews.spot));
     reviews.sort((a, b) => Date.parse(b["createdAt"]) - Date.parse(a["createdAt"]));
     const booking = useSelector(state => state.bookings.singleBooking)
-    const isBooked = Object.values(booking).length > 0;
+    const isBooked = !booking.expired && Object.values(booking).length > 0;
 
     function processDate(dateString) {
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'Augus', 'September', 'October', 'November', 'December']
