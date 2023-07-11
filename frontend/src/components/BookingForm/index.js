@@ -49,23 +49,29 @@ const BookingForm = () => {
 
     useEffect(() => {
         if (isBooked) {
+            const unAdjustedStart = new Date(booking.startDate)
+            const startDate = new Date(unAdjustedStart.getTime() - unAdjustedStart.getTimezoneOffset() * -60000);
+            const unAdjustedEnd = new Date(booking.endDate)
+            const endDate = new Date(unAdjustedEnd.getTime() - unAdjustedEnd.getTimezoneOffset() * -60000);
             setState([{
-                startDate: new Date(booking.startDate),
-                endDate: new Date(booking.endDate),
+                startDate,
+                endDate,
                 key: 'selection'
             }])
         }
     }, [booking])
 
-    useEffect(()=> {
-        if(spot.Bookings){
+    useEffect(() => {
+        if (spot.Bookings) {
             setForbiddenDates(prev => {
                 let out = [];
                 spot.Bookings.forEach(book => {
-                    const start = new Date(book.startDate);
-                    const end =  new Date(book.endDate)
+                    const unAdjustedStart = new Date(book.startDate)
+                    const start = new Date(unAdjustedStart.getTime() - unAdjustedStart.getTimezoneOffset() * -60000);
+                    const unAdjustedEnd = new Date(book.endDate)
+                    const end = new Date(unAdjustedEnd.getTime() - unAdjustedEnd.getTimezoneOffset() * -60000);
                     if (!isPast(end) && book.id !== booking.id) {
-                        out.push(...eachDayOfInterval({ start, end}))
+                        out.push(...eachDayOfInterval({ start, end }))
                     }
                 });
                 return out;
@@ -73,15 +79,15 @@ const BookingForm = () => {
         }
     }, [spot])
 
-    useEffect(()=> {
-        if (!isBooked && forbiddenDates.length){
+    useEffect(() => {
+        if (!isBooked && forbiddenDates.length) {
             let start = TODAY;
             let minDate;
-            minDate = !isWithinInterval(TOMORROW, {start: min(forbiddenDates), end: max(forbiddenDates)}) ? TODAY : minDate;
-            while (!minDate){
+            minDate = !isWithinInterval(TOMORROW, { start: min(forbiddenDates), end: max(forbiddenDates) }) ? TODAY : minDate;
+            while (!minDate) {
                 const weekendDates = eachWeekendOfMonth(start)
-                for (let date of weekendDates){
-                    if(!isPast(date) && !forbiddenDates.some(fbd => fbd.toUTCString() === date.toUTCString())){
+                for (let date of weekendDates) {
+                    if (!isPast(date) && !forbiddenDates.some(fbd => fbd.toUTCString() === date.toUTCString())) {
                         minDate = date;
                         break;
                     }
@@ -117,7 +123,7 @@ const BookingForm = () => {
             }
         }
 
-        if (nightCount < 1){
+        if (nightCount < 1) {
             alert("You must select at least 1 night.");
             return;
         }
@@ -135,11 +141,11 @@ const BookingForm = () => {
             history.push(`../bookings/current`);
         } else {
             alert("Sorry, there was an error trying to book this spot.");
-                return;
+            return;
         }
     };
 
-    const isInProgress = isBooked && isWithinInterval(new Date(), {start:new Date(booking.startDate), end:new Date(booking.endDate)})
+    const isInProgress = isBooked && isWithinInterval(new Date(), { start: new Date(booking.startDate), end: new Date(booking.endDate) })
 
     return (
         <div className='create-new-booking-page'>
@@ -155,17 +161,20 @@ const BookingForm = () => {
                 <DateRange
                     editableDateInputs={true}
                     onChange={item => {
-                        if(isInProgress){
-                            if(!forbiddenDates.every(date=>isAfter(item.selection.endDate, date))){
+                        if (isInProgress) {
+                            const unAdjustedStart = new Date(booking.startDate)
+                            const startDate = new Date(unAdjustedStart.getTime() - unAdjustedStart.getTimezoneOffset() * -60000 );
+                            if (!forbiddenDates.every(date => isAfter(item.selection.endDate, date))) {
+
                                 setState([{
-                                    startDate: new Date(booking.startDate),
+                                    startDate,
                                     endDate: item.selection.endDate,
                                     key: 'selection'
                                 }])
                             } else {
                                 setState([{
-                                    startDate: new Date(booking.startDate),
-                                    endDate: subDays(min(forbiddenDates),1),
+                                    startDate,
+                                    endDate: subDays(min(forbiddenDates), 1),
                                     key: 'selection'
                                 }])
                             }
@@ -183,12 +192,12 @@ const BookingForm = () => {
                 <h4>{nightCount} night{nightCount === 1 ? "" : "s"} at ${spot.price} / night</h4>
                 <button className="reserve-button" type='submit'>{isBooked ? "Update Booking" : "Create Booking"}</button>
             </form>
-            {!isInProgress?
-            <OpenModalButton
-                buttonText="Cancel Booking"
-                cssClass={"user-spot-delete-button"}
-                modalComponent={<DeleteBookingModal bookingId={booking.id} />}
-            /> : <></>}
+            {!isInProgress ?
+                <OpenModalButton
+                    buttonText="Cancel Booking"
+                    cssClass={"user-spot-delete-button"}
+                    modalComponent={<DeleteBookingModal bookingId={booking.id} />}
+                /> : <></>}
             <Tooltip id="my-tooltip" place='right' />
         </div>
     )
