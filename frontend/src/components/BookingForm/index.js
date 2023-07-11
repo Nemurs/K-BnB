@@ -22,11 +22,11 @@ const BookingForm = () => {
     const dispatch = useDispatch();
     const history = useHistory();
     const { id } = useParams();
-    const user = useSelector(state => state.session.user)
+    const user = useSelector(state => state.session.user);
     const spot = useSelector(state => state.spots.singleSpot);
 
-    const booking = useSelector(state => state.bookings.singleBooking)
-    const isBooked = Object.values(booking).length > 0;
+    const booking = useSelector(state => state.bookings.singleBooking);
+    const isBooked = !booking.expired && Object.values(booking).length > 0;
 
     const [nightCount, setNightCount] = useState(1);
     const [forbiddenDates, setForbiddenDates] = useState([]);
@@ -42,7 +42,7 @@ const BookingForm = () => {
         if (!spot || spot.id !== id) {
             dispatch(loadOneThunk(id));
         }
-        dispatch(loadOneBookingThunk(id))
+        dispatch(loadOneBookingThunk(id));
     }, [dispatch]);
 
     useEffect(() => {
