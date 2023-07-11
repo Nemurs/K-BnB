@@ -42,7 +42,7 @@ const BookingForm = () => {
         if (!spot || spot.id !== id) {
             dispatch(loadOneThunk(id));
         }
-        clearSingleBookingAction();
+        dispatch(clearSingleBookingAction());
         dispatch(loadOneBookingThunk(id));
     }, [dispatch]);
 
@@ -144,6 +144,7 @@ const BookingForm = () => {
 
         let bookRes = isBooked ? await dispatch(editBookingThunk({ bookingId: booking.id, book })) : await dispatch(createNewBookingThunk({ spotId: id, book }));
         if (bookRes.ok) {
+            await dispatch(clearSingleBookingAction());
             history.push(`../bookings/current`);
         } else {
             alert("Sorry, there was an error trying to book this spot.");

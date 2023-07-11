@@ -31,7 +31,7 @@ const DetailedSpotCard = () => {
     useEffect(() => {
         dispatch(loadOneThunk(id));
         dispatch(loadAllReviewsThunk(id));
-        clearSingleBookingAction();
+        dispatch(clearSingleBookingAction());
         dispatch(loadOneBookingThunk(id));
     }, [dispatch]);
 
