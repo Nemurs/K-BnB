@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loadOneThunk } from "../../store/singleSpot";
-import { loadOneBookingThunk } from '../../store/singleBooking';
+import { loadOneBookingThunk, clearSingleBookingAction } from '../../store/singleBooking';
 import { loadAllReviewsThunk } from "../../store/singleSpotReviews";
 import placeHolderImage from "../../Assets/Images/No-Image-Placeholder.png";
 import ReserveSpot from "../ReserveSpot";
@@ -31,6 +31,7 @@ const DetailedSpotCard = () => {
     useEffect(() => {
         dispatch(loadOneThunk(id));
         dispatch(loadAllReviewsThunk(id));
+        clearSingleBookingAction();
         dispatch(loadOneBookingThunk(id));
     }, [dispatch]);
 
