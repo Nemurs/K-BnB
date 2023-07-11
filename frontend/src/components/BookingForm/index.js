@@ -84,7 +84,7 @@ const BookingForm = () => {
                 return out;
             })
         }
-    }, [spot])
+    }, [spot, booking])
 
     useEffect(() => {
         if (!isBooked && forbiddenDates.length) {
