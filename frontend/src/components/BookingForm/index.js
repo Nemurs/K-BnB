@@ -89,9 +89,7 @@ const BookingForm = () => {
         if (!isBooked && forbiddenDates.length) {
             let start = TODAY;
             let minDate;
-            console.log(forbiddenDates)
             minDate = isWithinInterval(FORMATTEDTODAY, { start: min(forbiddenDates), end: max(forbiddenDates)}) || isWithinInterval(TOMORROW, { start: min(forbiddenDates), end: max(forbiddenDates)}) ? minDate : TODAY;
-            console.log(minDate)
             while (!minDate) {
                 const weekendDates = eachWeekendOfMonth(start)
                 for (let date of weekendDates) {
