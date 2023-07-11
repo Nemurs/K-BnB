@@ -27,7 +27,7 @@ const BookingForm = () => {
     const booking = useSelector(state => state.bookings.singleBooking)
     const isBooked = Object.values(booking).length > 0;
 
-    const [nightCount, setNightCount] = useState(2);
+    const [nightCount, setNightCount] = useState(1);
     const [forbiddenDates, setForbiddenDates] = useState([]);
     const [state, setState] = useState([{
         startDate: TODAY,
@@ -185,7 +185,7 @@ const BookingForm = () => {
                 <h4>{nightCount} night{nightCount === 1 ? "" : "s"} at ${spot.price} / night</h4>
                 <button className="reserve-button" type='submit'>{isBooked ? "Update Booking" : "Create Booking"}</button>
             </form>
-            {!isInProgress ?
+            {isBooked && !isInProgress ?
                 <OpenModalButton
                     buttonText="Cancel Booking"
                     cssClass={"user-spot-delete-button"}
